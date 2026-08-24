@@ -1,0 +1,78 @@
+/* Дизайн 3 «Аналитика» — светлая бумага, одна колонка, плотные строки:
+   слева название, справа число, под ними длинная шкала во всю ширину.
+   Максимум данных на экран, спокойный контраст. */
+
+body[data-theme="paper"] { background: #f6f3ec; color: #1d1b16; }
+body[data-theme="paper"] .app { max-width: 760px; padding: 12px 12px 28px 12px; }
+
+body[data-theme="paper"] .topbar { border-bottom: 1px solid #cfc7b6; padding-bottom: 8px; align-items: center; }
+body[data-theme="paper"] .clock { font-size: 40px; line-height: 1; letter-spacing: -0.04em; }
+body[data-theme="paper"] .date { font-size: 12px; color: #6d6553; letter-spacing: 0.04em; text-transform: uppercase; }
+body[data-theme="paper"] .place { font-size: 16px; letter-spacing: 0.02em; }
+body[data-theme="paper"] .updated { font-size: 12px; color: #6d6553; }
+body[data-theme="paper"] .cond { font-size: 12px; color: #4a4436; }
+
+body[data-theme="paper"] .btn {
+  border-width: 1px; border-color: #b9b0a0; color: #2c2820; background: #fffdf8;
+  border-radius: 4px; font-size: 13px;
+}
+body[data-theme="paper"] .btn:active { background: #ece6da; }
+body[data-theme="paper"] .input { border-width: 1px; border-color: #b9b0a0; border-radius: 4px; background: #fffdf8; }
+body[data-theme="paper"] .panel { border-width: 1px; border-color: #cfc7b6; border-radius: 6px; background: #fffdf8; }
+body[data-theme="paper"] .hint { font-size: 12px; color: #6d6553; }
+
+body[data-theme="paper"] .cards { display: block; margin-top: 10px; }
+body[data-theme="paper"] .card {
+  display: block; margin: 0 0 2px 0; padding: 10px 0 12px 0;
+  border-bottom: 1px solid #ddd6c8; border-left: 4px solid transparent; padding-left: 10px;
+}
+body[data-theme="paper"] .card-head { display: block; }
+body[data-theme="paper"] .card-title {
+  font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #6d6553; display: inline-block;
+}
+body[data-theme="paper"] .card-badge { font-size: 10px; color: #8b8271; margin-left: 8px; letter-spacing: 0.1em; }
+/* Число и подпись зоны — в одну строку, число прижато влево, зона справа. */
+body[data-theme="paper"] .card-value-row { margin-top: -2px; }
+body[data-theme="paper"] .card-value { font-size: 34px; letter-spacing: -0.03em; }
+body[data-theme="paper"] .card-unit { font-size: 13px; color: #6d6553; }
+body[data-theme="paper"] .card-band { font-size: 13px; margin-top: 4px; letter-spacing: 0.02em; }
+body[data-theme="paper"] .card-note { font-size: 12px; color: #6d6553; margin-top: 2px; }
+body[data-theme="paper"] .scale-ends { font-size: 10px; color: #8b8271; margin-top: 3px; }
+body[data-theme="paper"] .spark-cap { font-size: 10px; color: #8b8271; letter-spacing: 0.1em; text-transform: uppercase; }
+body[data-theme="paper"] .footbar { font-size: 11px; color: #8b8271; margin-top: 12px; }
+body[data-theme="paper"] .empty { background: #fffdf8; border: 1px solid #cfc7b6; border-radius: 6px; }
+
+/* Тонкая длинная шкала с зазорами — как измерительная линейка. */
+body[data-theme="paper"] .scale { padding-top: 11px; }
+body[data-theme="paper"] .seg { height: 8px; margin-right: 3px; }
+body[data-theme="paper"] .seg-off { background: #e2dccf; }
+body[data-theme="paper"] .scale-marker { border-top-color: #1d1b16; border-top-width: 8px; }
+body[data-theme="paper"] .spark { height: 34px; }
+body[data-theme="paper"] .spark-bar { background: #e2dccf; }
+
+body[data-theme="paper"] .seg-on.lv-deep, body[data-theme="paper"] .spark-bar.lv-deep { background: #4b4396; }
+body[data-theme="paper"] .seg-on.lv-cold, body[data-theme="paper"] .spark-bar.lv-cold { background: #3a63a8; }
+body[data-theme="paper"] .seg-on.lv-calm, body[data-theme="paper"] .spark-bar.lv-calm { background: #3f8ea8; }
+body[data-theme="paper"] .seg-on.lv-good, body[data-theme="paper"] .spark-bar.lv-good { background: #3f7f4b; }
+body[data-theme="paper"] .seg-on.lv-mid,  body[data-theme="paper"] .spark-bar.lv-mid  { background: #a08b2e; }
+body[data-theme="paper"] .seg-on.lv-warn, body[data-theme="paper"] .spark-bar.lv-warn { background: #b2712f; }
+body[data-theme="paper"] .seg-on.lv-bad,  body[data-theme="paper"] .spark-bar.lv-bad  { background: #a83f2c; }
+body[data-theme="paper"] .seg-on.lv-crit, body[data-theme="paper"] .spark-bar.lv-crit { background: #6f2320; }
+
+body[data-theme="paper"] .lv-deep-card { border-left-color: #4b4396; }
+body[data-theme="paper"] .lv-cold-card { border-left-color: #3a63a8; }
+body[data-theme="paper"] .lv-calm-card { border-left-color: #3f8ea8; }
+body[data-theme="paper"] .lv-good-card { border-left-color: #3f7f4b; }
+body[data-theme="paper"] .lv-mid-card  { border-left-color: #a08b2e; }
+body[data-theme="paper"] .lv-warn-card { border-left-color: #b2712f; }
+body[data-theme="paper"] .lv-bad-card  { border-left-color: #a83f2c; }
+body[data-theme="paper"] .lv-crit-card { border-left-color: #6f2320; }
+
+body[data-theme="paper"] .lv-deep-text { color: #4b4396; }
+body[data-theme="paper"] .lv-cold-text { color: #3a63a8; }
+body[data-theme="paper"] .lv-calm-text { color: #35768c; }
+body[data-theme="paper"] .lv-good-text { color: #3f7f4b; }
+body[data-theme="paper"] .lv-mid-text  { color: #8a761f; }
+body[data-theme="paper"] .lv-warn-text { color: #9c6027; }
+body[data-theme="paper"] .lv-bad-text  { color: #a83f2c; }
+body[data-theme="paper"] .lv-crit-text { color: #6f2320; }

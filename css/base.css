@@ -1,0 +1,80 @@
+/* base.css — только каркас и геометрия. Цвета и характер — в файлах тем.
+   Сознательно без CSS-переменных и grid: браузер PocketBook их не знает. */
+
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body {
+  font-family: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
+  -webkit-text-size-adjust: 100%;
+  line-height: 1.25;
+}
+img { max-width: 100%; }
+button, input { font-family: inherit; font-size: inherit; }
+
+.app { max-width: 1100px; margin: 0 auto; padding: 10px 10px 24px 10px; }
+
+/* ---- шапка ---- */
+.topbar { display: flex; flex-wrap: wrap; align-items: flex-end; }
+.clock-block { flex: 0 0 auto; margin-right: 16px; }
+.clock { font-weight: 700; letter-spacing: -0.02em; }
+.date { }
+.place-block { flex: 1 1 160px; min-width: 0; }
+.place { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.updated, .cond { }
+.tools { flex: 0 0 auto; display: flex; flex-wrap: wrap; }
+
+.btn {
+  display: inline-block; margin: 3px 0 3px 6px; padding: 8px 12px;
+  border-width: 2px; border-style: solid; background: transparent;
+  cursor: pointer; -webkit-appearance: none; appearance: none;
+}
+.input { flex: 1 1 160px; padding: 8px 10px; border-width: 2px; border-style: solid; }
+
+/* ---- панель настроек ---- */
+.panel { margin-top: 10px; padding: 10px; border-width: 2px; border-style: solid; }
+.panel-row { display: flex; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
+.found { list-style: none; margin: 0; padding: 0; width: 100%; }
+.found-item { margin: 0; }
+.btn-found { display: block; width: 100%; text-align: left; margin-left: 0; }
+.hint { margin: 4px 0 0 0; }
+
+/* ---- карточки ---- */
+.cards { display: flex; flex-wrap: wrap; margin-top: 12px; }
+.card { flex: 1 1 260px; margin: 0 8px 12px 0; padding: 10px 12px; min-width: 0; }
+.card-head { display: flex; align-items: baseline; justify-content: space-between; }
+.card-title { margin: 0; font-weight: 700; }
+.card-badge { }
+.card-value-row { display: flex; align-items: baseline; }
+.card-value { font-weight: 700; letter-spacing: -0.03em; }
+.card-unit { margin-left: 6px; }
+.card-band { font-weight: 700; }
+.card-note { }
+.empty { padding: 20px; }
+
+/* ---- шкала интенсивности ---- */
+.scale { position: relative; padding-top: 10px; }
+.scale-track { display: flex; width: 100%; }
+.seg { flex: 1 1 0; height: 16px; margin-right: 2px; }
+.seg:last-child { margin-right: 0; }
+.scale-marker {
+  position: absolute; top: 0; margin-left: -6px;
+  width: 0; height: 0;
+  border-left: 6px solid transparent;
+  border-right: 6px solid transparent;
+  border-top-width: 9px; border-top-style: solid;
+}
+.scale-ends { display: flex; justify-content: space-between; }
+
+/* ---- мини-график (барограмма и прогноз) ---- */
+.spark { display: flex; align-items: flex-end; height: 42px; margin-top: 8px; }
+.spark-bar { flex: 1 1 0; margin-right: 1px; min-height: 2px; }
+.spark-bar:last-child { margin-right: 0; }
+.spark-gap { height: 2px; }
+.spark-cap { }
+
+.footbar { margin-top: 6px; }
+
+/* На узком экране — одна колонка. */
+@media (max-width: 430px) {
+  .card { flex: 1 1 100%; margin-right: 0; }
+}

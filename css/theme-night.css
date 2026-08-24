@@ -1,0 +1,66 @@
+/* Дизайн 2 «Тёмный» — для телефона: плитки 2 в ряд, крупный акцент сверху,
+   мягкие скругления, приглушённый фон, шкала — сплошная полоса без рамок. */
+
+body[data-theme="night"] { background: #0b0f14; color: #e8eef5; }
+body[data-theme="night"] .app { padding: 14px 12px 28px 12px; }
+
+body[data-theme="night"] .topbar {
+  background: #131a22; border-radius: 18px; padding: 14px 16px; align-items: center;
+}
+body[data-theme="night"] .clock { font-size: 46px; line-height: 1; color: #ffffff; }
+body[data-theme="night"] .date { font-size: 13px; color: #8ea0b5; margin-top: 4px; }
+body[data-theme="night"] .place { font-size: 17px; color: #ffffff; }
+body[data-theme="night"] .updated { font-size: 12px; color: #7f93a8; }
+body[data-theme="night"] .cond { font-size: 13px; color: #9ec2e6; }
+
+body[data-theme="night"] .btn {
+  border-radius: 12px; border-color: #26313d; background: #1b232d; color: #cfe0f0; font-size: 13px;
+}
+body[data-theme="night"] .btn:active { background: #2a3542; }
+body[data-theme="night"] .input { border-radius: 12px; border-color: #26313d; background: #121820; color: #e8eef5; }
+body[data-theme="night"] .panel { border-radius: 16px; border-color: #26313d; background: #131a22; }
+body[data-theme="night"] .hint { font-size: 13px; color: #8ea0b5; }
+
+body[data-theme="night"] .cards { margin-top: 12px; }
+body[data-theme="night"] .card {
+  background: #141b23; border-radius: 18px; padding: 12px 14px 14px 14px;
+  flex: 1 1 44%; margin: 0 8px 10px 0; border: 1px solid #1e2733;
+}
+/* Первая карточка (температура) — во всю ширину, как главный показатель. */
+body[data-theme="night"] .card[data-metric="temp"] { flex: 1 1 100%; margin-right: 0; }
+body[data-theme="night"] .card[data-metric="temp"] .card-value { font-size: 64px; }
+
+body[data-theme="night"] .card-title { font-size: 13px; color: #8ea0b5; text-transform: uppercase; letter-spacing: 0.06em; }
+body[data-theme="night"] .card-badge { font-size: 10px; color: #7f93a8; border: 1px solid #26313d; border-radius: 6px; padding: 1px 5px; }
+body[data-theme="night"] .card-value { font-size: 38px; color: #ffffff; margin-top: 2px; }
+body[data-theme="night"] .card-unit { font-size: 14px; color: #8ea0b5; }
+body[data-theme="night"] .card-band { font-size: 14px; margin-top: 6px; }
+body[data-theme="night"] .card-note { font-size: 12px; color: #8ea0b5; margin-top: 3px; }
+body[data-theme="night"] .scale-ends { font-size: 10px; color: #5f7186; }
+body[data-theme="night"] .spark-cap { font-size: 11px; color: #6f8299; margin-top: 4px; }
+body[data-theme="night"] .footbar { font-size: 11px; color: #6f8299; text-align: center; margin-top: 10px; }
+body[data-theme="night"] .empty { background: #141b23; border-radius: 18px; color: #8ea0b5; }
+
+body[data-theme="night"] .seg { height: 10px; margin-right: 2px; border-radius: 3px; }
+body[data-theme="night"] .seg-off { background: #222c37; }
+body[data-theme="night"] .scale-marker { border-top-color: #ffffff; }
+body[data-theme="night"] .spark-bar { border-radius: 2px; background: #222c37; }
+body[data-theme="night"] .spark { height: 36px; }
+
+body[data-theme="night"] .seg-on.lv-deep, body[data-theme="night"] .spark-bar.lv-deep { background: #7b6cf6; }
+body[data-theme="night"] .seg-on.lv-cold, body[data-theme="night"] .spark-bar.lv-cold { background: #4d8dfd; }
+body[data-theme="night"] .seg-on.lv-calm, body[data-theme="night"] .spark-bar.lv-calm { background: #35bdf0; }
+body[data-theme="night"] .seg-on.lv-good, body[data-theme="night"] .spark-bar.lv-good { background: #35c46a; }
+body[data-theme="night"] .seg-on.lv-mid,  body[data-theme="night"] .spark-bar.lv-mid  { background: #e3c74a; }
+body[data-theme="night"] .seg-on.lv-warn, body[data-theme="night"] .spark-bar.lv-warn { background: #f08a3c; }
+body[data-theme="night"] .seg-on.lv-bad,  body[data-theme="night"] .spark-bar.lv-bad  { background: #ef5b45; }
+body[data-theme="night"] .seg-on.lv-crit, body[data-theme="night"] .spark-bar.lv-crit { background: #b2352a; }
+
+body[data-theme="night"] .lv-deep-text { color: #a79bff; }
+body[data-theme="night"] .lv-cold-text { color: #7fb0ff; }
+body[data-theme="night"] .lv-calm-text { color: #6fd3f7; }
+body[data-theme="night"] .lv-good-text { color: #5fd98c; }
+body[data-theme="night"] .lv-mid-text  { color: #ecd873; }
+body[data-theme="night"] .lv-warn-text { color: #f6a670; }
+body[data-theme="night"] .lv-bad-text  { color: #ff8574; }
+body[data-theme="night"] .lv-crit-text { color: #ff6b5c; }
