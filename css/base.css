@@ -1,5 +1,6 @@
-/* base.css — только каркас и геометрия. Цвета и характер — в файлах тем.
-   Сознательно без CSS-переменных и grid: браузер PocketBook их не знает. */
+/* base.css — structure and geometry only. Colour and character live in the
+   theme files. Deliberately no CSS custom properties and no grid: the
+   PocketBook browser understands neither. */
 
 * { box-sizing: border-box; }
 html, body { margin: 0; padding: 0; }
@@ -13,7 +14,7 @@ button, input { font-family: inherit; font-size: inherit; }
 
 .app { max-width: 1100px; margin: 0 auto; padding: 10px 10px 24px 10px; }
 
-/* ---- шапка ---- */
+/* ---- header ---- */
 .topbar { display: flex; flex-wrap: wrap; align-items: flex-end; }
 .clock-block { flex: 0 0 auto; margin-right: 16px; }
 .clock { font-weight: 700; letter-spacing: -0.02em; }
@@ -30,7 +31,7 @@ button, input { font-family: inherit; font-size: inherit; }
 }
 .input { flex: 1 1 160px; padding: 8px 10px; border-width: 2px; border-style: solid; }
 
-/* ---- панель настроек ---- */
+/* ---- settings panel ---- */
 .panel { margin-top: 10px; padding: 10px; border-width: 2px; border-style: solid; }
 .panel-row { display: flex; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
 .found { list-style: none; margin: 0; padding: 0; width: 100%; }
@@ -38,7 +39,7 @@ button, input { font-family: inherit; font-size: inherit; }
 .btn-found { display: block; width: 100%; text-align: left; margin-left: 0; }
 .hint { margin: 4px 0 0 0; }
 
-/* ---- карточки ---- */
+/* ---- cards ---- */
 .cards { display: flex; flex-wrap: wrap; margin-top: 12px; }
 .card { flex: 1 1 260px; margin: 0 8px 12px 0; padding: 10px 12px; min-width: 0; }
 .card-head { display: flex; align-items: baseline; justify-content: space-between; }
@@ -51,7 +52,7 @@ button, input { font-family: inherit; font-size: inherit; }
 .card-note { }
 .empty { padding: 20px; }
 
-/* ---- шкала интенсивности ---- */
+/* ---- intensity scale ---- */
 .scale { position: relative; padding-top: 10px; }
 .scale-track { display: flex; width: 100%; }
 .seg { flex: 1 1 0; height: 16px; margin-right: 2px; }
@@ -65,7 +66,7 @@ button, input { font-family: inherit; font-size: inherit; }
 }
 .scale-ends { display: flex; justify-content: space-between; }
 
-/* ---- мини-график (барограмма и прогноз) ---- */
+/* ---- mini chart (barogram and forecast) ---- */
 .spark { display: flex; align-items: flex-end; height: 42px; margin-top: 8px; }
 .spark-bar { flex: 1 1 0; margin-right: 1px; min-height: 2px; }
 .spark-bar:last-child { margin-right: 0; }
@@ -74,7 +75,7 @@ button, input { font-family: inherit; font-size: inherit; }
 
 .footbar { margin-top: 6px; }
 
-/* На узком экране — одна колонка. */
+/* Narrow screens fall back to a single column. */
 @media (max-width: 430px) {
   .card { flex: 1 1 100%; margin-right: 0; }
 }

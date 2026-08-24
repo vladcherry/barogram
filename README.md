@@ -1,127 +1,144 @@
-# Barogram — погода со шкалами интенсивности
+# Barogram — weather with intensity scales
 
-PWA-погода для **PocketBook Verse Pro Color** и обычного телефона. Рядом с каждой
-цифрой — шкала интенсивности: видно не только «6.2 м/с», но и где это значение
-находится между штилем и штормом.
+A weather PWA for the **PocketBook Verse Pro Color** e-reader and for ordinary
+phones. Next to every number there is an intensity scale, so you see not just
+"6.2 m/s" but where that value sits between dead calm and a storm.
 
-Три готовых дизайна переключаются кнопкой **«Дизайн»** прямо в приложении.
+Three designs ship with the app and are switched with the **Design** button.
 
-| 1 · E-Ink | 2 · Тёмный | 3 · Аналитика |
+| 1 · E-Ink | 2 · Night | 3 · Analytics |
 |---|---|---|
 | ![](docs/design-1-eink.png) | ![](docs/design-2-night.png) | ![](docs/design-3-paper.png) |
 
-## Дизайны
+## Designs
 
-1. **E-Ink** (`eink`) — для электронных чернил Verse Pro Color: белый фон, чёрные
-   рамки 3 px, огромные цифры, шкала — крупные блоки в обводке. Никаких теней,
-   градиентов и анимаций: на e-ink полутона размываются, а перерисовка дорогая.
-   Цвет используется только в шкалах — там, где Kaleido его действительно покажет.
-2. **Тёмный** (`night`) — для телефона: плитки 2 в ряд, температура во всю ширину,
-   скругления 18 px, тонкая сплошная шкала. Тёмный фон экономит OLED и не слепит ночью.
-3. **Аналитика** (`paper`) — светлая «бумага», одна колонка, плотные строки:
-   слева название, крупное число, под ним длинная шкала-линейка во всю ширину и
-   цветная метка зоны слева от карточки. Максимум данных на один экран.
+1. **E-Ink** (`eink`) — for the Kaleido screen of the Verse Pro Color: white
+   background, 3 px black borders, oversized numbers, the scale drawn as large
+   outlined blocks. No shadows, gradients or animation — half-tones smear on
+   e-ink and repaints are expensive. Colour appears only inside the scales,
+   where Kaleido actually shows it.
+2. **Night** (`night`) — for phones: two tiles per row, temperature across the
+   full width, 18 px corners, a thin solid scale bar. The dark background is
+   easy on an OLED panel and on the eyes at night.
+3. **Analytics** (`paper`) — light paper, a single column of dense rows: label,
+   large number, a full-width ruler-like scale and a coloured band marker down
+   the left edge of the card. Maximum data per screen.
 
-Выбранный дизайн запоминается. Для скриншотов и отладки работает `?theme=night`.
+The chosen design is remembered. `?theme=night` forces one, which is handy for
+screenshots.
 
-## Что показывает
+## What it shows
 
-Для каждого показателя: число, шкала с цветными зонами, бегунок на текущем значении
-и словесная оценка зоны.
+Every reading comes with a number, a scale with coloured bands, a marker at the
+current value and a verbal band label.
 
-| Карточка | Шкала | Зоны |
+| Card | Scale | Bands |
 |---|---|---|
-| Температура | −20…45 °C | мороз → комфорт → пекло |
-| Ветер | 0…25 м/с | штиль → умеренный → шторм (по шкале Бофорта) |
-| Осадки | 0…10 мм/ч | сухо → морось → ливень, плюс вероятность и сумма за сутки |
-| Облачность | 0…100 % | ясно → пасмурно, плюс расшифровка кода погоды |
-| УФ-индекс | 0…12 | низкий → экстремальный (границы ВОЗ) |
-| Влажность | 0…100 % | очень сухо → комфорт 40–60 % → духота |
-| Давление | 980…1040 гПа | плюс мм рт. ст., тенденция за 3 ч и **барограмма за 24 ч** |
-| Волны | 0…3 м | зеркало → шторм, период волны и температура воды |
-| Снорклинг | индекс 0…10 | считается из волны, воды, ветра, дождя и освещённости |
-| Велосипед | индекс 0…10 | считается из температуры, ветра с порывами, дождя, УФ и духоты |
+| Temperature | −20…45 °C | severe frost → comfortable → scorching |
+| Wind | 0…25 m/s | calm → moderate → storm (Beaufort boundaries) |
+| Precipitation | 0…10 mm/h | dry → drizzle → downpour, plus probability and 24 h total |
+| Cloud cover | 0…100 % | clear → overcast, plus the decoded weather code |
+| UV index | 0…12 | low → extreme (WHO boundaries) |
+| Humidity | 0…100 % | very dry → 40–60 % comfort range → muggy |
+| Pressure | 980…1040 hPa | plus mmHg, the 3-hour tendency and a **24 h barogram** |
+| Waves | 0…3 m | glassy → storm, with wave period and water temperature |
+| Snorkeling | index 0…10 | from waves, water temperature, wind, rain and light |
+| Cycling | index 0…10 | from temperature, wind with gusts, rain, UV and mugginess |
 
-Индексы комфорта считаются в `js/metrics.js` (`snorkel`, `bike`): каждое условие
-даёт штраф, из 10 вычитается сумма штрафов, и в подписи перечисляется, что именно
-испортило оценку («минусы: волна 0.42 м, ветер 6 м/с»).
+The comfort indices live in `js/metrics.js` (`snorkel`, `bike`): each condition
+adds a penalty, the penalties are subtracted from 10, and the card lists what
+actually cost the points ("downsides: waves 0.42 m, wind 6 m/s").
 
-Под температурой и осадками — столбики на ближайшие 24 ч, под давлением —
-барограмма за прошедшие сутки.
+Temperature and precipitation carry 24-hour forecast bars; pressure carries the
+barogram of the past 24 hours.
 
-## Данные
+## Data
 
-[Open-Meteo](https://open-meteo.com/) — без ключей и регистрации:
+[Open-Meteo](https://open-meteo.com/) — no key, no signup:
 
-* `api.open-meteo.com/v1/forecast` — погода, почасовой ряд, суточные максимумы;
-* `marine-api.open-meteo.com/v1/marine` — волны и температура воды (вглубь суши
-  данных нет, карточки волн и снорклинга это честно показывают);
-* `geocoding-api.open-meteo.com/v1/search` — поиск города по названию.
+* `api.open-meteo.com/v1/forecast` — current values, hourly series, daily extremes;
+* `marine-api.open-meteo.com/v1/marine` — waves and water temperature (inland
+  there is none, and the waves and snorkeling cards say so plainly);
+* `geocoding-api.open-meteo.com/v1/search` — city lookup by name.
 
-Место задаётся кнопкой «Моё местоположение» (Geolocation API) или поиском города.
-Координаты и последний снимок погоды лежат в `localStorage`, поэтому приложение
-сразу открывается с данными даже без сети.
+The place comes either from the Geolocation API ("My location") or from the city
+search. Coordinates and the last weather snapshot are kept in `localStorage`, so
+the app opens with data even with no network.
 
-## Обновление раз в час и часы раз в минуту
+## Hourly updates, minute-accurate clock
 
-* **Часы** пересчитываются по границе минуты (`setTimeout` до следующей `:00`
-  секунды, без накопления дрейфа), а не раз в 60 с от момента запуска.
-* **Погода** обновляется в начале каждого часа + 20 с — Open-Meteo отдаёт
-  почасовые значения, чаще смысла нет.
-* **Фон.** Кнопка «Фоновое обновление» просит разрешение на уведомления и
-  регистрирует Periodic Background Sync (`sw.js`, тег `barogram-hourly`,
-  `minInterval` 1 час). При срабатывании service worker забирает свежий прогноз,
-  кладёт его в кеш и показывает уведомление — оно и будит экран устройства.
-* **Возврат в приложение.** По `visibilitychange` данные старше 30 минут
-  перезапрашиваются сразу.
-* **Не гасить экран** — `navigator.wakeLock` для режима «настольные часы».
+* **The clock** re-renders on the minute boundary (a `setTimeout` to the next
+  `:00` second, so it never drifts), not every 60 s from launch.
+* **The weather** refreshes 20 seconds past every hour — Open-Meteo publishes
+  hourly values, more often buys nothing.
+* **Background.** The "Background updates" button asks for notification
+  permission and registers Periodic Background Sync (`sw.js`, tag
+  `barogram-hourly`, `minInterval` one hour). When it fires, the service worker
+  pulls a fresh forecast, caches it and posts a notification — and that
+  notification is what wakes the device screen.
+* **Coming back to the app.** On `visibilitychange`, data older than 30 minutes
+  is re-fetched immediately.
+* **Keep screen on** uses `navigator.wakeLock` for desk-clock mode.
 
-Честно о границах: разбудить спящее устройство из веб-страницы можно только
-средствами ОС. Periodic Background Sync есть в Chromium-браузерах и только для
-установленного PWA, и браузер сам решает, как часто его вызывать. Штатный браузер
-PocketBook его почти наверняка не поддержит — там рабочая схема такая: приложение
-открыто, Wake Lock включён, обновление идёт по часовому таймеру страницы.
+Being honest about the limits: a web page can only wake a sleeping device
+through the OS. Periodic Background Sync exists in Chromium browsers, only for
+an installed PWA, and the browser decides how often to actually call it. The
+stock PocketBook browser almost certainly does not support it; there the working
+setup is the app kept open with the wake lock on, refreshing on the page's own
+hourly timer.
 
-## Запуск
+## Language
 
-Нужен любой статический сервер (service worker требует http(s) или localhost):
+All strings live in `js/i18n.js`. English is the source language, Russian is a
+locale on top of it. The locale is picked from the browser, can be forced with
+`?lang=ru`, is switchable from the **Place** panel and is remembered.
+
+## Running it
+
+Any static server works (a service worker needs http(s) or localhost):
 
 ```bash
 python3 -m http.server 8777
-# затем открыть http://localhost:8777/
+# then open http://localhost:8777/
 ```
 
-Посмотреть вёрстку без сети: `http://localhost:8777/?demo=1`.
+To review the layout with no network: `http://localhost:8777/?demo=1`.
 
-На PocketBook: положить папку на устройство и открыть `index.html` в браузере, либо
-разместить на любом https-хостинге (GitHub Pages подойдёт) и добавить на главный экран.
+On a PocketBook: copy the folder onto the device and open `index.html` in the
+browser, or host it anywhere over https (GitHub Pages is enough) and add it to
+the home screen.
 
-## Совместимость
+## Compatibility
 
-Браузер PocketBook сильно старше телефонного, поэтому в коде сознательно:
+The PocketBook browser is far older than a phone's, so the code deliberately
+sticks to:
 
-* обычный ES5 — `var`, `function`, конкатенация строк, без стрелок, классов и `?.`;
-* запросы через `XMLHttpRequest`, а не `fetch` (в service worker — `fetch`, там он есть);
-* CSS без переменных и без `grid` — только flexbox и явные цвета в темах;
-* никаких сборщиков и зависимостей: файлы подключаются тегами `<script>`.
+* plain ES5 — `var`, `function`, string concatenation, no arrow functions,
+  classes or optional chaining;
+* `XMLHttpRequest` instead of `fetch` (the service worker uses `fetch`, which
+  exists wherever service workers do);
+* CSS without custom properties and without `grid` — flexbox and explicit
+  colours per theme;
+* no bundler and no dependencies: files are included with plain `<script>` tags.
 
-Если сервер не примет расширенный набор параметров запроса, `js/weather.js`
-повторяет запрос минимальным набором полей, и приложение всё равно показывает погоду.
+If the server rejects the extended parameter set, `js/weather.js` retries with a
+minimal set of fields so the app still shows the weather.
 
-## Структура
+## Layout
 
 ```
-index.html              разметка (одна для всех трёх дизайнов)
-css/base.css            каркас и геометрия
-css/theme-eink.css      дизайн 1
-css/theme-night.css     дизайн 2
-css/theme-paper.css     дизайн 3
-js/util.js              помощники, XHR, форматирование, коды погоды
-js/store.js             настройки и кеш в localStorage
-js/metrics.js           зоны шкал и формулы индексов комфорта
-js/scale.js             отрисовка шкалы, карточки и мини-графиков
-js/weather.js           Open-Meteo: запросы и нормализация
-js/app.js               экран, часы, расписание, фоновая работа
-sw.js                   офлайн-кеш, почасовой periodicsync, уведомления
-tools/make_icons.py     генерация PNG-иконок без внешних библиотек
+index.html              markup (one shell for all three designs)
+css/base.css            structure and geometry
+css/theme-eink.css      design 1
+css/theme-night.css     design 2
+css/theme-paper.css     design 3
+js/i18n.js              all user-facing strings: English source + Russian locale
+js/util.js              helpers, XHR, formatting, weather codes
+js/store.js             settings and cache in localStorage
+js/metrics.js           scale bands and comfort-index maths
+js/scale.js             scale, card and mini-chart rendering
+js/weather.js           Open-Meteo requests and normalisation
+js/app.js               screen, clock, schedule, background work
+sw.js                   offline cache, hourly periodicsync, notifications
+tools/make_icons.py     PNG icon generation with no third-party libraries
 ```

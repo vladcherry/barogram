@@ -1,20 +1,21 @@
-/* store.js — настройки и последний снимок погоды в localStorage. */
+/* store.js — settings and the last weather snapshot in localStorage. */
 var Store = (function () {
-  var KEY = 'barogram.v1';
+  var KEY = 'barogram.v2';
   var state = {
     theme: 'eink',
+    lang: null,
     lat: null, lon: null, place: '',
     lastData: null, lastTs: 0,
-    bg: false, screen: false
+    background: false, keepScreen: false
   };
 
   function load() {
     try {
       var raw = localStorage.getItem(KEY);
       if (!raw) { return state; }
-      var o = JSON.parse(raw);
-      for (var k in o) { if (o.hasOwnProperty(k)) { state[k] = o[k]; } }
-    } catch (e) { /* приватный режим / нет квоты — работаем без кеша */ }
+      var saved = JSON.parse(raw);
+      for (var k in saved) { if (saved.hasOwnProperty(k)) { state[k] = saved[k]; } }
+    } catch (e) { /* private mode or no quota — run without a cache */ }
     return state;
   }
 

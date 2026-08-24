@@ -1,18 +1,20 @@
-/* app.js — сборка экрана, часы, расписание обновлений, фоновая работа. */
+/* app.js — screen composition, clock, refresh schedule and background work. */
 (function () {
 
   var THEMES = [
-    { id: 'eink',  name: 'E-Ink',     color: '#ffffff' },
-    { id: 'night', name: 'Тёмный',    color: '#0b0f14' },
-    { id: 'paper', name: 'Аналитика', color: '#f6f3ec' }
+    { id: 'eink',  name: 'theme.eink',  color: '#ffffff' },
+    { id: 'night', name: 'theme.night', color: '#0b0f14' },
+    { id: 'paper', name: 'theme.paper', color: '#f6f3ec' }
   ];
 
-  var S = Store.load();
+  var HOUR = 60 * 60 * 1000;
+
+  var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
-  var wakeLock = null;
+  var screenLock = null;
   var refreshing = false;
 
-  /* ---------- тема ---------- */
+  /* ---------- theme ---------- */
 
   function themeIndex(id) {
     for (var i = 0; i < THEMES.length; i++) { if (THEMES[i].id === id) { return i; } }
@@ -20,360 +22,476 @@
   }
 
   function applyTheme(id) {
-    var t = THEMES[themeIndex(id)];
-    document.body.setAttribute('data-theme', t.id);
+    var theme = THEMES[themeIndex(id)];
+    document.body.setAttribute('data-theme', theme.id);
     var meta = document.querySelector('meta[name="theme-color"]');
-    if (meta) { meta.setAttribute('content', t.color); }
-    U.$('#btn-theme').firstChild.nodeValue = 'Дизайн: ' + t.name;
-    Store.set({ theme: t.id });
+    if (meta) { meta.setAttribute('content', theme.color); }
+    U.setText(U.$('#btn-theme'), I18N.t('ui.design', { name: I18N.t(theme.name) }));
+    Store.set({ theme: theme.id });
   }
 
   function nextTheme() {
-    applyTheme(THEMES[(themeIndex(S.theme) + 1) % THEMES.length].id);
+    applyTheme(THEMES[(themeIndex(settings.theme) + 1) % THEMES.length].id);
   }
 
-  /* ---------- часы ---------- */
+  /* ---------- language ---------- */
+
+  function applyLanguage(lang) {
+    var active = I18N.use(lang);
+    Store.set({ lang: active });
+    document.documentElement.setAttribute('lang', active);
+    document.title = I18N.t('app.title');
+    translateStaticText();
+    applyTheme(settings.theme);
+    updateBackgroundButton();
+    updateScreenButton();
+    U.setText(U.$('#btn-language'), I18N.t('ui.language', { name: I18N.t('lang.' + active) }));
+    U.setText(U.$('#place'), settings.place || I18N.t(demoMode ? 'ui.demoPlace' : 'ui.noPlace'));
+    U.setText(U.$('#date'), U.dateText(new Date()));
+    U.setText(U.$('#updated'), U.agoText(settings.lastTs));
+    render(settings.lastData);
+    refreshStatus();
+    pushConfigToWorker();
+  }
+
+  /* The footer line describes the current state, so it is rebuilt, not translated. */
+  function refreshStatus() {
+    if (demoMode) { setStatus(I18N.t('status.demo')); }
+    else if (settings.lat === null) { setStatus(I18N.t('status.noPlace')); }
+    else if (settings.lastTs) { setStatus(I18N.t('status.ok')); }
+    else { setStatus(I18N.t('status.initial')); }
+  }
+
+  /* Static labels carry data-i18n keys, so one pass retranslates the shell. */
+  function translateStaticText() {
+    var nodes = document.querySelectorAll('[data-i18n]');
+    for (var i = 0; i < nodes.length; i++) {
+      U.setText(nodes[i], I18N.t(nodes[i].getAttribute('data-i18n')));
+    }
+    var placeholders = document.querySelectorAll('[data-i18n-placeholder]');
+    for (i = 0; i < placeholders.length; i++) {
+      placeholders[i].setAttribute('placeholder', I18N.t(placeholders[i].getAttribute('data-i18n-placeholder')));
+    }
+  }
+
+  /* ---------- clock ---------- */
 
   function tickClock() {
-    var d = new Date();
-    U.$('#clock').firstChild.nodeValue = U.pad2(d.getHours()) + ':' + U.pad2(d.getMinutes());
-    U.$('#date').firstChild.nodeValue = U.dateText(d);
-    U.$('#updated').firstChild.nodeValue = U.agoText(S.lastTs);
-    /* ровно на границе минуты, без дрейфа */
-    var ms = 60000 - (d.getSeconds() * 1000 + d.getMilliseconds());
+    var now = new Date();
+    U.setText(U.$('#clock'), U.pad2(now.getHours()) + ':' + U.pad2(now.getMinutes()));
+    U.setText(U.$('#date'), U.dateText(now));
+    U.setText(U.$('#updated'), U.agoText(settings.lastTs));
+    /* land exactly on the minute boundary instead of drifting by 60 s steps */
+    var ms = 60000 - (now.getSeconds() * 1000 + now.getMilliseconds());
     setTimeout(tickClock, ms + 30);
   }
 
-  /* ---------- карточки ---------- */
+  /* ---------- cards ---------- */
 
-  function mmHg(hpa) { return Math.round(hpa * 0.750062); }
+  function toMmHg(hpa) { return Math.round(hpa * 0.750062); }
 
-  function trendText(t) {
-    if (t === null) { return ''; }
-    if (t > 1.5) { return 'растёт быстро ' + fmtSigned(t); }
-    if (t > 0.4) { return 'растёт ' + fmtSigned(t); }
-    if (t < -1.5) { return 'падает быстро ' + fmtSigned(t); }
-    if (t < -0.4) { return 'падает ' + fmtSigned(t); }
-    return 'ровно ' + fmtSigned(t);
+  function trendText(delta) {
+    var v = (delta > 0 ? '+' : '') + delta.toFixed(1) + ' ' + I18N.t('trend.unit');
+    if (delta > 1.5) { return I18N.t('trend.riseFast', { v: v }); }
+    if (delta > 0.4) { return I18N.t('trend.rise', { v: v }); }
+    if (delta < -1.5) { return I18N.t('trend.fallFast', { v: v }); }
+    if (delta < -0.4) { return I18N.t('trend.fall', { v: v }); }
+    return I18N.t('trend.steady', { v: v });
   }
-  function fmtSigned(v) { return (v > 0 ? '+' : '') + v.toFixed(1) + ' гПа/3ч'; }
 
-  function whyNote(res, good) {
-    if (!res) { return ''; }
-    if (!res.why.length) { return good; }
-    return 'минусы: ' + res.why.join(', ');
+  function whyNote(index) {
+    if (!index) { return I18N.t('note.noData'); }
+    if (!index.why.length) { return I18N.t('note.noIssues'); }
+    var parts = [];
+    for (var i = 0; i < index.why.length; i++) {
+      parts.push(I18N.t(index.why[i].key, index.why[i].params));
+    }
+    return I18N.t('note.why', { list: parts.join(', ') });
+  }
+
+  function appendSpark(card, values, spec, captionKey) {
+    if (!values || !values.length) { return; }
+    var spark = Scale.sparkBars(values, spec, I18N.t(captionKey));
+    if (spark) { card.appendChild(spark); }
   }
 
   function render(w) {
     var host = U.$('#cards');
+    if (!host) { return; }
     U.clear(host);
+
     if (!w) {
-      host.appendChild(U.el('p', 'empty', 'Нет данных. Нажмите «Обновить» или выберите место.'));
+      host.appendChild(U.el('p', 'empty', I18N.t('ui.noData')));
+      U.setText(U.$('#cond'), ' ');
       return;
     }
 
-    U.$('#cond').firstChild.nodeValue = U.wmoText(w.code);
+    U.setText(U.$('#cond'), U.wmoText(w.code));
 
-    /* 1. Температура */
-    var tempNote = 'ощущается ' + U.fmt(w.feels, 1) + '°';
-    if (w.tMin !== null && w.tMax !== null) {
-      tempNote += ' · сегодня ' + U.fmt(w.tMin, 0) + '…' + U.fmt(w.tMax, 0) + '°';
-    }
+    /* 1. Temperature */
+    var tempNote = (w.tempMin !== null && w.tempMax !== null)
+      ? I18N.t('note.tempRange', {
+          feels: U.fmt(w.feels, 1), min: U.fmt(w.tempMin, 0), max: U.fmt(w.tempMax, 0)
+        })
+      : I18N.t('note.temp', { feels: U.fmt(w.feels, 1) });
     var tempCard = Scale.card({ key: 'temp', spec: Metrics.SPEC.temp, value: w.temp, note: tempNote });
-    if (w.tempSeries && w.tempSeries.length) {
-      tempCard.appendChild(Scale.sparkBars(w.tempSeries, Metrics.SPEC.temp));
-      tempCard.appendChild(U.el('div', 'spark-cap', 'температура, ближайшие 24 ч'));
-    }
+    appendSpark(tempCard, w.tempSeries, Metrics.SPEC.temp, 'spark.temp');
     host.appendChild(tempCard);
 
-    /* 2. Ветер */
-    var windNote = 'порывы ' + U.fmt(w.gust, 1) + ' м/с';
-    if (w.windDir !== null) { windNote += ' · ' + U.windDir(w.windDir) + ' (' + U.fmt(w.windDir, 0) + '°)'; }
+    /* 2. Wind */
+    var windNote = (w.windDir !== null)
+      ? I18N.t('note.windDir', {
+          gust: U.fmt(w.gust, 1), dir: U.windDir(w.windDir), deg: U.fmt(w.windDir, 0)
+        })
+      : I18N.t('note.wind', { gust: U.fmt(w.gust, 1) });
     host.appendChild(Scale.card({ key: 'wind', spec: Metrics.SPEC.wind, value: w.wind, note: windNote }));
 
-    /* 3. Осадки */
-    var rainNote = 'вероятность ' + (w.rainProb === null ? '—' : U.fmt(w.rainProb, 0) + '%');
-    if (w.rainSum !== null) { rainNote += ' · за сутки ' + U.fmt(w.rainSum, 1) + ' мм'; }
+    /* 3. Precipitation */
+    var prob = w.rainProb === null ? '—' : U.fmt(w.rainProb, 0) + '%';
+    var rainNote = (w.rainSum !== null)
+      ? I18N.t('note.rainSum', { prob: prob, sum: U.fmt(w.rainSum, 1) })
+      : I18N.t('note.rain', { prob: prob });
     var rainCard = Scale.card({ key: 'rain', spec: Metrics.SPEC.rain, value: w.rain, note: rainNote });
-    if (w.rainSeries && w.rainSeries.length) {
-      rainCard.appendChild(Scale.sparkBars(w.rainSeries, Metrics.SPEC.rain));
-      rainCard.appendChild(U.el('div', 'spark-cap', 'осадки, ближайшие 24 ч'));
-    }
+    appendSpark(rainCard, w.rainSeries, Metrics.SPEC.rain, 'spark.rain');
     host.appendChild(rainCard);
 
-    /* 4. Облачность */
+    /* 4. Cloud cover */
     host.appendChild(Scale.card({
       key: 'clouds', spec: Metrics.SPEC.clouds, value: w.clouds, note: U.wmoText(w.code)
     }));
 
-    /* 5. УФ */
+    /* 5. UV */
     host.appendChild(Scale.card({
       key: 'uv', spec: Metrics.SPEC.uv, value: w.uv,
-      note: (w.uvMax === null ? 'защита нужна с УФ 3' : 'максимум сегодня ' + U.fmt(w.uvMax, 1))
+      note: w.uvMax === null ? I18N.t('note.uvDefault') : I18N.t('note.uvMax', { max: U.fmt(w.uvMax, 1) })
     }));
 
-    /* 6. Влажность */
+    /* 6. Humidity */
     host.appendChild(Scale.card({
-      key: 'humidity', spec: Metrics.SPEC.humidity, value: w.humidity, note: 'комфортный коридор 40–60%'
+      key: 'humidity', spec: Metrics.SPEC.humidity, value: w.humidity, note: I18N.t('note.humidity')
     }));
 
-    /* 7. Давление + барограмма */
-    var pNote = (w.pressure === null ? '' : mmHg(w.pressure) + ' мм рт. ст.');
-    if (w.pressureTrend3h !== null) { pNote += ' · ' + trendText(w.pressureTrend3h); }
-    var pCard = Scale.card({ key: 'pressure', spec: Metrics.SPEC.pressure, value: w.pressure, note: pNote });
-    if (w.pressureSeries && w.pressureSeries.length) {
-      pCard.appendChild(Scale.sparkBars(w.pressureSeries, Metrics.SPEC.pressure));
-      pCard.appendChild(U.el('div', 'spark-cap', 'барограмма, прошедшие 24 ч'));
+    /* 7. Pressure with the barogram */
+    var pressureNote = '';
+    if (w.pressure !== null) {
+      pressureNote = (w.pressureTrend3h !== null)
+        ? I18N.t('note.pressureTrend', { mmhg: toMmHg(w.pressure), trend: trendText(w.pressureTrend3h) })
+        : I18N.t('note.pressure', { mmhg: toMmHg(w.pressure) });
     }
-    host.appendChild(pCard);
+    var pressureCard = Scale.card({
+      key: 'pressure', spec: Metrics.SPEC.pressure, value: w.pressure, note: pressureNote
+    });
+    appendSpark(pressureCard, w.pressureSeries, Metrics.SPEC.pressure, 'spark.pressure');
+    host.appendChild(pressureCard);
 
-    /* 8. Волны */
-    var waveNote = w.sea
-      ? ('период ' + U.fmt(w.wavePeriod, 1) + ' с · вода ' + U.fmt(w.seaTemp, 1) + '°')
-      : 'морских данных для этой точки нет';
-    host.appendChild(Scale.card({ key: 'waves', spec: Metrics.SPEC.waves, value: w.waveHeight, note: waveNote }));
-
-    /* 9. Снорклинг */
-    var sn = Metrics.snorkel(w);
+    /* 8. Waves */
+    var waveNote = w.hasSea
+      ? I18N.t('note.waves', { period: U.fmt(w.wavePeriod, 1), temp: U.fmt(w.seaTemp, 1) })
+      : I18N.t('note.noSea');
     host.appendChild(Scale.card({
-      key: 'snorkel', spec: Metrics.SPEC.snorkel, value: sn ? sn.value : null,
-      badge: 'индекс',
-      note: sn ? whyNote(sn, 'условия без замечаний') : 'нужны данные о море'
+      key: 'waves', spec: Metrics.SPEC.waves, value: w.waveHeight, note: waveNote
     }));
 
-    /* 10. Велосипед */
-    var bk = Metrics.bike(w);
+    /* 9. Snorkeling */
+    var snorkel = Metrics.snorkel(w);
     host.appendChild(Scale.card({
-      key: 'bike', spec: Metrics.SPEC.bike, value: bk ? bk.value : null,
-      badge: 'индекс',
-      note: bk ? whyNote(bk, 'условия без замечаний') : 'нет данных'
+      key: 'snorkel', spec: Metrics.SPEC.snorkel, value: snorkel ? snorkel.value : null,
+      badge: I18N.t('card.index'),
+      note: snorkel ? whyNote(snorkel) : I18N.t('note.needSea')
+    }));
+
+    /* 10. Cycling */
+    var bike = Metrics.bike(w);
+    host.appendChild(Scale.card({
+      key: 'bike', spec: Metrics.SPEC.bike, value: bike ? bike.value : null,
+      badge: I18N.t('card.index'),
+      note: whyNote(bike)
     }));
   }
 
-  /* ---------- данные ---------- */
+  /* ---------- data ---------- */
 
-  function setStatus(text) { U.$('#status').firstChild.nodeValue = text; }
-  function setHint(text) { U.$('#hint').innerHTML = ''; U.$('#hint').appendChild(document.createTextNode(text)); }
+  function setStatus(text) { U.setText(U.$('#status'), text); }
+  function setHint(text) { U.setText(U.$('#hint'), text); }
 
   function refresh() {
     if (refreshing) { return; }
+
     if (demoMode) {
-      var d = Weather.demo();
-      Store.set({ lastData: d, lastTs: d.ts });
-      render(d); setStatus('Демо-данные, сеть не используется.');
-      U.$('#updated').firstChild.nodeValue = U.agoText(S.lastTs);
+      var demo = Weather.demo();
+      Store.set({ lastData: demo, lastTs: demo.ts });
+      render(demo);
+      U.setText(U.$('#updated'), U.agoText(settings.lastTs));
+      setStatus(I18N.t('status.demo'));
       return;
     }
-    if (S.lat === null || S.lon === null) { setStatus('Место не выбрано — откройте «Место».'); return; }
+    if (settings.lat === null || settings.lon === null) {
+      setStatus(I18N.t('status.noPlace'));
+      return;
+    }
+
     refreshing = true;
-    setStatus('Обновляем…');
-    Weather.load(S.lat, S.lon, function (w) {
+    setStatus(I18N.t('status.updating'));
+    Weather.load(settings.lat, settings.lon, function (data) {
       refreshing = false;
-      Store.set({ lastData: w, lastTs: w.ts });
-      render(w);
-      U.$('#updated').firstChild.nodeValue = U.agoText(S.lastTs);
-      setStatus('Данные Open-Meteo · следующее обновление в начале часа');
-      pushConfigToSW();
+      Store.set({ lastData: data, lastTs: data.ts });
+      render(data);
+      U.setText(U.$('#updated'), U.agoText(settings.lastTs));
+      setStatus(I18N.t('status.ok'));
+      pushConfigToWorker();
     }, function (err) {
       refreshing = false;
-      setStatus('Не вышло обновить (' + err + '), показаны последние данные');
+      setStatus(I18N.t('status.failed', { err: err }));
     });
   }
 
   function setPlace(lat, lon, name) {
     Store.set({ lat: lat, lon: lon, place: name || (U.fmt(lat, 2) + ', ' + U.fmt(lon, 2)) });
-    U.$('#place').firstChild.nodeValue = S.place;
+    U.setText(U.$('#place'), settings.place);
     refresh();
   }
 
-  /* ---------- расписание ---------- */
+  /* ---------- schedule ---------- */
 
-  /* Раз в час, ровно после начала часа: данные Open-Meteo обновляются почасово. */
-  function scheduleHourly() {
+  /* Once an hour, twenty seconds past the hour: Open-Meteo publishes hourly values. */
+  function scheduleHourlyRefresh() {
     var now = new Date();
     var ms = (60 - now.getMinutes()) * 60000 - now.getSeconds() * 1000 + 20000;
     setTimeout(function () {
       refresh();
-      scheduleHourly();
+      scheduleHourlyRefresh();
     }, ms);
   }
 
-  /* ---------- фон и экран ---------- */
+  /* ---------- background and screen ---------- */
 
-  function pushConfigToSW() {
+  function pushConfigToWorker() {
     if (!navigator.serviceWorker || !navigator.serviceWorker.controller) { return; }
-    if (S.lat === null) { return; }
+    if (settings.lat === null) { return; }
     navigator.serviceWorker.controller.postMessage({
       type: 'config',
-      forecast: Weather.forecastUrl(S.lat, S.lon),
-      place: S.place,
-      notify: !!S.bg
+      forecast: Weather.forecastUrl(settings.lat, settings.lon),
+      notify: !!settings.background,
+      strings: {
+        title: settings.place ? I18N.t('notify.title', { place: settings.place })
+                              : I18N.t('notify.titlePlain'),
+        wind: I18N.t('notify.wind'),
+        uv: I18N.t('notify.uv'),
+        humidity: I18N.t('notify.humidity')
+      }
     });
   }
 
-  function updateWakeBtn() {
-    U.$('#btn-wake').firstChild.nodeValue = 'Фоновое обновление: ' + (S.bg ? 'вкл' : 'выкл');
+  function updateBackgroundButton() {
+    U.setText(U.$('#btn-background'),
+      I18N.t('ui.background', { state: I18N.t(settings.background ? 'ui.on' : 'ui.off') }));
+  }
+
+  function updateScreenButton() {
+    U.setText(U.$('#btn-screen'),
+      I18N.t('ui.keepScreen', { state: I18N.t(screenLock ? 'ui.on' : 'ui.off') }));
   }
 
   function toggleBackground() {
-    if (S.bg) {
-      Store.set({ bg: false }); updateWakeBtn(); pushConfigToSW();
-      setHint('Фоновые уведомления выключены.');
+    if (settings.background) {
+      Store.set({ background: false });
+      updateBackgroundButton();
+      pushConfigToWorker();
+      setHint(I18N.t('hint.bgOff'));
       return;
     }
+
     var enable = function () {
-      Store.set({ bg: true }); updateWakeBtn(); pushConfigToSW();
+      Store.set({ background: true });
+      updateBackgroundButton();
+      pushConfigToWorker();
       registerPeriodicSync();
     };
+
     if (window.Notification && Notification.permission === 'default') {
-      Notification.requestPermission(function (p) {
-        if (p === 'granted') { enable(); } else { setHint('Без разрешения на уведомления разбудить экран нельзя.'); }
+      Notification.requestPermission(function (permission) {
+        if (permission === 'granted') { enable(); } else { setHint(I18N.t('hint.bgNoPermission')); }
       });
     } else if (window.Notification && Notification.permission === 'granted') {
       enable();
     } else {
       enable();
-      setHint('Уведомления недоступны: обновление будет идти, пока приложение открыто.');
+      setHint(I18N.t('hint.bgNoNotifications'));
     }
   }
 
   function registerPeriodicSync() {
     if (!navigator.serviceWorker || !navigator.serviceWorker.ready) {
-      setHint('Service Worker недоступен: держите приложение открытым, оно обновится само.');
+      setHint(I18N.t('hint.swUnavailable'));
       return;
     }
     navigator.serviceWorker.ready.then(function (reg) {
       if (!reg.periodicSync) {
-        setHint('Фоновая синхронизация не поддерживается браузером. Пока приложение открыто, обновление идёт раз в час.');
+        setHint(I18N.t('hint.syncUnsupported'));
         return;
       }
-      var go = function () {
-        reg.periodicSync.register('barogram-hourly', { minInterval: 60 * 60 * 1000 }).then(function () {
-          setHint('Фоновое обновление раз в час включено.');
+      var register = function () {
+        reg.periodicSync.register('barogram-hourly', { minInterval: HOUR }).then(function () {
+          setHint(I18N.t('hint.bgOn'));
         }, function (e) {
-          setHint('Браузер отклонил фоновую синхронизацию: ' + e);
+          setHint(I18N.t('hint.syncRejected', { err: e }));
         });
       };
       if (navigator.permissions && navigator.permissions.query) {
-        navigator.permissions.query({ name: 'periodic-background-sync' }).then(function (st) {
-          if (st.state === 'granted') { go(); }
-          else { setHint('Разрешите «периодическую фоновую синхронизацию» для установленного приложения.'); go(); }
-        }, go);
-      } else { go(); }
+        navigator.permissions.query({ name: 'periodic-background-sync' }).then(function (status) {
+          if (status.state !== 'granted') { setHint(I18N.t('hint.syncPermission')); }
+          register();
+        }, register);
+      } else {
+        register();
+      }
     });
   }
 
-  function toggleScreen() {
-    if (wakeLock) {
-      try { wakeLock.release(); } catch (e) {}
-      wakeLock = null;
-      Store.set({ screen: false });
-      U.$('#btn-screen').firstChild.nodeValue = 'Не гасить экран: выкл';
+  function toggleScreenLock() {
+    if (screenLock) {
+      try { screenLock.release(); } catch (e) {}
+      screenLock = null;
+      Store.set({ keepScreen: false });
+      updateScreenButton();
       return;
     }
-    if (!navigator.wakeLock) { setHint('Wake Lock не поддерживается этим браузером.'); return; }
+    if (!navigator.wakeLock) {
+      setHint(I18N.t('hint.wakeLockUnsupported'));
+      return;
+    }
     navigator.wakeLock.request('screen').then(function (lock) {
-      wakeLock = lock;
-      Store.set({ screen: true });
-      U.$('#btn-screen').firstChild.nodeValue = 'Не гасить экран: вкл';
-      lock.addEventListener('release', function () { wakeLock = null; });
-    }, function (e) { setHint('Wake Lock отклонён: ' + e); });
+      screenLock = lock;
+      Store.set({ keepScreen: true });
+      updateScreenButton();
+      lock.addEventListener('release', function () {
+        screenLock = null;
+        updateScreenButton();
+      });
+    }, function (e) {
+      setHint(I18N.t('hint.wakeLockRejected', { err: e }));
+    });
   }
 
-  /* ---------- место ---------- */
+  /* ---------- place ---------- */
 
-  function doGeo() {
-    if (!navigator.geolocation) { setHint('Геолокация недоступна, найдите город по названию.'); return; }
-    setHint('Определяем координаты…');
+  function detectLocation() {
+    if (!navigator.geolocation) {
+      setHint(I18N.t('hint.geoUnsupported'));
+      return;
+    }
+    setHint(I18N.t('hint.locating'));
     navigator.geolocation.getCurrentPosition(function (pos) {
       setPlace(U.num(pos.coords.latitude, 4), U.num(pos.coords.longitude, 4), '');
-      setHint('Координаты получены.');
+      setHint(I18N.t('hint.geoOk'));
     }, function (e) {
-      setHint('Не удалось определить место (' + (e && e.message ? e.message : 'ошибка') + ').');
+      setHint(I18N.t('hint.geoFailed', { err: (e && e.message) ? e.message : 'error' }));
     }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 });
   }
 
-  function doCitySearch() {
+  function searchCity() {
     var name = U.$('#city-input').value;
-    if (!name || name.length < 2) { setHint('Введите название города.'); return; }
-    setHint('Ищем…');
-    Weather.searchCity(name, function (list) {
-      var ul = U.$('#found');
-      U.clear(ul);
-      if (!list.length) { setHint('Ничего не найдено.'); return; }
-      setHint('Выберите город:');
-      for (var i = 0; i < list.length; i++) {
-        (function (r) {
-          var li = U.el('li', 'found-item');
-          var b = U.el('button', 'btn btn-found',
-            r.name + (r.admin1 ? ', ' + r.admin1 : '') + (r.country ? ' · ' + r.country : ''));
-          b.type = 'button';
-          b.onclick = function () {
-            setPlace(U.num(r.latitude, 4), U.num(r.longitude, 4), r.name);
-            U.clear(ul); setHint('Место: ' + r.name);
-            U.$('#panel').hidden = true;
-          };
-          li.appendChild(b);
-          ul.appendChild(li);
-        })(list[i]);
+    if (!name || name.length < 2) {
+      setHint(I18N.t('hint.enterCity'));
+      return;
+    }
+    setHint(I18N.t('hint.searching'));
+    Weather.searchCity(name, function (results) {
+      var list = U.$('#found');
+      U.clear(list);
+      if (!results.length) {
+        setHint(I18N.t('hint.nothingFound'));
+        return;
       }
-    }, function (e) { setHint('Поиск не удался: ' + e); });
+      setHint(I18N.t('hint.chooseCity'));
+      for (var i = 0; i < results.length; i++) {
+        list.appendChild(cityItem(results[i], list));
+      }
+    }, function (err) {
+      setHint(I18N.t('hint.searchFailed', { err: err }));
+    });
   }
 
-  /* ---------- старт ---------- */
+  function cityItem(result, list) {
+    var item = U.el('li', 'found-item');
+    var label = result.name +
+      (result.admin1 ? ', ' + result.admin1 : '') +
+      (result.country ? ' · ' + result.country : '');
+    var button = U.el('button', 'btn btn-found', label);
+    button.type = 'button';
+    button.onclick = function () {
+      setPlace(U.num(result.latitude, 4), U.num(result.longitude, 4), result.name);
+      U.clear(list);
+      setHint(I18N.t('hint.placeSet', { name: result.name }));
+      U.$('#panel').hidden = true;
+    };
+    item.appendChild(button);
+    return item;
+  }
 
-  function boot() {
-    var qTheme = /[?&]theme=([a-z]+)/.exec(location.search);
-    applyTheme(qTheme ? qTheme[1] : S.theme);
-    tickClock();
+  /* ---------- start ---------- */
 
-    U.$('#place').firstChild.nodeValue = S.place || (demoMode ? 'Демо-режим' : 'Место не выбрано');
-    updateWakeBtn();
-    Store.set({ screen: false }); /* Wake Lock переживает только текущую сессию */
-
-    if (S.lastData) { render(S.lastData); }
-    else { render(null); }
-
+  function bindControls() {
     U.$('#btn-theme').onclick = nextTheme;
     U.$('#btn-refresh').onclick = refresh;
     U.$('#btn-settings').onclick = function () {
-      var p = U.$('#panel');
-      p.hidden = !p.hidden;
+      var panel = U.$('#panel');
+      panel.hidden = !panel.hidden;
     };
-    U.$('#btn-geo').onclick = doGeo;
-    U.$('#btn-city').onclick = doCitySearch;
-    U.$('#city-input').onkeydown = function (e) { if (e.keyCode === 13) { doCitySearch(); } };
-    U.$('#btn-wake').onclick = toggleBackground;
-    U.$('#btn-screen').onclick = toggleScreen;
+    U.$('#btn-language').onclick = function () { applyLanguage(I18N.next()); };
+    U.$('#btn-geo').onclick = detectLocation;
+    U.$('#btn-city').onclick = searchCity;
+    U.$('#city-input').onkeydown = function (e) { if (e.keyCode === 13) { searchCity(); } };
+    U.$('#btn-background').onclick = toggleBackground;
+    U.$('#btn-screen').onclick = toggleScreenLock;
+  }
 
-    if (demoMode) { refresh(); }
-    else if (S.lat !== null) { refresh(); }
-    else { U.$('#panel').hidden = false; setHint('Выберите место: кнопка ниже или поиск по названию.'); }
+  function registerWorker() {
+    if (!navigator.serviceWorker) { return; }
+    navigator.serviceWorker.register('sw.js').then(function () {
+      navigator.serviceWorker.ready.then(function () { setTimeout(pushConfigToWorker, 500); });
+    }, function () {});
+    /* The worker refreshed in the background — reread, the response is cached. */
+    navigator.serviceWorker.addEventListener('message', function (event) {
+      if (event.data && event.data.type === 'refreshed') { refresh(); }
+    });
+  }
 
-    scheduleHourly();
+  function boot() {
+    I18N.use(settings.lang || I18N.detect());
+    var themeParam = /[?&]theme=([a-z]+)/.exec(location.search);
+    if (themeParam) { settings.theme = themeParam[1]; }
 
-    /* вернулись к приложению — подтягиваем свежее, если данные старше получаса */
-    if (typeof document.addEventListener === 'function') {
-      document.addEventListener('visibilitychange', function () {
-        if (!document.hidden) {
-          U.$('#updated').firstChild.nodeValue = U.agoText(S.lastTs);
-          if (Date.now() - S.lastTs > 30 * 60 * 1000) { refresh(); }
-        }
-      }, false);
+    applyLanguage(I18N.lang());
+    tickClock();
+    bindControls();
+    /* A screen wake lock never survives a reload — it needs a fresh gesture. */
+    Store.set({ keepScreen: false });
+    updateScreenButton();
+
+    if (demoMode || settings.lat !== null) {
+      refresh();
+    } else {
+      U.$('#panel').hidden = false;
+      setHint(I18N.t('hint.pickPlace'));
+      setStatus(I18N.t('status.noPlace'));
     }
 
-    if (navigator.serviceWorker) {
-      navigator.serviceWorker.register('sw.js').then(function () {
-        navigator.serviceWorker.ready.then(function () { setTimeout(pushConfigToSW, 500); });
-      }, function () {});
-      /* Service Worker обновился в фоне — перечитываем (ответ уже в кеше). */
-      navigator.serviceWorker.addEventListener('message', function (ev) {
-        if (ev.data && ev.data.type === 'sw-refreshed') { refresh(); }
-      });
-    }
+    scheduleHourlyRefresh();
+
+    /* Back in the app — pull fresh data if what we have is older than half an hour. */
+    document.addEventListener('visibilitychange', function () {
+      if (document.hidden) { return; }
+      U.setText(U.$('#updated'), U.agoText(settings.lastTs));
+      if (Date.now() - settings.lastTs > 30 * 60 * 1000) { refresh(); }
+    }, false);
+
+    registerWorker();
   }
 
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', boot, false);
-  } else { boot(); }
+  } else {
+    boot();
+  }
 })();

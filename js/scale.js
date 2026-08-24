@@ -1,27 +1,25 @@
-/* scale.js — шкала интенсивности: сегменты + бегунок + подпись зоны.
-   Один и тот же DOM во всех трёх дизайнах, вид задаёт CSS темы. */
+/* scale.js — the intensity scale: coloured segments, a marker and a band label.
+   All three designs share this DOM; the theme CSS decides how it looks. */
 var Scale = (function () {
 
-  /* Строит шкалу: сегменты окрашены по зонам, «пройденные» — залиты,
-     остальные приглушены; треугольник-бегунок стоит на текущем значении. */
+  /* Segments are coloured by band; the ones below the current value are filled,
+     the rest stay muted, and a triangle marks the exact position. */
   function build(spec, value) {
     var wrap = U.el('div', 'scale');
     var track = U.el('div', 'scale-track');
-    var n = spec.segments;
+    var count = spec.segments;
     var span = spec.max - spec.min;
     var pos = (value === null) ? null : U.clamp((value - spec.min) / span, 0, 1);
-    var i, segValue, b, seg, cls;
+    var i, segValue, cls;
 
-    for (i = 0; i < n; i++) {
-      segValue = spec.min + span * ((i + 0.5) / n);
-      b = Metrics.band(spec.bands, segValue);
-      cls = 'seg ' + b.cls;
+    for (i = 0; i < count; i++) {
+      segValue = spec.min + span * ((i + 0.5) / count);
+      cls = 'seg ' + Metrics.band(spec.bands, segValue).cls;
       if (pos === null) { cls += ' seg-off'; }
-      else if ((i + 1) / n <= pos + 0.0001) { cls += ' seg-on'; }
-      else if (i / n < pos) { cls += ' seg-on seg-edge'; }
+      else if ((i + 1) / count <= pos + 0.0001) { cls += ' seg-on'; }
+      else if (i / count < pos) { cls += ' seg-on seg-edge'; }
       else { cls += ' seg-off'; }
-      seg = U.el('div', cls);
-      track.appendChild(seg);
+      track.appendChild(U.el('div', cls));
     }
     wrap.appendChild(track);
 
@@ -39,62 +37,67 @@ var Scale = (function () {
     return wrap;
   }
 
-  /* Карточка метрики целиком. */
+  /* A whole metric card: title, number, scale, band label, note. */
   function card(opts) {
     var spec = opts.spec;
-    var value = (opts.value === null || opts.value === undefined || isNaN(opts.value)) ? null : Number(opts.value);
-    var b = value === null ? null : Metrics.band(spec.bands, value);
+    var value = (opts.value === null || opts.value === undefined || isNaN(opts.value))
+      ? null : Number(opts.value);
+    var band = value === null ? null : Metrics.band(spec.bands, value);
 
-    var card = U.el('article', 'card' + (b ? ' ' + b.cls + '-card' : ' lv-none-card'));
-    card.setAttribute('data-metric', opts.key);
+    var node = U.el('article', 'card' + (band ? ' ' + band.cls + '-card' : ' lv-none-card'));
+    node.setAttribute('data-metric', opts.key);
 
     var head = U.el('div', 'card-head');
-    head.appendChild(U.el('h2', 'card-title', spec.title));
+    head.appendChild(U.el('h2', 'card-title', I18N.t(spec.title)));
     if (opts.badge) { head.appendChild(U.el('span', 'card-badge', opts.badge)); }
-    card.appendChild(head);
+    node.appendChild(head);
 
     var row = U.el('div', 'card-value-row');
-    var val = U.el('div', 'card-value', value === null ? '—' : U.fmt(value, spec.decimals));
-    row.appendChild(val);
-    if (spec.unit) { row.appendChild(U.el('div', 'card-unit', spec.unit)); }
-    card.appendChild(row);
+    row.appendChild(U.el('div', 'card-value', value === null ? '—' : U.fmt(value, spec.decimals)));
+    if (spec.unit) { row.appendChild(U.el('div', 'card-unit', I18N.t(spec.unit))); }
+    node.appendChild(row);
 
-    card.appendChild(build(spec, value));
+    node.appendChild(build(spec, value));
 
-    var label = U.el('div', 'card-band' + (b ? ' ' + b.cls + '-text' : ''), b ? b.label : 'нет данных');
-    card.appendChild(label);
+    node.appendChild(U.el('div', 'card-band' + (band ? ' ' + band.cls + '-text' : ''),
+      band ? I18N.t(band.label) : I18N.t('note.noData')));
 
-    if (opts.note) { card.appendChild(U.el('div', 'card-note', opts.note)); }
-    return card;
+    if (opts.note) { node.appendChild(U.el('div', 'card-note', opts.note)); }
+    return node;
   }
 
-  /* Мини-барограмма: столбики истории/прогноза под карточкой. */
-  function sparkBars(values, spec) {
+  /* Mini chart under a card: past barogram or upcoming hours. */
+  function sparkBars(values, spec, caption) {
     var wrap = U.el('div', 'spark');
-    var i, v, b, bar, h;
-    var lo = null, hi = null;
+    var lo = null, hi = null, i, v, bar, height, band;
+
     for (i = 0; i < values.length; i++) {
       v = values[i];
       if (v === null || v === undefined) { continue; }
       if (lo === null || v < lo) { lo = v; }
       if (hi === null || v > hi) { hi = v; }
     }
-    if (lo === null) { return wrap; }
+    if (lo === null) { return null; }
     if (hi - lo < 0.0001) { hi = lo + 1; }
+
     for (i = 0; i < values.length; i++) {
       v = values[i];
-      bar = U.el('div', 'spark-bar');
       if (v === null || v === undefined) {
-        bar.className = 'spark-bar spark-gap';
-      } else {
-        h = 12 + 88 * (v - lo) / (hi - lo);
-        bar.style.height = h.toFixed(0) + '%';
-        b = spec ? Metrics.band(spec.bands, v) : null;
-        if (b) { bar.className = 'spark-bar ' + b.cls; }
+        wrap.appendChild(U.el('div', 'spark-bar spark-gap'));
+        continue;
       }
+      height = 12 + 88 * (v - lo) / (hi - lo);
+      band = spec ? Metrics.band(spec.bands, v) : null;
+      bar = U.el('div', 'spark-bar' + (band ? ' ' + band.cls : ''));
+      bar.style.height = height.toFixed(0) + '%';
       wrap.appendChild(bar);
     }
-    return wrap;
+
+    if (!caption) { return wrap; }
+    var box = document.createDocumentFragment();
+    box.appendChild(wrap);
+    box.appendChild(U.el('div', 'spark-cap', caption));
+    return box;
   }
 
   return { build: build, card: card, sparkBars: sparkBars };

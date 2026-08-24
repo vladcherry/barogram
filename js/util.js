@@ -1,14 +1,22 @@
-/* util.js — мелкие помощники. Специально ES5: браузер PocketBook старый. */
+/* util.js — small helpers. Deliberately ES5: the PocketBook browser is old. */
 var U = (function () {
 
   function $(sel, root) { return (root || document).querySelector(sel); }
+
   function el(tag, cls, text) {
     var n = document.createElement(tag);
     if (cls) { n.className = cls; }
     if (text !== undefined && text !== null) { n.appendChild(document.createTextNode(String(text))); }
     return n;
   }
+
   function clear(node) { while (node.firstChild) { node.removeChild(node.firstChild); } }
+
+  function setText(node, text) {
+    if (!node) { return; }
+    clear(node);
+    node.appendChild(document.createTextNode(String(text)));
+  }
 
   function clamp(v, lo, hi) { return v < lo ? lo : (v > hi ? hi : v); }
 
@@ -26,7 +34,7 @@ var U = (function () {
 
   function pad2(n) { return n < 10 ? '0' + n : String(n); }
 
-  /* JSON через XHR: fetch есть не везде, XHR есть везде. */
+  /* JSON over XHR: fetch is missing on old browsers, XHR is everywhere. */
   function getJSON(url, ok, fail) {
     var x = new XMLHttpRequest();
     var done = false;
@@ -48,7 +56,7 @@ var U = (function () {
     try { x.send(null); } catch (e) { if (fail) { fail('send'); } }
   }
 
-  /* Значение из массива hourly по ближайшему прошедшему часу. */
+  /* Value of an hourly series at the most recent past hour. */
   function hourlyNow(times, values, nowIso) {
     if (!times || !values) { return null; }
     var idx = -1, i;
@@ -66,42 +74,37 @@ var U = (function () {
   }
 
   function agoText(ts) {
-    if (!ts) { return 'нет данных'; }
+    if (!ts) { return I18N.t('time.never'); }
     var min = Math.floor((Date.now() - ts) / 60000);
-    if (min < 1) { return 'обновлено только что'; }
-    if (min < 60) { return 'обновлено ' + min + ' мин назад'; }
+    if (min < 1) { return I18N.t('time.justNow'); }
+    if (min < 60) { return I18N.t('time.minutes', { n: min }); }
     var h = Math.floor(min / 60);
-    if (h < 24) { return 'обновлено ' + h + ' ч назад'; }
-    return 'обновлено ' + Math.floor(h / 24) + ' дн назад';
+    if (h < 24) { return I18N.t('time.hours', { n: h }); }
+    return I18N.t('time.days', { n: Math.floor(h / 24) });
   }
 
-  var WEEK = ['воскресенье', 'понедельник', 'вторник', 'среда', 'четверг', 'пятница', 'суббота'];
-  var MON = ['января', 'февраля', 'марта', 'апреля', 'мая', 'июня',
-             'июля', 'августа', 'сентября', 'октября', 'ноября', 'декабря'];
+  function dateText(d) {
+    return I18N.t('date.format', {
+      day: d.getDate(),
+      month: I18N.list('date.months')[d.getMonth()],
+      weekday: I18N.list('date.weekdays')[d.getDay()]
+    });
+  }
 
-  function dateText(d) { return d.getDate() + ' ' + MON[d.getMonth()] + ', ' + WEEK[d.getDay()]; }
-
-  var WMO = {
-    0: 'Ясно', 1: 'Малооблачно', 2: 'Переменная облачность', 3: 'Пасмурно',
-    45: 'Туман', 48: 'Изморозь', 51: 'Морось слабая', 53: 'Морось', 55: 'Морось сильная',
-    56: 'Ледяная морось', 57: 'Ледяная морось', 61: 'Дождь слабый', 63: 'Дождь', 65: 'Ливень',
-    66: 'Ледяной дождь', 67: 'Ледяной дождь', 71: 'Снег слабый', 73: 'Снег', 75: 'Снегопад',
-    77: 'Снежная крупа', 80: 'Ливни местами', 81: 'Ливни', 82: 'Сильные ливни',
-    85: 'Снежные заряды', 86: 'Снежные заряды', 95: 'Гроза', 96: 'Гроза с градом', 99: 'Гроза с градом'
-  };
   function wmoText(code) {
     if (code === null || code === undefined) { return '—'; }
-    return WMO[code] || ('код ' + code);
+    var key = 'wmo.' + code;
+    var text = I18N.t(key);
+    return text === key ? I18N.t('wmo.unknown', { code: code }) : text;
   }
 
   function windDir(deg) {
     if (deg === null || deg === undefined) { return ''; }
-    var names = ['С', 'СВ', 'В', 'ЮВ', 'Ю', 'ЮЗ', 'З', 'СЗ'];
-    return names[Math.round(deg / 45) % 8];
+    return I18N.list('compass.points')[Math.round(deg / 45) % 8];
   }
 
   return {
-    $: $, el: el, clear: clear, clamp: clamp, num: num, fmt: fmt, pad2: pad2,
+    $: $, el: el, clear: clear, setText: setText, clamp: clamp, num: num, fmt: fmt, pad2: pad2,
     getJSON: getJSON, hourlyNow: hourlyNow, isoLocalHour: isoLocalHour,
     agoText: agoText, dateText: dateText, wmoText: wmoText, windDir: windDir
   };

@@ -1,5 +1,5 @@
-/* Дизайн 2 «Тёмный» — для телефона: плитки 2 в ряд, крупный акцент сверху,
-   мягкие скругления, приглушённый фон, шкала — сплошная полоса без рамок. */
+/* Design 2 "Night" — for phones: two tiles per row, one large accent card on
+   top, soft corners, muted background, scale drawn as a plain unframed bar. */
 
 body[data-theme="night"] { background: #0b0f14; color: #e8eef5; }
 body[data-theme="night"] .app { padding: 14px 12px 28px 12px; }
@@ -26,7 +26,7 @@ body[data-theme="night"] .card {
   background: #141b23; border-radius: 18px; padding: 12px 14px 14px 14px;
   flex: 1 1 44%; margin: 0 8px 10px 0; border: 1px solid #1e2733;
 }
-/* Первая карточка (температура) — во всю ширину, как главный показатель. */
+/* The temperature card spans the full width — it is the headline number. */
 body[data-theme="night"] .card[data-metric="temp"] { flex: 1 1 100%; margin-right: 0; }
 body[data-theme="night"] .card[data-metric="temp"] .card-value { font-size: 64px; }
 

@@ -1,6 +1,6 @@
-/* Дизайн 1 «E-Ink» — для PocketBook Verse Pro Color.
-   Белый фон, жирные рамки, крупные цифры, никаких теней и анимаций:
-   на электронных чернилах читается всё, кроме полутонов. */
+/* Design 1 "E-Ink" — made for the PocketBook Verse Pro Color.
+   White background, heavy borders, oversized numbers, no shadows or
+   animation: e-ink renders everything well except half-tones. */
 
 body[data-theme="eink"] { background: #ffffff; color: #000000; }
 body[data-theme="eink"] .app { padding-top: 6px; }
@@ -36,7 +36,7 @@ body[data-theme="eink"] .spark-cap { font-size: 12px; text-transform: uppercase;
 body[data-theme="eink"] .footbar { font-size: 13px; border-top: 2px solid #000; padding-top: 4px; }
 body[data-theme="eink"] .empty { border: 3px solid #000; font-size: 18px; }
 
-/* Шкала: жирные блоки в чёрной рамке — на e-ink видно даже при слабой заливке. */
+/* Scale: bold blocks in a black outline stay readable even when the fill is faint. */
 body[data-theme="eink"] .scale { padding-top: 12px; }
 body[data-theme="eink"] .seg { height: 20px; border: 2px solid #000; margin-right: 3px; }
 body[data-theme="eink"] .seg-off { background: #ffffff; }
@@ -61,5 +61,5 @@ body[data-theme="eink"] .spark-bar.lv-warn { background: #d9741a; }
 body[data-theme="eink"] .spark-bar.lv-bad  { background: #c8341f; }
 body[data-theme="eink"] .spark-bar.lv-crit { background: #6f1010; }
 
-/* Текст зоны всегда чёрный: цветные надписи на e-ink бледнеют. */
+/* Band labels stay black: coloured text washes out on e-ink. */
 body[data-theme="eink"] .card-band { color: #000; }

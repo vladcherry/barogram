@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
-"""Рисует PNG-иконки без внешних зависимостей: тот же мотив, что в icon.svg —
-несколько шкал интенсивности и линия барограммы."""
+"""Draw the PNG icons without any third-party dependency: same motif as
+icon.svg — a few intensity scales plus a barogram line."""
 import struct, zlib
 
 BG = (11, 15, 20)

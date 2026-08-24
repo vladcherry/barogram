@@ -1,6 +1,6 @@
-/* Дизайн 3 «Аналитика» — светлая бумага, одна колонка, плотные строки:
-   слева название, справа число, под ними длинная шкала во всю ширину.
-   Максимум данных на экран, спокойный контраст. */
+/* Design 3 "Analytics" — light paper, single column, dense rows: label first,
+   then the number, then a full-width scale underneath. Maximum data per
+   screen at a calm contrast level. */
 
 body[data-theme="paper"] { background: #f6f3ec; color: #1d1b16; }
 body[data-theme="paper"] .app { max-width: 760px; padding: 12px 12px 28px 12px; }
@@ -31,7 +31,7 @@ body[data-theme="paper"] .card-title {
   font-size: 12px; letter-spacing: 0.14em; text-transform: uppercase; color: #6d6553; display: inline-block;
 }
 body[data-theme="paper"] .card-badge { font-size: 10px; color: #8b8271; margin-left: 8px; letter-spacing: 0.1em; }
-/* Число и подпись зоны — в одну строку, число прижато влево, зона справа. */
+/* Number and band label sit on their own lines, tight against each other. */
 body[data-theme="paper"] .card-value-row { margin-top: -2px; }
 body[data-theme="paper"] .card-value { font-size: 34px; letter-spacing: -0.03em; }
 body[data-theme="paper"] .card-unit { font-size: 13px; color: #6d6553; }
@@ -42,7 +42,7 @@ body[data-theme="paper"] .spark-cap { font-size: 10px; color: #8b8271; letter-sp
 body[data-theme="paper"] .footbar { font-size: 11px; color: #8b8271; margin-top: 12px; }
 body[data-theme="paper"] .empty { background: #fffdf8; border: 1px solid #cfc7b6; border-radius: 6px; }
 
-/* Тонкая длинная шкала с зазорами — как измерительная линейка. */
+/* A thin, long, gapped scale that reads like a measuring ruler. */
 body[data-theme="paper"] .scale { padding-top: 11px; }
 body[data-theme="paper"] .seg { height: 8px; margin-right: 3px; }
 body[data-theme="paper"] .seg-off { background: #e2dccf; }
