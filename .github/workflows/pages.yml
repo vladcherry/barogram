@@ -3,11 +3,10 @@ name: Deploy to GitHub Pages
 # The app is plain static files, so the repository root is published as-is.
 # configure-pages turns Pages on the first time this runs.
 
+# Only manual runs: if Pages is set to "Deploy from a branch", GitHub builds the
+# site itself on every push and this workflow would just duplicate it. Run it by
+# hand when the Pages source is set to "GitHub Actions" instead.
 on:
-  push:
-    branches:
-      - claude/pwa-weather-intensity-scales-hy46mi
-      - main
   workflow_dispatch:
 
 permissions:
