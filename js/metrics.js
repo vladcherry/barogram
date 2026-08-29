@@ -242,6 +242,10 @@ var Metrics = (function () {
     windsport: {
       title: 'metric.windsport', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
       bands: INDEX_BANDS()
+    },
+    drone: {
+      title: 'metric.drone', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
+      bands: INDEX_BANDS()
     }
   };
 
@@ -519,8 +523,33 @@ var Metrics = (function () {
     return { value: U.clamp(10 - p, 0, 10), why: why };
   }
 
+  /* Drone flight: wind and its gusts decide, rain grounds it outright, and the
+     rest is what stops you seeing the aircraft or holding a charge. */
+  function drone(w) {
+    if (w.wind === null) { return null; }
+    var p = 0, why = [];
+    var pw = penalty([[4, 0], [6, 1], [8, 2.5], [10, 4.5], [99, 7]], w.wind);
+    p += pw; if (pw >= 1) { why.push(reason('why.wind', { v: Math.round(w.wind) })); }
+    if (w.gust !== null && w.gust - w.wind > 4) {
+      p += (w.gust - w.wind > 7 ? 2.5 : 1.2);
+      why.push(reason('why.gusts'));
+    }
+    if (w.rain !== null && w.rain > 0.05) { p += 5; why.push(reason('why.rain')); }
+    else if (w.rainProb !== null && w.rainProb >= 60) { p += 1.5; why.push(reason('why.rainLikely')); }
+    if (w.visibility !== null && w.visibility < 5) {
+      p += (w.visibility < 2 ? 3 : 1.5);
+      why.push(reason('why.haze'));
+    }
+    if (w.temp !== null) {
+      if (w.temp < -5) { p += 2.5; why.push(reason('why.coldBattery')); }
+      else if (w.temp < 5) { p += 1.2; why.push(reason('why.coldBattery')); }
+      else if (w.temp > 35) { p += 1; why.push(reason('why.temp', { v: Math.round(w.temp) })); }
+    }
+    return { value: U.clamp(10 - p, 0, 10), why: why };
+  }
+
   return {
-    SPEC: SPEC, band: band,
+    SPEC: SPEC, band: band, drone: drone,
     snorkel: snorkel, bike: bike, run: run, swim: swim, tennis: tennis,
     hike: hike, fishing: fishing, golf: golf, surf: surf, windsport: windsport
   };

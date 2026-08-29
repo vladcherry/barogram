@@ -251,10 +251,23 @@ var Icons = (function () {
     ];
   }
 
+  /* Quadcopter: body, four arms, four rotor discs. */
+  function droneParts() {
+    return [
+      node('rect', { x: 9.6, y: 10.6, width: 4.8, height: 3.4, rx: 1 }),
+      line(9.8, 11, 5.6, 6.6), line(14.2, 11, 18.4, 6.6),
+      line(9.8, 13.6, 5.6, 18), line(14.2, 13.6, 18.4, 18),
+      node('ellipse', { cx: 4.4, cy: 5.8, rx: 3.1, ry: 1 }),
+      node('ellipse', { cx: 19.6, cy: 5.8, rx: 3.1, ry: 1 }),
+      node('ellipse', { cx: 4.4, cy: 18.8, rx: 3.1, ry: 1 }),
+      node('ellipse', { cx: 19.6, cy: 18.8, rx: 3.1, ry: 1 })
+    ];
+  }
+
   var SPORT_PARTS = {
     snorkel: maskParts, bike: bikeParts, run: runParts, swim: swimParts,
     tennis: tennisParts, hike: hikeParts, fishing: fishingParts, golf: golfParts,
-    surf: surfParts, windsport: windsportParts
+    surf: surfParts, windsport: windsportParts, drone: droneParts
   };
 
   /* Wind direction is not a comfort reading, so it gets a compass instead of a

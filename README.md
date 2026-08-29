@@ -76,11 +76,12 @@ current value and a verbal band label.
 Another eighteen cards wait in the library and can be put on the screen at any
 time: feels-like, gusts, wind direction (a compass instead of a face), rain
 chance, dew point, visibility, water temperature, air quality, PM2.5 and pollen,
-plus eight more outdoor sports — running, open-water swimming, tennis, hiking,
-fishing, golf, surfing and kite/windsurfing. Each sport weighs what actually
-decides the outing, so their optima disagree on purpose: the runner wants cool,
-clean, pollen-free air, the surfer needs the swell the swimmer is complaining
-about, and the kite card is the only one that wants it blowing hard.
+plus nine more outdoor pursuits — running, open-water swimming, tennis, hiking,
+fishing, golf, surfing, kite/windsurfing and drone flying. Each one weighs what
+actually decides the outing, so their optima disagree on purpose: the runner
+wants cool, clean, pollen-free air, the surfer needs the swell the swimmer is
+complaining about, the kite card is the only one that wants it blowing hard, and
+the drone card grounds itself on gusts, rain, haze or a battery-cold morning.
 
 Every card also carries an icon, sitting large in the empty half of the value
 row next to the number and painted in the colour of the reading's comfort band —
