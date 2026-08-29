@@ -79,17 +79,30 @@ body[data-theme="tiles"] .scale-marker {
   margin-left: -5px; border-top-color: #000;
 }
 
+/* Each tile is washed in the colour of its comfort band, so the screen reads at
+   a glance before any number does. Text flips to white on the dark grounds and
+   stays black on the light ones — every pair clears WCAG AA (4.5:1) for the
+   small labels, and most reach AAA. */
+body[data-theme="tiles"] .lv-deep-card { background: #3b2f8f; color: #ffffff; }
+body[data-theme="tiles"] .lv-cold-card { background: #2b5fd9; color: #ffffff; }
+body[data-theme="tiles"] .lv-calm-card { background: #17698f; color: #ffffff; }
+body[data-theme="tiles"] .lv-good-card { background: #24732f; color: #ffffff; }
+body[data-theme="tiles"] .lv-mid-card  { background: #e2c23a; color: #000000; }
+body[data-theme="tiles"] .lv-warn-card { background: #e0842c; color: #000000; }
+body[data-theme="tiles"] .lv-bad-card  { background: #c8341f; color: #ffffff; }
+body[data-theme="tiles"] .lv-crit-card { background: #6f1010; color: #ffffff; }
+body[data-theme="tiles"] .lv-none-card { background: #ffffff; color: #000000; }
+
+/* On a coloured ground the slider cannot use the band palette any more — the
+   filled part would vanish into the tile. It goes monochrome instead: filled
+   segments and the marker in the text colour, empty ones just outlined. */
+body[data-theme="tiles"] .card .seg { border-color: currentColor; }
+body[data-theme="tiles"] .card .seg-off { background: transparent; }
+body[data-theme="tiles"] .card .seg-on { background: currentColor; }
+body[data-theme="tiles"] .card .scale-marker { border-top-color: currentColor; }
+
 body[data-theme="tiles"] .footbar { font-size: 11px; border-top: 2px solid #000; padding-top: 3px; }
 body[data-theme="tiles"] .empty { border: 2px solid #000; }
-
-body[data-theme="tiles"] .seg-on.lv-deep { background: #3b2f8f; }
-body[data-theme="tiles"] .seg-on.lv-cold { background: #2b5fd9; }
-body[data-theme="tiles"] .seg-on.lv-calm { background: #2f9bd4; }
-body[data-theme="tiles"] .seg-on.lv-good { background: #2e8b3d; }
-body[data-theme="tiles"] .seg-on.lv-mid  { background: #d8b21a; }
-body[data-theme="tiles"] .seg-on.lv-warn { background: #d9741a; }
-body[data-theme="tiles"] .seg-on.lv-bad  { background: #c8341f; }
-body[data-theme="tiles"] .seg-on.lv-crit { background: #6f1010; }
 
 /* From this width the number column is wide enough for a much bigger step. */
 @media (min-width: 480px) {

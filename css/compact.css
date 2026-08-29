@@ -1,0 +1,82 @@
+/* Phone mode: everything on one screen, no scrolling.
+   Loaded after every theme, so at equal specificity these rules win. Each
+   design keeps its own colour, borders and typography — what changes is the
+   density: two columns, tighter boxes, and no 24 h charts, which are what make
+   a card three times taller than the reading it carries.
+   The 520 px cut-off keeps e-ink readers (536 px and up) on the roomy layout. */
+
+@media (max-width: 520px) {
+
+  body[data-theme] .app { padding: 6px 6px 8px 6px; }
+
+  /* A compact header: the clock still reads across the room, the rest shrinks. */
+  body[data-theme] .topbar { padding: 0 8px 4px 8px; }
+  body[data-theme] .clock { font-size: 34px; }
+  body[data-theme] .date { font-size: 10px; }
+  body[data-theme] .place { font-size: 14px; }
+  body[data-theme] .updated { font-size: 10px; }
+  body[data-theme] .cond { font-size: 11px; }
+  body[data-theme] .btn-icon svg { width: 20px; height: 20px; }
+
+  body[data-theme] .cards { display: flex; flex-wrap: wrap; margin-top: 5px; }
+  body[data-theme] .card {
+    flex: 1 1 47%; min-width: 0; max-width: 50%;
+    margin: 0 4px 4px 0; padding: 3px 6px 5px 6px;
+  }
+
+  /* The charts and the scale end labels are the first things to go. */
+  body[data-theme] .spark,
+  body[data-theme] .spark-cap,
+  body[data-theme] .scale-ends,
+  body[data-theme] .card-badge { display: none; }
+
+  body[data-theme] .seg { height: 8px; margin-right: 2px; }
+  body[data-theme] .scale { padding-top: 8px; }
+  body[data-theme] .scale-marker {
+    border-top-width: 7px; border-left-width: 4px; border-right-width: 4px; margin-left: -4px;
+  }
+
+  /* Everything but Tiles shares one compact card; Tiles keeps its own layout,
+     where the number already owns the left half of the cell. */
+  body[data-theme]:not([data-theme="tiles"]) .card-head { display: block; }
+  body[data-theme]:not([data-theme="tiles"]) .card-title { font-size: 10px; letter-spacing: 0.04em; }
+  body[data-theme]:not([data-theme="tiles"]) .card-value-row { margin-top: -1px; }
+  body[data-theme]:not([data-theme="tiles"]) .card-value { font-size: 27px; line-height: 1.05; }
+  body[data-theme]:not([data-theme="tiles"]) .card-unit { font-size: 11px; margin-left: 4px; }
+  body[data-theme]:not([data-theme="tiles"]) .card-band { font-size: 11px; margin-top: 3px; }
+  body[data-theme]:not([data-theme="tiles"]) .card-note {
+    font-size: 10px; margin-top: 1px;
+    white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+  }
+
+  /* Tiles: shorter cells and a smaller number, so the grid clears the shortest
+     phone screens too. */
+  body[data-theme="tiles"] .card { min-height: 88px; }
+  body[data-theme="tiles"] .card-value { font-size: 34px; }
+  body[data-theme="tiles"] .card[data-metric="pressure"] .card-value { font-size: 28px; }
+
+  /* Design-specific trimmings that only make sense at this density. */
+  body[data-theme="night"] .card[data-metric="temp"] { flex: 1 1 47%; }
+  body[data-theme="night"] .card[data-metric="temp"] .card-value { font-size: 27px; }
+  body[data-theme="night"] .topbar { padding: 8px 10px; border-radius: 14px; }
+  body[data-theme="night"] .card { border-radius: 12px; }
+  body[data-theme="paper"] .card { border-left-width: 3px; padding-left: 7px; }
+  body[data-theme="eink"] .card { border-width: 2px; }
+
+  body[data-theme] .footbar { font-size: 10px; }
+
+  /* Short screens need one more notch of density to clear the fold. */
+  @media (max-height: 660px) {
+    body[data-theme] .clock { font-size: 30px; }
+    body[data-theme] .card { margin: 0 3px 3px 0; padding: 2px 5px 4px 5px; }
+    body[data-theme] .seg { height: 7px; }
+    body[data-theme] .scale { padding-top: 7px; }
+    body[data-theme]:not([data-theme="tiles"]) .card-value { font-size: 24px; }
+    body[data-theme]:not([data-theme="tiles"]) .card-band { font-size: 10px; margin-top: 2px; }
+    body[data-theme]:not([data-theme="tiles"]) .card-note { font-size: 9px; }
+    body[data-theme="tiles"] .card { min-height: 78px; }
+    body[data-theme="tiles"] .card-value { font-size: 30px; }
+    body[data-theme="tiles"] .card[data-metric="pressure"] .card-value { font-size: 25px; }
+    body[data-theme="night"] .topbar { padding: 6px 10px; }
+  }
+}

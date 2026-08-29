@@ -21,9 +21,13 @@ Four designs ship with the app and are cycled with the grid icon in the top bar.
    a two-column grid (three columns from 620 px). Inside each tile the number is
    as large as the cell allows and owns the left half over its full height, with
    the unit beneath it; the title, the band label and one clipped line of detail
-   sit in the top right, and the comfort slider runs along the bottom right. The
-   24-hour charts are dropped here — they are what pushes the last tiles below
-   the fold.
+   sit in the top right, and the comfort slider runs along the bottom right. Each
+   tile is washed in the colour of its comfort band, so the screen reads before
+   any number does — text flips to white on the dark grounds and stays black on
+   the light ones, every pair clearing WCAG AA for the small labels. On a
+   coloured ground the slider goes monochrome (filled segments in the text
+   colour), because the band palette would vanish into the tile. The 24-hour
+   charts are dropped here — they are what pushes the last tiles below the fold.
 3. **Night** (`night`) — for phones: two tiles per row, temperature across the
    full width, 18 px corners, a thin solid scale bar. The dark background is
    easy on an OLED panel and on the eyes at night.
@@ -107,6 +111,16 @@ stock PocketBook browser almost certainly does not support it; there the working
 setup is the app kept open with the wake lock on, refreshing on the page's own
 hourly timer.
 
+## On a phone
+
+Below 520 px every design switches to a compact layout so the whole set of
+readings fits on one screen with no scrolling: two columns, tighter boxes, and
+no 24-hour charts — a chart makes a card three times taller than the reading it
+carries. Short screens get one more notch of density. Each design keeps its own
+colour, borders and typography, only the density changes. Measured from 320×568
+to 430×932, all four designs fit with headroom; e-ink readers (536 px and wider)
+stay on the roomy layout with the charts.
+
 ## Language
 
 All strings live in `js/i18n.js`. English is the source language; Russian,
@@ -155,6 +169,7 @@ css/theme-eink.css      design 1
 css/theme-night.css     design 3
 css/theme-paper.css     design 4
 css/theme-tiles.css     design 2
+css/compact.css         phone layout: one screen, no scrolling (loaded last)
 js/i18n.js              all user-facing strings: English source + ru/uk/es locales
 js/util.js              helpers, XHR, formatting, weather codes
 js/store.js             settings and cache in localStorage
