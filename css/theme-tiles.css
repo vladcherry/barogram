@@ -38,7 +38,10 @@ body[data-theme="tiles"] .card-title {
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em;
 }
 body[data-theme="tiles"] .card-badge { display: none; }
-body[data-theme="tiles"] .card-icon svg { width: 20px; height: 20px; }
+/* The tile ground already carries the comfort colour, so the icon stays in the
+   text colour: painting it the same colour would erase it. */
+body[data-theme="tiles"] .card-icon svg { width: 34px; height: 34px; }
+body[data-theme="tiles"] .card-icon { color: inherit; }
 body[data-theme="tiles"] .card-value { font-size: 34px; line-height: 1.05; letter-spacing: -0.03em; }
 body[data-theme="tiles"] .card-unit { font-size: 12px; font-weight: 700; }
 body[data-theme="tiles"] .card-band { font-size: 12px; margin-top: 3px; text-transform: uppercase; }
@@ -91,6 +94,7 @@ body[data-theme="tiles"] .empty { border: 2px solid #000; }
   body[data-theme="tiles"] .card-band { margin-top: 2px; }
   body[data-theme="tiles"] .scale { padding-top: 8px; }
   body[data-theme="tiles"] .seg { height: 8px; }
+  body[data-theme="tiles"] .card-icon svg { width: 38px; height: 38px; }
 }
 
 /* Three columns once the screen is wide enough. The width cap keeps the last

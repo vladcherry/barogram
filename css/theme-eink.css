@@ -21,6 +21,19 @@ body[data-theme="eink"] .btn:active { background: #000; color: #fff; }
 body[data-theme="eink"] .btn-icon svg { width: 24px; height: 24px; stroke-width: 2.4; }
 /* Thin strokes fade on electronic ink, so the card icons are drawn heavier. */
 body[data-theme="eink"] .card-icon svg { width: 24px; height: 24px; stroke-width: 2.1; }
+
+/* The icon takes the empty half of the value row and carries the comfort colour
+   itself — on Kaleido a solid coloured shape reads from further away than the
+   thin scale does. */
+body[data-theme="eink"] .card-icon svg { width: 46px; height: 46px; stroke-width: 1.7; }
+body[data-theme="eink"] .card-icon.lv-deep { color: #3b2f8f; }
+body[data-theme="eink"] .card-icon.lv-cold { color: #2b5fd9; }
+body[data-theme="eink"] .card-icon.lv-calm { color: #2f8fc4; }
+body[data-theme="eink"] .card-icon.lv-good { color: #2e8b3d; }
+body[data-theme="eink"] .card-icon.lv-mid  { color: #b8930f; }
+body[data-theme="eink"] .card-icon.lv-warn { color: #d9741a; }
+body[data-theme="eink"] .card-icon.lv-bad  { color: #c8341f; }
+body[data-theme="eink"] .card-icon.lv-crit { color: #6f1010; }
 body[data-theme="eink"] .btn.is-active { background: #000; color: #fff; }
 body[data-theme="eink"] .input { border-color: #000; border-radius: 0; font-size: 16px; }
 body[data-theme="eink"] .panel { border-color: #000; }

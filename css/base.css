@@ -76,9 +76,9 @@ button, input { font-family: inherit; font-size: inherit; }
 .card-badge { }
 /* Card icons follow the card's text colour, so they work on white paper, on a
    dark tile and on a coloured comfort ground alike. */
-.card-icon { flex: 0 0 auto; line-height: 0; margin-left: 6px; }
+.card-icon { flex: 0 0 auto; line-height: 0; margin-left: auto; align-self: center; }
 .card-icon svg {
-  display: block; width: 22px; height: 22px;
+  display: block; width: 38px; height: 38px;
   fill: none; stroke: currentColor; stroke-width: 1.8;
   stroke-linecap: round; stroke-linejoin: round;
 }

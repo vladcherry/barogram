@@ -73,7 +73,11 @@ current value and a verbal band label.
 | Snorkeling | index 0…10 | from waves, water temperature, wind, rain and light |
 | Cycling | index 0…10 | from temperature, wind with gusts, rain, UV and mugginess |
 
-Every card also carries an icon. The cloud-cover and precipitation cards show
+Every card also carries an icon, sitting large in the empty half of the value
+row next to the number and painted in the colour of the reading's comfort band —
+a solid coloured shape carries further across a room than the thin scale does.
+In E-Ink Color the ground already holds that colour, so there the icon stays in
+the text colour instead; painting it the same colour would erase it.  The cloud-cover and precipitation cards show
 the weather itself — sun, sun behind cloud, fog, rain, snow, thunderstorm, or a
 struck-through drop when it is dry. The other readings show a comfort face for
 the band they are in, from a smile down to crossed-out eyes. The two sport

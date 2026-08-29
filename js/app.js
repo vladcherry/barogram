@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.29-8';
+  var APP_VERSION = '2026.08.29-9';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -212,13 +212,18 @@
   }
 
   /* Sky and rain show the weather itself, the sports show the sport with a
-     verdict, everything else shows the face of its comfort band. */
+     verdict, everything else shows the face of its comfort band. The band class
+     rides along on the element so each design can colour the icon by comfort. */
   function iconFor(key, value, w) {
-    if (key === 'clouds') { return Icons.sky(w.code, w.clouds); }
-    if (key === 'rain') { return Icons.rain(w.rain); }
-    if (key === 'snorkel' || key === 'bike') { return Icons.sport(key, value); }
-    if (value === null || value === undefined) { return Icons.mood(null); }
-    return Icons.mood(Metrics.band(Metrics.SPEC[key].bands, value).cls);
+    var band = (value === null || value === undefined)
+      ? null : Metrics.band(Metrics.SPEC[key].bands, value).cls;
+    var icon;
+    if (key === 'clouds') { icon = Icons.sky(w.code, w.clouds); }
+    else if (key === 'rain') { icon = Icons.rain(w.rain); }
+    else if (key === 'snorkel' || key === 'bike') { icon = Icons.sport(key, value); }
+    else { icon = Icons.mood(band); }
+    if (band) { icon.className = 'card-icon ' + band; }
+    return icon;
   }
 
   function appendSpark(card, values, spec, captionKey) {
@@ -317,7 +322,7 @@
     host.appendChild(Scale.card({
       key: 'snorkel', spec: Metrics.SPEC.snorkel, value: snorkel ? snorkel.value : null,
       badge: I18N.t('card.index'),
-      icon: Icons.sport('snorkel', snorkel ? snorkel.value : null),
+      icon: iconFor('snorkel', snorkel ? snorkel.value : null, w),
       note: snorkel ? whyNote(snorkel) : I18N.t('note.needSea')
     }));
 
@@ -326,7 +331,7 @@
     host.appendChild(Scale.card({
       key: 'bike', spec: Metrics.SPEC.bike, value: bike ? bike.value : null,
       badge: I18N.t('card.index'),
-      icon: Icons.sport('bike', bike ? bike.value : null),
+      icon: iconFor('bike', bike ? bike.value : null, w),
       note: whyNote(bike)
     }));
   }

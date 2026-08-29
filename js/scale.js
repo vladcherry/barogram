@@ -50,12 +50,13 @@ var Scale = (function () {
     var head = U.el('div', 'card-head');
     head.appendChild(U.el('h2', 'card-title', I18N.t(spec.title)));
     if (opts.badge) { head.appendChild(U.el('span', 'card-badge', opts.badge)); }
-    if (opts.icon) { head.appendChild(opts.icon); }
     node.appendChild(head);
 
+    /* The icon rides on the right of the number, where the card is empty. */
     var row = U.el('div', 'card-value-row');
     row.appendChild(U.el('div', 'card-value', value === null ? '—' : U.fmt(value, spec.decimals)));
     if (spec.unit) { row.appendChild(U.el('div', 'card-unit', I18N.t(spec.unit))); }
+    if (opts.icon) { row.appendChild(opts.icon); }
     node.appendChild(row);
 
     node.appendChild(build(spec, value));

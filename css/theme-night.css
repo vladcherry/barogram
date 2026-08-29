@@ -18,6 +18,15 @@ body[data-theme="night"] .btn {
 }
 body[data-theme="night"] .btn:active { background: #2a3542; }
 body[data-theme="night"] .btn-icon svg { width: 20px; height: 20px; }
+body[data-theme="night"] .card-icon svg { width: 36px; height: 36px; }
+body[data-theme="night"] .card-icon.lv-deep { color: #a79bff; }
+body[data-theme="night"] .card-icon.lv-cold { color: #7fb0ff; }
+body[data-theme="night"] .card-icon.lv-calm { color: #6fd3f7; }
+body[data-theme="night"] .card-icon.lv-good { color: #5fd98c; }
+body[data-theme="night"] .card-icon.lv-mid  { color: #ecd873; }
+body[data-theme="night"] .card-icon.lv-warn { color: #f6a670; }
+body[data-theme="night"] .card-icon.lv-bad  { color: #ff8574; }
+body[data-theme="night"] .card-icon.lv-crit { color: #ff6b5c; }
 body[data-theme="night"] .btn.is-active { background: #2a3542; border-color: #4d8dfd; color: #ffffff; }
 body[data-theme="night"] .menu-label { color: #8ea0b5; }
 body[data-theme="night"] .input { border-radius: 12px; border-color: #26313d; background: #121820; color: #e8eef5; }
