@@ -11,12 +11,14 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.29-9';
+  var APP_VERSION = '2026.08.29-10';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
   var screenLock = null;
   var refreshing = false;
+  var editing = false;
+  var dragKey = null;
 
   /* ---------- theme ---------- */
 
@@ -90,7 +92,7 @@
     var startX = null, startY = null, startedAt = 0;
 
     document.addEventListener('touchstart', function (e) {
-      if (!e.touches || e.touches.length !== 1 || insideMenu(e.target)) {
+      if (!e.touches || e.touches.length !== 1 || editing || insideMenu(e.target)) {
         startX = null;
         return;
       }
@@ -143,6 +145,10 @@
     updateScreenButton();
     U.setText(U.$('#btn-language'), I18N.t('ui.language', { name: I18N.t('lang.' + active) }));
     buildDesignRow();
+    if (editing) {
+      U.setText(U.$('#edit-hint'), I18N.t('hint.editMode'));
+      renderLibrary();
+    }
     U.setText(U.$('#version'), I18N.t('ui.version', { v: APP_VERSION }));
     U.setText(U.$('#place'), settings.place || I18N.t(demoMode ? 'ui.demoPlace' : 'ui.noPlace'));
     U.setText(U.$('#date'), U.dateText(new Date()));
@@ -188,6 +194,175 @@
     setTimeout(tickClock, ms + 30);
   }
 
+  /* ---------- the card library ----------
+     Every card is described here: where its number comes from, what its note
+     says, and whether it carries a 24 h chart. The screen is then just a list
+     of keys, which is what makes the cards rearrangeable. */
+
+  var SPORTS = {
+    snorkel: 1, bike: 1, run: 1, swim: 1, tennis: 1,
+    hike: 1, fishing: 1, golf: 1, surf: 1, windsport: 1
+  };
+
+  function pct(v) { return v === null ? '—' : U.fmt(v, 0) + '%'; }
+
+  var CARDS = {
+    temp: {
+      value: function (w) { return w.temp; },
+      spark: { series: 'tempSeries', caption: 'spark.temp' },
+      note: function (w) {
+        return (w.tempMin !== null && w.tempMax !== null)
+          ? I18N.t('note.tempRange', {
+              feels: U.fmt(w.feels, 1), min: U.fmt(w.tempMin, 0), max: U.fmt(w.tempMax, 0) })
+          : I18N.t('note.temp', { feels: U.fmt(w.feels, 1) });
+      }
+    },
+    wind: {
+      value: function (w) { return w.wind; },
+      note: function (w) {
+        return (w.windDir !== null)
+          ? I18N.t('note.windDir', {
+              gust: U.fmt(w.gust, 1), dir: U.windDir(w.windDir), deg: U.fmt(w.windDir, 0) })
+          : I18N.t('note.wind', { gust: U.fmt(w.gust, 1) });
+      }
+    },
+    rain: {
+      value: function (w) { return w.rain; },
+      spark: { series: 'rainSeries', caption: 'spark.rain' },
+      note: function (w) {
+        return (w.rainSum !== null)
+          ? I18N.t('note.rainSum', { prob: pct(w.rainProb), sum: U.fmt(w.rainSum, 1) })
+          : I18N.t('note.rain', { prob: pct(w.rainProb) });
+      }
+    },
+    clouds: {
+      value: function (w) { return w.clouds; },
+      note: function (w) { return U.wmoText(w.code); }
+    },
+    uv: {
+      value: function (w) { return w.uv; },
+      note: function (w) {
+        return w.uvMax === null ? I18N.t('note.uvDefault')
+                                : I18N.t('note.uvMax', { max: U.fmt(w.uvMax, 1) });
+      }
+    },
+    humidity: {
+      value: function (w) { return w.humidity; },
+      note: function () { return I18N.t('note.humidity'); }
+    },
+    pressure: {
+      value: function (w) { return w.pressure; },
+      spark: { series: 'pressureSeries', caption: 'spark.pressure' },
+      note: function (w) {
+        if (w.pressure === null) { return ''; }
+        return (w.pressureTrend3h !== null)
+          ? I18N.t('note.pressureTrend', { mmhg: toMmHg(w.pressure), trend: trendText(w.pressureTrend3h) })
+          : I18N.t('note.pressure', { mmhg: toMmHg(w.pressure) });
+      }
+    },
+    waves: {
+      value: function (w) { return w.waveHeight; },
+      note: function (w) {
+        return w.hasSea
+          ? I18N.t('note.waves', { period: U.fmt(w.wavePeriod, 1), temp: U.fmt(w.seaTemp, 1) })
+          : I18N.t('note.noSea');
+      }
+    },
+    feelsLike: {
+      value: function (w) { return w.feels; },
+      note: function (w) { return I18N.t('note.measured', { v: U.fmt(w.temp, 1) }); }
+    },
+    gusts: {
+      value: function (w) { return w.gust; },
+      note: function (w) { return I18N.t('note.steadyWind', { v: U.fmt(w.wind, 1) }); }
+    },
+    windDir: {
+      value: function (w) { return w.windDir; },
+      bandText: function (w) { return U.windDir(w.windDir); },
+      icon: function (w) { return Icons.compass(w.windDir); },
+      note: function (w) { return I18N.t('note.windFrom', { dir: U.windDir(w.windDir) }); }
+    },
+    rainProb: {
+      value: function (w) { return w.rainProb; },
+      note: function (w) { return I18N.t('note.rainAmount', { v: U.fmt(w.rainSum, 1) }); }
+    },
+    waterTemp: {
+      value: function (w) { return w.seaTemp; },
+      note: function (w) {
+        return w.hasSea ? I18N.t('note.waterHint', { v: U.fmt(w.waveHeight, 2) })
+                        : I18N.t('note.noSea');
+      }
+    },
+    dewPoint: {
+      value: function (w) { return w.dewPoint; },
+      note: function () { return I18N.t('note.dewHint'); }
+    },
+    visibility: {
+      value: function (w) { return w.visibility; },
+      note: function () { return I18N.t('note.visHint'); }
+    },
+    airQuality: {
+      value: function (w) { return w.airQuality; },
+      note: function (w) {
+        return w.pm25 === null ? I18N.t('note.noData') : I18N.t('note.pm', { v: U.fmt(w.pm25, 1) });
+      }
+    },
+    pm25: {
+      value: function (w) { return w.pm25; },
+      note: function (w) {
+        return w.airQuality === null ? I18N.t('note.noData')
+                                     : I18N.t('metric.airQuality') + ' ' + U.fmt(w.airQuality, 0);
+      }
+    },
+    pollen: {
+      value: function (w) { return w.pollen; },
+      note: function () { return I18N.t('note.pollenSpecies'); }
+    }
+  };
+
+  /* Sports share one shape: the index, its reasons, and the sport's own icon. */
+  function addSportCards() {
+    var keys = [], k;
+    for (k in SPORTS) { if (SPORTS.hasOwnProperty(k)) { keys.push(k); } }
+    for (var i = 0; i < keys.length; i++) {
+      (function (key) {
+        CARDS[key] = {
+          index: true,
+          badge: function () { return I18N.t('card.index'); },
+          value: function (w) { var r = Metrics[key](w); return r ? r.value : null; },
+          note: function (w) {
+            var r = Metrics[key](w);
+            if (r) { return whyNote(r); }
+            return (key === 'swim' || key === 'surf' || key === 'snorkel')
+              ? I18N.t('note.needSea') : I18N.t('note.noData');
+          }
+        };
+      })(keys[i]);
+    }
+  }
+  addSportCards();
+
+  /* The screen as it comes out of the box, and the order of the library. */
+  var DEFAULT_CARDS = ['temp', 'wind', 'rain', 'clouds', 'uv', 'humidity',
+                       'pressure', 'waves', 'snorkel', 'bike'];
+  var LIBRARY = ['temp', 'feelsLike', 'wind', 'gusts', 'windDir', 'rain', 'rainProb',
+                 'clouds', 'uv', 'humidity', 'dewPoint', 'pressure', 'visibility',
+                 'airQuality', 'pm25', 'pollen', 'waves', 'waterTemp',
+                 'snorkel', 'swim', 'surf', 'windsport', 'bike', 'run', 'hike',
+                 'tennis', 'golf', 'fishing'];
+
+  function cardList() {
+    var list = settings.cards;
+    if (!list || !list.length) { return DEFAULT_CARDS.slice(); }
+    var out = [], i;
+    for (i = 0; i < list.length; i++) {
+      if (CARDS[list[i]]) { out.push(list[i]); }
+    }
+    return out.length ? out : DEFAULT_CARDS.slice();
+  }
+
+  function saveCards(list) { Store.set({ cards: list }); }
+
   /* ---------- cards ---------- */
 
   function toMmHg(hpa) { return Math.round(hpa * 0.750062); }
@@ -215,12 +390,14 @@
      verdict, everything else shows the face of its comfort band. The band class
      rides along on the element so each design can colour the icon by comfort. */
   function iconFor(key, value, w) {
-    var band = (value === null || value === undefined)
-      ? null : Metrics.band(Metrics.SPEC[key].bands, value).cls;
+    var spec = Metrics.SPEC[key];
+    var band = (value === null || value === undefined || !spec)
+      ? null : Metrics.band(spec.bands, value).cls;
     var icon;
-    if (key === 'clouds') { icon = Icons.sky(w.code, w.clouds); }
+    if (CARDS[key] && CARDS[key].icon) { icon = CARDS[key].icon(w); }
+    else if (key === 'clouds') { icon = Icons.sky(w.code, w.clouds); }
     else if (key === 'rain') { icon = Icons.rain(w.rain); }
-    else if (key === 'snorkel' || key === 'bike') { icon = Icons.sport(key, value); }
+    else if (SPORTS[key]) { icon = Icons.sport(key, value); }
     else { icon = Icons.mood(band); }
     if (band) { icon.className = 'card-icon ' + band; }
     return icon;
@@ -232,6 +409,24 @@
     if (spark) { card.appendChild(spark); }
   }
 
+  function buildCard(key, w) {
+    var def = CARDS[key];
+    var spec = Metrics.SPEC[key];
+    if (!def || !spec) { return null; }
+
+    var value = def.value(w);
+    var card = Scale.card({
+      key: key, spec: spec, value: value,
+      note: def.note ? def.note(w) : '',
+      badge: def.badge ? def.badge() : null,
+      bandText: def.bandText ? def.bandText(w) : null,
+      icon: iconFor(key, value, w)
+    });
+    if (def.spark) { appendSpark(card, w[def.spark.series], spec, def.spark.caption); }
+    if (editing) { card.appendChild(editControls(key)); }
+    return card;
+  }
+
   function render(w) {
     var host = U.$('#cards');
     if (!host) { return; }
@@ -239,101 +434,200 @@
 
     if (!w) {
       host.appendChild(U.el('p', 'empty', I18N.t('ui.noData')));
-      U.setText(U.$('#cond'), ' ');
+      U.setText(U.$('#cond'), ' ');
       return;
     }
 
     U.setText(U.$('#cond'), U.wmoText(w.code));
 
-    /* 1. Temperature */
-    var tempNote = (w.tempMin !== null && w.tempMax !== null)
-      ? I18N.t('note.tempRange', {
-          feels: U.fmt(w.feels, 1), min: U.fmt(w.tempMin, 0), max: U.fmt(w.tempMax, 0)
-        })
-      : I18N.t('note.temp', { feels: U.fmt(w.feels, 1) });
-    var tempCard = Scale.card({ key: 'temp', spec: Metrics.SPEC.temp, value: w.temp, note: tempNote,
-      icon: iconFor('temp', w.temp, w) });
-    appendSpark(tempCard, w.tempSeries, Metrics.SPEC.temp, 'spark.temp');
-    host.appendChild(tempCard);
-
-    /* 2. Wind */
-    var windNote = (w.windDir !== null)
-      ? I18N.t('note.windDir', {
-          gust: U.fmt(w.gust, 1), dir: U.windDir(w.windDir), deg: U.fmt(w.windDir, 0)
-        })
-      : I18N.t('note.wind', { gust: U.fmt(w.gust, 1) });
-    host.appendChild(Scale.card({ key: 'wind', spec: Metrics.SPEC.wind, value: w.wind, note: windNote,
-      icon: iconFor('wind', w.wind, w) }));
-
-    /* 3. Precipitation */
-    var prob = w.rainProb === null ? '—' : U.fmt(w.rainProb, 0) + '%';
-    var rainNote = (w.rainSum !== null)
-      ? I18N.t('note.rainSum', { prob: prob, sum: U.fmt(w.rainSum, 1) })
-      : I18N.t('note.rain', { prob: prob });
-    var rainCard = Scale.card({ key: 'rain', spec: Metrics.SPEC.rain, value: w.rain, note: rainNote,
-      icon: iconFor('rain', w.rain, w) });
-    appendSpark(rainCard, w.rainSeries, Metrics.SPEC.rain, 'spark.rain');
-    host.appendChild(rainCard);
-
-    /* 4. Cloud cover */
-    host.appendChild(Scale.card({
-      key: 'clouds', spec: Metrics.SPEC.clouds, value: w.clouds, note: U.wmoText(w.code),
-      icon: iconFor('clouds', w.clouds, w)
-    }));
-
-    /* 5. UV */
-    host.appendChild(Scale.card({
-      key: 'uv', spec: Metrics.SPEC.uv, value: w.uv,
-      icon: iconFor('uv', w.uv, w),
-      note: w.uvMax === null ? I18N.t('note.uvDefault') : I18N.t('note.uvMax', { max: U.fmt(w.uvMax, 1) })
-    }));
-
-    /* 6. Humidity */
-    host.appendChild(Scale.card({
-      key: 'humidity', spec: Metrics.SPEC.humidity, value: w.humidity, note: I18N.t('note.humidity'),
-      icon: iconFor('humidity', w.humidity, w)
-    }));
-
-    /* 7. Pressure with the barogram */
-    var pressureNote = '';
-    if (w.pressure !== null) {
-      pressureNote = (w.pressureTrend3h !== null)
-        ? I18N.t('note.pressureTrend', { mmhg: toMmHg(w.pressure), trend: trendText(w.pressureTrend3h) })
-        : I18N.t('note.pressure', { mmhg: toMmHg(w.pressure) });
+    var list = cardList(), i, card;
+    for (i = 0; i < list.length; i++) {
+      card = buildCard(list[i], w);
+      if (card) {
+        card.setAttribute('data-index', i);
+        host.appendChild(card);
+      }
     }
-    var pressureCard = Scale.card({
-      key: 'pressure', spec: Metrics.SPEC.pressure, value: w.pressure, note: pressureNote,
-      icon: iconFor('pressure', w.pressure, w)
-    });
-    appendSpark(pressureCard, w.pressureSeries, Metrics.SPEC.pressure, 'spark.pressure');
-    host.appendChild(pressureCard);
+    if (editing) { host.appendChild(addCardTile()); }
+  }
 
-    /* 8. Waves */
-    var waveNote = w.hasSea
-      ? I18N.t('note.waves', { period: U.fmt(w.wavePeriod, 1), temp: U.fmt(w.seaTemp, 1) })
-      : I18N.t('note.noSea');
-    host.appendChild(Scale.card({
-      key: 'waves', spec: Metrics.SPEC.waves, value: w.waveHeight, note: waveNote,
-      icon: iconFor('waves', w.waveHeight, w)
-    }));
 
-    /* 9. Snorkeling */
-    var snorkel = Metrics.snorkel(w);
-    host.appendChild(Scale.card({
-      key: 'snorkel', spec: Metrics.SPEC.snorkel, value: snorkel ? snorkel.value : null,
-      badge: I18N.t('card.index'),
-      icon: iconFor('snorkel', snorkel ? snorkel.value : null, w),
-      note: snorkel ? whyNote(snorkel) : I18N.t('note.needSea')
-    }));
+  /* ---------- editing the card set ----------
+     Holding any card turns the screen into an editor: cards can be dragged into
+     a new order, removed with ×, and new ones picked from the library. Arrow
+     buttons do the same job as dragging, because dragging on electronic ink is
+     a lottery. */
 
-    /* 10. Cycling */
-    var bike = Metrics.bike(w);
-    host.appendChild(Scale.card({
-      key: 'bike', spec: Metrics.SPEC.bike, value: bike ? bike.value : null,
-      badge: I18N.t('card.index'),
-      icon: iconFor('bike', bike ? bike.value : null, w),
-      note: whyNote(bike)
-    }));
+  function editControls(key) {
+    var box = U.el('div', 'card-edit');
+    box.appendChild(editButton('‹', 'ui.moveLeft', function () { moveCard(key, -1); }));
+    box.appendChild(editButton('×', 'ui.removeCard', function () { removeCard(key); }));
+    box.appendChild(editButton('›', 'ui.moveRight', function () { moveCard(key, 1); }));
+    return box;
+  }
+
+  function editButton(glyph, labelKey, onClick) {
+    var button = U.el('button', 'btn btn-edit', glyph);
+    button.type = 'button';
+    setLabel(button, I18N.t(labelKey));
+    button.onclick = function (e) {
+      if (e && e.stopPropagation) { e.stopPropagation(); }
+      onClick();
+    };
+    return button;
+  }
+
+  function addCardTile() {
+    var tile = U.el('article', 'card card-add');
+    var button = U.el('button', 'btn btn-add', '+');
+    button.type = 'button';
+    setLabel(button, I18N.t('ui.library'));
+    button.onclick = function () { U.$('#library').hidden = false; };
+    tile.appendChild(button);
+    tile.appendChild(U.el('div', 'card-add-label', I18N.t('ui.library')));
+    return tile;
+  }
+
+  function setEditing(on) {
+    editing = !!on;
+    document.body.setAttribute('data-editing', editing ? '1' : '0');
+    U.$('#editbar').hidden = !editing;
+    U.$('#library').hidden = true;
+    if (editing) {
+      setHint('');
+      U.setText(U.$('#edit-hint'), I18N.t('hint.editMode'));
+      renderLibrary();
+    }
+    render(settings.lastData);
+  }
+
+  function moveCard(key, direction) {
+    var list = cardList();
+    var from = indexOfKey(list, key);
+    var to = from + direction;
+    if (from < 0 || to < 0 || to >= list.length) { return; }
+    list.splice(to, 0, list.splice(from, 1)[0]);
+    saveCards(list);
+    render(settings.lastData);
+  }
+
+  function removeCard(key) {
+    var list = cardList();
+    var at = indexOfKey(list, key);
+    if (at < 0 || list.length <= 1) { return; }
+    list.splice(at, 1);
+    saveCards(list);
+    renderLibrary();
+    render(settings.lastData);
+  }
+
+  function addCard(key) {
+    var list = cardList();
+    if (indexOfKey(list, key) >= 0) { return; }
+    list.push(key);
+    saveCards(list);
+    renderLibrary();
+    render(settings.lastData);
+    U.setText(U.$('#edit-hint'),
+      I18N.t('hint.cardAdded', { name: I18N.t(Metrics.SPEC[key].title) }));
+  }
+
+  function indexOfKey(list, key) {
+    for (var i = 0; i < list.length; i++) { if (list[i] === key) { return i; } }
+    return -1;
+  }
+
+  /* The library only offers what is not on the screen already. */
+  function renderLibrary() {
+    var host = U.$('#library');
+    if (!host) { return; }
+    U.clear(host);
+    var list = cardList(), added = 0, i, key;
+    for (i = 0; i < LIBRARY.length; i++) {
+      key = LIBRARY[i];
+      if (indexOfKey(list, key) >= 0 || !Metrics.SPEC[key]) { continue; }
+      host.appendChild(libraryButton(key));
+      added++;
+    }
+    if (!added) { host.appendChild(U.el('p', 'hint', I18N.t('hint.allCards'))); }
+  }
+
+  function libraryButton(key) {
+    var button = U.el('button', 'btn btn-library', I18N.t(Metrics.SPEC[key].title));
+    button.type = 'button';
+    button.onclick = function () { addCard(key); };
+    return button;
+  }
+
+  function resetCards() {
+    saveCards(DEFAULT_CARDS.slice());
+    renderLibrary();
+    render(settings.lastData);
+  }
+
+  /* Hold a card to enter the editor; in the editor a drag reorders instead. */
+  function bindCardGestures() {
+    var host = U.$('#cards');
+    var holdTimer = null, startX = 0, startY = 0;
+
+    function cardKeyAt(x, y) {
+      var node = document.elementFromPoint(x, y);
+      for (; node; node = node.parentNode) {
+        if (node.className && String(node.className).indexOf('card') === 0 &&
+            node.getAttribute && node.getAttribute('data-metric')) {
+          return node.getAttribute('data-metric');
+        }
+      }
+      return null;
+    }
+
+    function down(x, y) {
+      startX = x; startY = y;
+      var key = cardKeyAt(x, y);
+      if (!key) { return; }
+      if (editing) { dragKey = key; return; }
+      holdTimer = setTimeout(function () {
+        holdTimer = null;
+        setEditing(true);
+      }, 550);
+    }
+
+    function move(x, y) {
+      if (holdTimer && (Math.abs(x - startX) > 10 || Math.abs(y - startY) > 10)) {
+        clearTimeout(holdTimer);
+        holdTimer = null;
+      }
+      if (!editing || !dragKey) { return; }
+      var over = cardKeyAt(x, y);
+      if (!over || over === dragKey) { return; }
+      var list = cardList();
+      var from = indexOfKey(list, dragKey), to = indexOfKey(list, over);
+      if (from < 0 || to < 0) { return; }
+      list.splice(to, 0, list.splice(from, 1)[0]);
+      saveCards(list);
+      render(settings.lastData);
+    }
+
+    function up() {
+      if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
+      dragKey = null;
+    }
+
+    host.addEventListener('touchstart', function (e) {
+      if (!e.touches || e.touches.length !== 1) { return; }
+      down(e.touches[0].clientX, e.touches[0].clientY);
+    }, false);
+    host.addEventListener('touchmove', function (e) {
+      if (!e.touches || !e.touches.length) { return; }
+      if (editing && dragKey && e.preventDefault) { e.preventDefault(); }
+      move(e.touches[0].clientX, e.touches[0].clientY);
+    }, false);
+    host.addEventListener('touchend', up, false);
+    host.addEventListener('touchcancel', up, false);
+
+    host.addEventListener('mousedown', function (e) { down(e.clientX, e.clientY); }, false);
+    document.addEventListener('mousemove', function (e) { move(e.clientX, e.clientY); }, false);
+    document.addEventListener('mouseup', up, false);
   }
 
   /* ---------- data ---------- */
@@ -596,6 +890,9 @@
     U.$('#btn-screen').onclick = toggleScreenLock;
     U.$('#btn-reload').onclick = reloadPage;
     U.$('#btn-update').onclick = updateApp;
+    U.$('#btn-edit').onclick = function () { setEditing(true); closeMenu(); };
+    U.$('#btn-edit-done').onclick = function () { setEditing(false); };
+    U.$('#btn-cards-reset').onclick = resetCards;
   }
 
   function registerWorker() {
@@ -642,6 +939,7 @@
     }, false);
 
     bindSwipe();
+    bindCardGestures();
     registerWorker();
   }
 

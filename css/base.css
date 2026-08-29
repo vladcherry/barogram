@@ -3,6 +3,8 @@
    PocketBook browser understands neither. */
 
 * { box-sizing: border-box; }
+/* A class with display: flex outranks the UA rule for [hidden], so say it here. */
+[hidden] { display: none !important; }
 html, body { margin: 0; padding: 0; }
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
@@ -114,6 +116,22 @@ button, input { font-family: inherit; font-size: inherit; }
 .spark-bar:last-child { margin-right: 0; }
 .spark-gap { height: 2px; }
 .spark-cap { }
+
+/* ---- card editor ---- */
+.editbar { display: flex; flex-wrap: wrap; align-items: center; margin-top: 8px; }
+.editbar .hint { flex: 1 1 200px; margin-left: 8px; }
+.library { display: flex; flex-wrap: wrap; margin-top: 8px; }
+.btn-library { margin: 3px 6px 3px 0; }
+.card-edit { display: flex; justify-content: space-between; margin-top: 6px; }
+.btn-edit { flex: 1 1 auto; margin: 0 3px 0 0; padding: 4px 0; text-align: center; font-weight: 700; }
+.btn-edit:last-child { margin-right: 0; }
+.card-add { display: flex; flex-direction: column; align-items: center; justify-content: center; }
+.btn-add { font-size: 26px; line-height: 1; padding: 4px 14px; margin: 0; }
+.card-add-label { margin-top: 4px; font-size: 12px; text-align: center; }
+/* While editing, cards are handles: no text selection, no long-press callout. */
+body[data-editing="1"] .card {
+  -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
+}
 
 .footbar { margin-top: 6px; }
 

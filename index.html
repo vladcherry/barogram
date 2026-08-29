@@ -63,6 +63,7 @@
     <div class="panel-row">
       <button class="btn" id="btn-reload" type="button" data-i18n="ui.reload">Reload page</button>
       <button class="btn" id="btn-update" type="button" data-i18n="ui.update">Update app</button>
+      <button class="btn" id="btn-edit" type="button" data-i18n="ui.edit">Edit cards</button>
       <span class="version" id="version"></span>
     </div>
     <div class="panel-row">
@@ -74,7 +75,17 @@
     <div class="panel-row"><p class="hint" id="hint"></p></div>
   </div>
 
+  <!-- Shown only while the card editor is open. -->
+  <div class="editbar" id="editbar" hidden>
+    <button class="btn" id="btn-edit-done" type="button" data-i18n="ui.editDone">Done</button>
+    <button class="btn" id="btn-cards-reset" type="button" data-i18n="ui.resetCards">Default set</button>
+    <span class="hint" id="edit-hint"></span>
+  </div>
+
   <main class="cards" id="cards"></main>
+
+  <!-- The card library: everything not already on the screen. -->
+  <div class="library" id="library" hidden></div>
 
   <footer class="footbar">
     <span id="status" data-i18n="status.initial">Open-Meteo data. Hourly updates.</span>

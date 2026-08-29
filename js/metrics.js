@@ -101,6 +101,107 @@ var Metrics = (function () {
         { to: 99,   cls: 'lv-crit', label: 'band.waves.storm' }
       ]
     },
+    /* ---- extra readings, off by default and added from the card library ---- */
+    feelsLike: {
+      title: 'metric.feelsLike', unit: 'unit.temp', min: -20, max: 45, segments: 13, decimals: 1,
+      bands: [
+        { to: -10, cls: 'lv-deep', label: 'band.temp.deepFrost' },
+        { to: 0,   cls: 'lv-cold', label: 'band.temp.frost' },
+        { to: 8,   cls: 'lv-calm', label: 'band.temp.cold' },
+        { to: 15,  cls: 'lv-good', label: 'band.temp.cool' },
+        { to: 24,  cls: 'lv-good', label: 'band.temp.comfort' },
+        { to: 29,  cls: 'lv-mid',  label: 'band.temp.warm' },
+        { to: 34,  cls: 'lv-warn', label: 'band.temp.hot' },
+        { to: 99,  cls: 'lv-bad',  label: 'band.temp.scorching' }
+      ]
+    },
+    gusts: {
+      title: 'metric.gusts', unit: 'unit.wind', min: 0, max: 30, segments: 12, decimals: 1,
+      bands: [
+        { to: 3,  cls: 'lv-calm', label: 'band.wind.calm' },
+        { to: 6,  cls: 'lv-good', label: 'band.wind.light' },
+        { to: 9,  cls: 'lv-mid',  label: 'band.wind.moderate' },
+        { to: 13, cls: 'lv-warn', label: 'band.wind.fresh' },
+        { to: 18, cls: 'lv-bad',  label: 'band.wind.strong' },
+        { to: 99, cls: 'lv-crit', label: 'band.wind.storm' }
+      ]
+    },
+    windDir: {
+      title: 'metric.windDir', unit: 'unit.degree', min: 0, max: 360, segments: 12, decimals: 0,
+      bands: [{ to: 360, cls: 'lv-calm', label: 'band.windDir.any' }]
+    },
+    rainProb: {
+      title: 'metric.rainProb', unit: 'unit.percent', min: 0, max: 100, segments: 10, decimals: 0,
+      bands: [
+        { to: 20,  cls: 'lv-good', label: 'band.rainProb.unlikely' },
+        { to: 50,  cls: 'lv-mid',  label: 'band.rainProb.possible' },
+        { to: 80,  cls: 'lv-warn', label: 'band.rainProb.likely' },
+        { to: 100, cls: 'lv-bad',  label: 'band.rainProb.certain' }
+      ]
+    },
+    waterTemp: {
+      title: 'metric.waterTemp', unit: 'unit.temp', min: 8, max: 32, segments: 12, decimals: 1,
+      bands: [
+        { to: 15, cls: 'lv-deep', label: 'band.water.icy' },
+        { to: 19, cls: 'lv-cold', label: 'band.water.cold' },
+        { to: 22, cls: 'lv-calm', label: 'band.water.brisk' },
+        { to: 25, cls: 'lv-good', label: 'band.water.pleasant' },
+        { to: 29, cls: 'lv-good', label: 'band.water.warm' },
+        { to: 99, cls: 'lv-mid',  label: 'band.water.bath' }
+      ]
+    },
+    dewPoint: {
+      title: 'metric.dewPoint', unit: 'unit.temp', min: -5, max: 30, segments: 12, decimals: 1,
+      bands: [
+        { to: 5,  cls: 'lv-calm', label: 'band.dew.dry' },
+        { to: 13, cls: 'lv-good', label: 'band.dew.comfort' },
+        { to: 17, cls: 'lv-mid',  label: 'band.dew.sticky' },
+        { to: 21, cls: 'lv-warn', label: 'band.dew.humid' },
+        { to: 24, cls: 'lv-bad',  label: 'band.dew.oppressive' },
+        { to: 99, cls: 'lv-crit', label: 'band.dew.miserable' }
+      ]
+    },
+    visibility: {
+      title: 'metric.visibility', unit: 'unit.km', min: 0, max: 30, segments: 12, decimals: 1,
+      bands: [
+        { to: 1,  cls: 'lv-crit', label: 'band.vis.fog' },
+        { to: 4,  cls: 'lv-bad',  label: 'band.vis.poor' },
+        { to: 10, cls: 'lv-mid',  label: 'band.vis.moderate' },
+        { to: 20, cls: 'lv-good', label: 'band.vis.good' },
+        { to: 99, cls: 'lv-good', label: 'band.vis.excellent' }
+      ]
+    },
+    airQuality: {
+      title: 'metric.airQuality', unit: '', min: 0, max: 120, segments: 12, decimals: 0,
+      bands: [
+        { to: 20,  cls: 'lv-good', label: 'band.aqi.good' },
+        { to: 40,  cls: 'lv-good', label: 'band.aqi.fair' },
+        { to: 60,  cls: 'lv-mid',  label: 'band.aqi.moderate' },
+        { to: 80,  cls: 'lv-warn', label: 'band.aqi.poor' },
+        { to: 100, cls: 'lv-bad',  label: 'band.aqi.veryPoor' },
+        { to: 999, cls: 'lv-crit', label: 'band.aqi.extreme' }
+      ]
+    },
+    pm25: {
+      title: 'metric.pm25', unit: 'unit.ugm3', min: 0, max: 60, segments: 12, decimals: 1,
+      bands: [
+        { to: 5,  cls: 'lv-good', label: 'band.aqi.good' },
+        { to: 15, cls: 'lv-mid',  label: 'band.aqi.fair' },
+        { to: 25, cls: 'lv-warn', label: 'band.aqi.moderate' },
+        { to: 50, cls: 'lv-bad',  label: 'band.aqi.poor' },
+        { to: 999, cls: 'lv-crit', label: 'band.aqi.veryPoor' }
+      ]
+    },
+    pollen: {
+      title: 'metric.pollen', unit: 'unit.grains', min: 0, max: 120, segments: 12, decimals: 0,
+      bands: [
+        { to: 10,  cls: 'lv-good', label: 'band.pollen.low' },
+        { to: 30,  cls: 'lv-mid',  label: 'band.pollen.moderate' },
+        { to: 80,  cls: 'lv-warn', label: 'band.pollen.high' },
+        { to: 999, cls: 'lv-bad',  label: 'band.pollen.veryHigh' }
+      ]
+    },
+
     /* comfort indices: the higher, the better */
     snorkel: {
       title: 'metric.snorkel', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
@@ -108,6 +209,38 @@ var Metrics = (function () {
     },
     bike: {
       title: 'metric.bike', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
+      bands: INDEX_BANDS()
+    },
+    run: {
+      title: 'metric.run', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
+      bands: INDEX_BANDS()
+    },
+    swim: {
+      title: 'metric.swim', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
+      bands: INDEX_BANDS()
+    },
+    tennis: {
+      title: 'metric.tennis', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
+      bands: INDEX_BANDS()
+    },
+    hike: {
+      title: 'metric.hike', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
+      bands: INDEX_BANDS()
+    },
+    fishing: {
+      title: 'metric.fishing', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
+      bands: INDEX_BANDS()
+    },
+    golf: {
+      title: 'metric.golf', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
+      bands: INDEX_BANDS()
+    },
+    surf: {
+      title: 'metric.surf', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
+      bands: INDEX_BANDS()
+    },
+    windsport: {
+      title: 'metric.windsport', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
       bands: INDEX_BANDS()
     }
   };
@@ -197,5 +330,198 @@ var Metrics = (function () {
     return { value: U.clamp(10 - p, 0, 10), why: why };
   }
 
-  return { SPEC: SPEC, band: band, snorkel: snorkel, bike: bike };
+  /* ---- the rest of the sport library ----
+     Each one weighs the conditions that actually decide whether the outing is
+     worth it, so their optima differ: a runner wants cool air and clean air, a
+     windsurfer wants the wind a golfer is ruined by. */
+
+  function heatPenalty(t, pairs) { return penalty(pairs, t); }
+
+  function airPenalty(w, weight) {
+    var p = 0, why = [];
+    if (w.airQuality !== null && w.airQuality > 40) {
+      p += penalty([[60, 1], [80, 2.5], [100, 4], [999, 6]], w.airQuality) * weight;
+      why.push(reason('why.air', { v: Math.round(w.airQuality) }));
+    }
+    return { p: p, why: why };
+  }
+
+  function merge(target, extra) {
+    for (var i = 0; i < extra.why.length; i++) { target.why.push(extra.why[i]); }
+    return extra.p;
+  }
+
+  /* Running: cool air, clean air and no downpour; pollen matters here. */
+  function run(w) {
+    if (w.temp === null) { return null; }
+    var p = 0, why = [], res = { why: why };
+    var pt = (w.temp >= 4 && w.temp <= 16) ? 0
+      : (w.temp > 16 ? heatPenalty(w.temp, [[20, 0.8], [24, 1.8], [28, 3.2], [32, 5], [99, 6.5]])
+                     : (w.temp >= 0 ? 0.8 : (w.temp >= -5 ? 2 : 3.5)));
+    p += pt; if (pt >= 1) { why.push(reason('why.temp', { v: Math.round(w.temp) })); }
+    if (w.wind !== null) {
+      var pw = penalty([[3, 0], [6, 0.6], [9, 1.6], [12, 3], [99, 4.5]], w.wind);
+      p += pw; if (pw >= 1.6) { why.push(reason('why.wind', { v: Math.round(w.wind) })); }
+    }
+    if (w.rain !== null && w.rain > 0.1) { p += (w.rain > 1 ? 3 : 1.5); why.push(reason('why.rain')); }
+    if (w.uv !== null && w.uv >= 8) { p += 0.8; why.push(reason('why.uv', { v: Math.round(w.uv) })); }
+    if (w.humidity !== null && w.temp > 26 && w.humidity > 65) { p += 1; why.push(reason('why.mugginess')); }
+    p += merge(res, airPenalty(w, 1));
+    if (w.pollen !== null && w.pollen > 10) {
+      p += penalty([[30, 0.6], [80, 1.6], [999, 2.5]], w.pollen);
+      why.push(reason('why.pollen'));
+    }
+    return { value: U.clamp(10 - p, 0, 10), why: why };
+  }
+
+  /* Open-water swimming: the water decides, then the chop. */
+  function swim(w) {
+    if (w.seaTemp === null && w.waveHeight === null) { return null; }
+    var p = 0, why = [];
+    if (w.seaTemp !== null) {
+      var pt = penalty([[17, 7], [20, 4], [22, 2.5], [24, 1], [26, 0.3], [99, 0]], w.seaTemp);
+      p += pt; if (pt >= 1) { why.push(reason('why.water', { v: Math.round(w.seaTemp) })); }
+    }
+    if (w.waveHeight !== null) {
+      var pv = penalty([[0.2, 0], [0.4, 0.8], [0.7, 2], [1.1, 4], [99, 6.5]], w.waveHeight);
+      p += pv; if (pv >= 0.8) { why.push(reason('why.waves', { v: w.waveHeight.toFixed(2) })); }
+    }
+    if (w.wind !== null) {
+      var pwd = penalty([[4, 0], [7, 1], [10, 2.5], [99, 4]], w.wind);
+      p += pwd; if (pwd >= 1) { why.push(reason('why.wind', { v: Math.round(w.wind) })); }
+    }
+    if (w.rain !== null && w.rain > 0.5) { p += 1; why.push(reason('why.rain')); }
+    return { value: U.clamp(10 - p, 0, 10), why: why };
+  }
+
+  /* Tennis: a wet court ends it, and wind ruins the ball flight. */
+  function tennis(w) {
+    if (w.temp === null) { return null; }
+    var p = 0, why = [];
+    if (w.rain !== null && w.rain > 0.05) { p += 6; why.push(reason('why.wetCourt')); }
+    else if (w.rainProb !== null && w.rainProb >= 60) { p += 2; why.push(reason('why.rainLikely')); }
+    if (w.wind !== null) {
+      var pw = penalty([[2, 0], [4, 0.8], [6, 2], [9, 3.5], [99, 5.5]], w.wind);
+      p += pw; if (pw >= 0.8) { why.push(reason('why.wind', { v: Math.round(w.wind) })); }
+    }
+    var pt = (w.temp >= 12 && w.temp <= 26) ? 0
+      : (w.temp > 26 ? penalty([[30, 1.5], [34, 3.5], [99, 5]], w.temp)
+                     : (w.temp >= 8 ? 1 : (w.temp >= 3 ? 2.5 : 4.5)));
+    p += pt; if (pt >= 1) { why.push(reason('why.temp', { v: Math.round(w.temp) })); }
+    if (w.uv !== null && w.uv >= 8) { p += 0.8; why.push(reason('why.uv', { v: Math.round(w.uv) })); }
+    return { value: U.clamp(10 - p, 0, 10), why: why };
+  }
+
+  /* Hiking: a wide comfortable range, but rain and haze cost the view. */
+  function hike(w) {
+    if (w.temp === null) { return null; }
+    var p = 0, why = [], res = { why: why };
+    var pt = (w.temp >= 5 && w.temp <= 22) ? 0
+      : (w.temp > 22 ? penalty([[26, 1], [30, 2.5], [34, 4.5], [99, 6]], w.temp)
+                     : (w.temp >= 0 ? 1.5 : (w.temp >= -5 ? 3 : 4.5)));
+    p += pt; if (pt >= 1) { why.push(reason('why.temp', { v: Math.round(w.temp) })); }
+    if (w.rain !== null && w.rain > 0.2) { p += 2.5; why.push(reason('why.rain')); }
+    else if (w.rainProb !== null && w.rainProb >= 60) { p += 1; why.push(reason('why.rainLikely')); }
+    if (w.wind !== null) {
+      var pw = penalty([[5, 0], [9, 1], [13, 2.5], [99, 4]], w.wind);
+      p += pw; if (pw >= 1) { why.push(reason('why.wind', { v: Math.round(w.wind) })); }
+    }
+    if (w.uv !== null && w.uv >= 8) { p += 0.8; why.push(reason('why.uv', { v: Math.round(w.uv) })); }
+    if (w.visibility !== null && w.visibility < 5) {
+      p += (w.visibility < 2 ? 2 : 1);
+      why.push(reason('why.haze'));
+    }
+    p += merge(res, airPenalty(w, 0.6));
+    return { value: U.clamp(10 - p, 0, 10), why: why };
+  }
+
+  /* Fishing: a light breeze beats dead calm, and a jumping barometer kills the
+     bite more reliably than any of the rest. */
+  function fishing(w) {
+    if (w.wind === null && w.pressure === null) { return null; }
+    var p = 0, why = [];
+    if (w.wind !== null) {
+      var pw = (w.wind < 1.5) ? 0.8 : penalty([[5.5, 0], [8, 1.5], [11, 3], [99, 5]], w.wind);
+      p += pw;
+      if (pw >= 1.5) { why.push(reason('why.wind', { v: Math.round(w.wind) })); }
+      else if (pw > 0) { why.push(reason('why.deadCalm')); }
+    }
+    if (w.waveHeight !== null) {
+      var pv = penalty([[0.4, 0], [0.8, 1], [1.5, 2.5], [99, 4]], w.waveHeight);
+      p += pv; if (pv >= 1) { why.push(reason('why.waves', { v: w.waveHeight.toFixed(2) })); }
+    }
+    if (w.rain !== null && w.rain > 2) { p += 2; why.push(reason('why.rain')); }
+    if (w.pressureTrend3h !== null) {
+      var swing = Math.abs(w.pressureTrend3h);
+      if (swing > 2) { p += 2; why.push(reason('why.pressureSwing')); }
+      else if (swing > 1) { p += 1; why.push(reason('why.pressureSwing')); }
+    }
+    if (w.temp !== null && w.temp < 0) { p += 1.5; why.push(reason('why.temp', { v: Math.round(w.temp) })); }
+    return { value: U.clamp(10 - p, 0, 10), why: why };
+  }
+
+  /* Golf: rain and wind, in that order. */
+  function golf(w) {
+    if (w.temp === null) { return null; }
+    var p = 0, why = [];
+    if (w.rain !== null && w.rain > 0.1) { p += 4; why.push(reason('why.rain')); }
+    else if (w.rainProb !== null && w.rainProb >= 60) { p += 1.5; why.push(reason('why.rainLikely')); }
+    if (w.wind !== null) {
+      var pw = penalty([[3, 0], [6, 1], [9, 2.5], [12, 4], [99, 6]], w.wind);
+      p += pw; if (pw >= 1) { why.push(reason('why.wind', { v: Math.round(w.wind) })); }
+    }
+    var pt = (w.temp >= 12 && w.temp <= 28) ? 0
+      : (w.temp > 28 ? penalty([[32, 1.5], [99, 3]], w.temp)
+                     : (w.temp >= 7 ? 1 : (w.temp >= 2 ? 2.5 : 4)));
+    p += pt; if (pt >= 1) { why.push(reason('why.temp', { v: Math.round(w.temp) })); }
+    if (w.uv !== null && w.uv >= 9) { p += 0.5; why.push(reason('why.uv', { v: Math.round(w.uv) })); }
+    return { value: U.clamp(10 - p, 0, 10), why: why };
+  }
+
+  /* Surfing wants the swell the swimmers are complaining about: flat water is
+     the failure case here, not the storm. */
+  function surf(w) {
+    if (w.waveHeight === null) { return null; }
+    var p = 0, why = [];
+    var h = w.waveHeight;
+    if (h < 0.3) { p += 5; why.push(reason('why.flat')); }
+    else if (h < 0.5) { p += 3.5; why.push(reason('why.flat')); }
+    else if (h < 0.8) { p += 1.5; why.push(reason('why.smallSwell')); }
+    else if (h > 3.5) { p += 3.5; why.push(reason('why.waves', { v: h.toFixed(1) })); }
+    else if (h > 2.5) { p += 1.5; why.push(reason('why.waves', { v: h.toFixed(1) })); }
+    if (w.wind !== null) {
+      var pw = penalty([[4, 0], [7, 1], [10, 2.5], [99, 4]], w.wind);
+      p += pw; if (pw >= 1) { why.push(reason('why.wind', { v: Math.round(w.wind) })); }
+    }
+    if (w.seaTemp !== null) {
+      var pt = penalty([[17, 3], [20, 1.5], [23, 0.5], [99, 0]], w.seaTemp);
+      p += pt; if (pt >= 1.5) { why.push(reason('why.water', { v: Math.round(w.seaTemp) })); }
+    }
+    return { value: U.clamp(10 - p, 0, 10), why: why };
+  }
+
+  /* Windsurf and kite: the one card that wants it blowing. */
+  function windsport(w) {
+    if (w.wind === null) { return null; }
+    var p = 0, why = [];
+    var v = w.wind;
+    if (v < 4) { p += 5; why.push(reason('why.tooLittleWind')); }
+    else if (v < 6) { p += 2; why.push(reason('why.tooLittleWind')); }
+    else if (v > 18) { p += 5; why.push(reason('why.wind', { v: Math.round(v) })); }
+    else if (v > 15) { p += 3; why.push(reason('why.wind', { v: Math.round(v) })); }
+    else if (v > 12) { p += 1.5; why.push(reason('why.wind', { v: Math.round(v) })); }
+    if (w.gust !== null && w.gust - v > 7) { p += 1.5; why.push(reason('why.gusts')); }
+    if (w.waveHeight !== null && w.waveHeight > 2) {
+      p += (w.waveHeight > 3 ? 3.5 : 2);
+      why.push(reason('why.waves', { v: w.waveHeight.toFixed(1) }));
+    }
+    if (w.seaTemp !== null && w.seaTemp < 18) { p += 1; why.push(reason('why.water', { v: Math.round(w.seaTemp) })); }
+    return { value: U.clamp(10 - p, 0, 10), why: why };
+  }
+
+  return {
+    SPEC: SPEC, band: band,
+    snorkel: snorkel, bike: bike, run: run, swim: swim, tennis: tennis,
+    hike: hike, fishing: fishing, golf: golf, surf: surf, windsport: windsport
+  };
 })();

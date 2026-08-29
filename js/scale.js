@@ -61,8 +61,8 @@ var Scale = (function () {
 
     node.appendChild(build(spec, value));
 
-    node.appendChild(U.el('div', 'card-band' + (band ? ' ' + band.cls + '-text' : ''),
-      band ? I18N.t(band.label) : I18N.t('note.noData')));
+    var bandText = opts.bandText || (band ? I18N.t(band.label) : I18N.t('note.noData'));
+    node.appendChild(U.el('div', 'card-band' + (band ? ' ' + band.cls + '-text' : ''), bandText));
 
     if (opts.note) { node.appendChild(U.el('div', 'card-note', opts.note)); }
     return node;

@@ -183,10 +183,98 @@ var Icons = (function () {
     ];
   }
 
+  function runParts() {
+    return [
+      node('circle', { cx: 15.5, cy: 4.8, r: 2.1 }),
+      path('M16.5 9l-4 2.6.4 3.6 3.4 3.4'),
+      path('M12.5 11.6L9 14l-2.6 5.8'),
+      path('M12.9 7.8L8.4 9.6 7 13'),
+      path('M13.5 12.2l4.2-.6')
+    ];
+  }
+
+  function swimParts() {
+    return [
+      node('circle', { cx: 8.5, cy: 7.5, r: 2 }),
+      path('M4 13.5l5-2.4 4.6 1.6 5.4-3.4'),
+      path('M3 18.5c2-1.4 3.4-1.4 5.4 0s3.4 1.4 5.4 0 3.4-1.4 5.4 0')
+    ];
+  }
+
+  function tennisParts() {
+    return [
+      node('ellipse', { cx: 9.6, cy: 8.6, rx: 5.1, ry: 6 , transform: 'rotate(-35 9.6 8.6)' }),
+      path('M12.6 13.6L18.5 20'),
+      node('circle', { cx: 18.4, cy: 8.6, r: 2.1 })
+    ];
+  }
+
+  function hikeParts() {
+    return [
+      path('M2 19.5l6.6-10.4 4 5.6 2.4-3.4L22 19.5z'),
+      line(2, 19.5, 22, 19.5),
+      node('circle', { cx: 18.5, cy: 5.5, r: 2 })
+    ];
+  }
+
+  function fishingParts() {
+    return [
+      path('M4.5 4.5l9 9'),
+      path('M13.5 13.5c2.4-2 4.6-2 6.6 0-2 2-4.2 2-6.6 0z'),
+      line(20.1, 13.5, 22, 11.6), line(20.1, 13.5, 22, 15.4),
+      path('M3 20.5c2-1.3 3.4-1.3 5.4 0s3.4 1.3 5.4 0 3.4-1.3 5.4 0')
+    ];
+  }
+
+  function golfParts() {
+    return [
+      line(8.5, 3.5, 8.5, 17.5),
+      path('M8.5 4.2l7 2.6-7 2.6z'),
+      node('circle', { cx: 15.5, cy: 17.6, r: 1.8 }),
+      path('M3.5 19.5c3.5 2 13.5 2 17 0')
+    ];
+  }
+
+  function surfParts() {
+    return [
+      node('ellipse', { cx: 12, cy: 10, rx: 3.2, ry: 7.6, transform: 'rotate(38 12 10)' }),
+      line(9.6, 6.6, 14.4, 13.4),
+      path('M3 20.5c2-1.3 3.4-1.3 5.4 0s3.4 1.3 5.4 0 3.4-1.3 5.4 0')
+    ];
+  }
+
+  function windsportParts() {
+    return [
+      line(6.5, 3.5, 6.5, 17),
+      path('M6.5 4.5c5 1.6 8.2 4.6 9.6 9.2H6.5z'),
+      path('M3 20.5c2-1.3 3.4-1.3 5.4 0s3.4 1.3 5.4 0 3.4-1.3 5.4 0')
+    ];
+  }
+
+  var SPORT_PARTS = {
+    snorkel: maskParts, bike: bikeParts, run: runParts, swim: swimParts,
+    tennis: tennisParts, hike: hikeParts, fishing: fishingParts, golf: golfParts,
+    surf: surfParts, windsport: windsportParts
+  };
+
+  /* Wind direction is not a comfort reading, so it gets a compass instead of a
+     face: the needle points where the air is going, the label says where it is
+     coming from. */
+  function compass(deg) {
+    var parts = [node('circle', { cx: 12, cy: 12, r: 9 })];
+    if (deg === null || deg === undefined) { return svg(parts); }
+    var arrow = node('g', { transform: 'rotate(' + ((deg + 180) % 360) + ' 12 12)' });
+    arrow.appendChild(path('M12 4.5v15'));
+    arrow.appendChild(path('M8.4 8.1L12 4.5l3.6 3.6'));
+    parts.push(arrow);
+    return svg(parts);
+  }
+
   /* Sport icon plus a verdict: clean when it is worth going, a question mark
      when conditions are middling, struck through when they are not. */
   function sport(kind, value) {
-    var parts = (kind === 'snorkel') ? maskParts() : bikeParts();
+    var builder = SPORT_PARTS[kind] || bikeParts;
+    var parts = builder();
     if (value === null || value === undefined) { return svg(parts); }
     if (value < 4) {
       parts.push(line(3.5, 20.5, 20.5, 3.5));
@@ -198,5 +286,5 @@ var Icons = (function () {
     return svg(parts);
   }
 
-  return { sky: sky, rain: rain, mood: mood, sport: sport, face: face };
+  return { sky: sky, rain: rain, mood: mood, sport: sport, face: face, compass: compass };
 })();

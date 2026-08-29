@@ -73,6 +73,15 @@ current value and a verbal band label.
 | Snorkeling | index 0…10 | from waves, water temperature, wind, rain and light |
 | Cycling | index 0…10 | from temperature, wind with gusts, rain, UV and mugginess |
 
+Another eighteen cards wait in the library and can be put on the screen at any
+time: feels-like, gusts, wind direction (a compass instead of a face), rain
+chance, dew point, visibility, water temperature, air quality, PM2.5 and pollen,
+plus eight more outdoor sports — running, open-water swimming, tennis, hiking,
+fishing, golf, surfing and kite/windsurfing. Each sport weighs what actually
+decides the outing, so their optima disagree on purpose: the runner wants cool,
+clean, pollen-free air, the surfer needs the swell the swimmer is complaining
+about, and the kite card is the only one that wants it blowing hard.
+
 Every card also carries an icon, sitting large in the empty half of the value
 row next to the number and painted in the colour of the reading's comfort band —
 a solid coloured shape carries further across a room than the thin scale does.
@@ -101,7 +110,12 @@ barogram of the past 24 hours.
 * `api.open-meteo.com/v1/forecast` — current values, hourly series, daily extremes;
 * `marine-api.open-meteo.com/v1/marine` — waves and water temperature (inland
   there is none, and the waves and snorkeling cards say so plainly);
+* `air-quality-api.open-meteo.com/v1/air-quality` — European AQI, PM2.5/PM10 and
+  six pollen species, summed into one reading;
 * `geocoding-api.open-meteo.com/v1/search` — city lookup by name.
+
+Marine and air-quality data are both optional: neither is allowed to block the
+forecast if the endpoint has nothing for that point.
 
 The place comes either from the Geolocation API ("My location") or from the city
 search. Coordinates and the last weather snapshot are kept in `localStorage`, so
@@ -128,6 +142,15 @@ an installed PWA, and the browser decides how often to actually call it. The
 stock PocketBook browser almost certainly does not support it; there the working
 setup is the app kept open with the wake lock on, refreshing on the page's own
 hourly timer.
+
+## Rearranging the cards
+
+Hold any card and the screen becomes an editor: drag a card to move it, use the
+arrows if dragging on e-ink is being uncooperative, × removes a card and + opens
+the library of everything not on the screen. *Default set* restores the ten
+cards the app ships with, *Done* leaves the editor. The set and its order live
+in `localStorage`, so the screen comes back the way it was left. The editor is
+also reachable from the menu, and design swipes are suspended while it is open.
 
 ## On a phone
 
