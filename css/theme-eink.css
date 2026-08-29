@@ -5,7 +5,7 @@
 body[data-theme="eink"] { background: #ffffff; color: #000000; }
 body[data-theme="eink"] .app { padding-top: 6px; }
 
-body[data-theme="eink"] .topbar { border-bottom: 4px solid #000; padding-bottom: 6px; }
+body[data-theme="eink"] .topbar { border-bottom: 4px solid #000; padding: 0 10px 6px 10px; }
 body[data-theme="eink"] .clock { font-size: 54px; line-height: 1; }
 body[data-theme="eink"] .date { font-size: 15px; margin-top: 2px; }
 body[data-theme="eink"] .place { font-size: 20px; }

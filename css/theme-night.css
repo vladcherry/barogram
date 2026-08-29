@@ -5,7 +5,7 @@ body[data-theme="night"] { background: #0b0f14; color: #e8eef5; }
 body[data-theme="night"] .app { padding: 14px 12px 28px 12px; }
 
 body[data-theme="night"] .topbar {
-  background: #131a22; border-radius: 18px; padding: 14px 16px; align-items: center;
+  background: #131a22; border-radius: 18px; padding: 14px 18px; align-items: center;
 }
 body[data-theme="night"] .clock { font-size: 46px; line-height: 1; color: #ffffff; }
 body[data-theme="night"] .date { font-size: 13px; color: #8ea0b5; margin-top: 4px; }

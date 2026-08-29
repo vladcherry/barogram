@@ -7,7 +7,7 @@
 body[data-theme="tiles"] { background: #ffffff; color: #000000; }
 body[data-theme="tiles"] .app { padding: 4px 5px 8px 5px; }
 
-body[data-theme="tiles"] .topbar { border-bottom: 3px solid #000; padding-bottom: 4px; align-items: center; }
+body[data-theme="tiles"] .topbar { border-bottom: 3px solid #000; padding: 0 10px 4px 10px; align-items: center; }
 body[data-theme="tiles"] .clock { font-size: 34px; line-height: 1; }
 body[data-theme="tiles"] .date { font-size: 11px; }
 body[data-theme="tiles"] .place { font-size: 14px; }

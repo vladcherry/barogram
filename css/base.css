@@ -14,15 +14,20 @@ button, input { font-family: inherit; font-size: inherit; }
 
 .app { max-width: 1100px; margin: 0 auto; padding: 10px 10px 24px 10px; }
 
-/* ---- header ---- */
-.topbar { display: flex; flex-wrap: wrap; align-items: flex-end; }
+/* ---- header ----
+   One line, always: clock left, place in the middle, menu hard right. The row
+   never wraps, so on a phone the button stays beside the clock instead of
+   dropping underneath it; the place block shrinks and clips instead. */
+.topbar { display: flex; flex-wrap: nowrap; align-items: flex-end; padding: 0 6px; }
 .clock-block { flex: 0 0 auto; margin-right: 16px; }
 .clock { font-weight: 700; letter-spacing: -0.02em; }
-.date { }
-.place-block { flex: 1 1 160px; min-width: 0; }
-.place { font-weight: 700; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-.updated, .cond { }
-.tools { flex: 0 0 auto; display: flex; flex-wrap: wrap; }
+.date { white-space: nowrap; }
+.place-block { flex: 1 1 auto; min-width: 0; }
+.place, .updated, .cond {
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.place { font-weight: 700; }
+.tools { flex: 0 0 auto; margin-left: auto; display: flex; }
 
 .btn {
   display: inline-block; margin: 3px 0 3px 6px; padding: 8px 12px;

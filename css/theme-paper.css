@@ -5,7 +5,7 @@
 body[data-theme="paper"] { background: #f6f3ec; color: #1d1b16; }
 body[data-theme="paper"] .app { max-width: 760px; padding: 12px 12px 28px 12px; }
 
-body[data-theme="paper"] .topbar { border-bottom: 1px solid #cfc7b6; padding-bottom: 8px; align-items: center; }
+body[data-theme="paper"] .topbar { border-bottom: 1px solid #cfc7b6; padding: 0 10px 8px 10px; align-items: center; }
 body[data-theme="paper"] .clock { font-size: 40px; line-height: 1; letter-spacing: -0.04em; }
 body[data-theme="paper"] .date { font-size: 12px; color: #6d6553; letter-spacing: 0.04em; text-transform: uppercase; }
 body[data-theme="paper"] .place { font-size: 16px; letter-spacing: 0.02em; }
