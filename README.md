@@ -17,17 +17,16 @@ Four designs ship with the app and are cycled with the grid icon in the top bar.
    outlined blocks. No shadows, gradients or animation — half-tones smear on
    e-ink and repaints are expensive. Colour appears only inside the scales,
    where Kaleido actually shows it.
-2. **E-Ink Color** (`tiles`) — all ten readings on one 6" screen with no scrolling:
-   a two-column grid (three columns from 620 px). Inside each tile the number is
-   as large as the cell allows and owns the left half over its full height, with
-   the unit beneath it; the title, the band label and one clipped line of detail
-   sit in the top right, and the comfort slider runs along the bottom right. Each
-   tile is washed in the colour of its comfort band, so the screen reads before
-   any number does — text flips to white on the dark grounds and stays black on
-   the light ones, every pair clearing WCAG AA for the small labels. On a
-   coloured ground the slider goes monochrome (filled segments in the text
-   colour), because the band palette would vanish into the tile. The 24-hour
-   charts are dropped here — they are what pushes the last tiles below the fold.
+2. **E-Ink Color** (`tiles`) — all ten readings on one 6" screen with no
+   scrolling: a two-column grid (three columns from 620 px), with the same card
+   layout as the other designs — title and icon, number, scale, band label, one
+   clipped line of detail. What is different is the ground: each tile is washed
+   in the colour of its comfort band, so the screen reads before any number does.
+   Text flips to white on the dark grounds and stays black on the light ones,
+   every pair clearing WCAG AA for the small labels, and the slider goes
+   monochrome (filled segments in the text colour) because the band palette would
+   vanish into the tile. The 24-hour charts are dropped here — they are what
+   pushes the last tiles below the fold.
 3. **Night** (`night`) — for phones: two tiles per row, temperature across the
    full width, 18 px corners, a thin solid scale bar. The dark background is
    easy on an OLED panel and on the eyes at night.

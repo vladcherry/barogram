@@ -20,9 +20,7 @@
   body[data-theme] .cards { flex: 1 1 auto; align-content: stretch; }
   body[data-theme] .footbar { margin-top: 4px; }
   /* Stretched cards would otherwise leave their content clinging to the top. */
-  body[data-theme]:not([data-theme="tiles"]) .card {
-    display: flex; flex-direction: column; justify-content: center;
-  }
+  body[data-theme] .card { display: flex; flex-direction: column; justify-content: center; }
 
   /* A compact header: the clock still reads across the room, the rest shrinks. */
   body[data-theme] .topbar { padding: 0 8px 4px 8px; }
@@ -51,28 +49,20 @@
     border-top-width: 7px; border-left-width: 4px; border-right-width: 4px; margin-left: -4px;
   }
 
-  /* Everything but Tiles shares one compact card; Tiles keeps its own layout,
-     where the number already owns the left half of the cell. */
   /* Flex, not block: the icon belongs on the right of the title, not under it. */
-  body[data-theme]:not([data-theme="tiles"]) .card-head {
+  body[data-theme] .card-head {
     display: flex; align-items: center; justify-content: space-between;
   }
   body[data-theme] .card-icon svg { width: 19px; height: 19px; }
-  body[data-theme]:not([data-theme="tiles"]) .card-title { font-size: 10px; letter-spacing: 0.04em; }
-  body[data-theme]:not([data-theme="tiles"]) .card-value-row { margin-top: -1px; }
-  body[data-theme]:not([data-theme="tiles"]) .card-value { font-size: 27px; line-height: 1.05; }
-  body[data-theme]:not([data-theme="tiles"]) .card-unit { font-size: 11px; margin-left: 4px; }
-  body[data-theme]:not([data-theme="tiles"]) .card-band { font-size: 11px; margin-top: 3px; }
-  body[data-theme]:not([data-theme="tiles"]) .card-note {
+  body[data-theme] .card-title { font-size: 10px; letter-spacing: 0.04em; }
+  body[data-theme] .card-value-row { margin-top: -1px; }
+  body[data-theme] .card-value { font-size: 27px; line-height: 1.05; }
+  body[data-theme] .card-unit { font-size: 11px; margin-left: 4px; }
+  body[data-theme] .card-band { font-size: 11px; margin-top: 3px; }
+  body[data-theme] .card-note {
     font-size: 10px; margin-top: 1px;
     white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
   }
-
-  /* Tiles: shorter cells and a smaller number, so the grid clears the shortest
-     phone screens too. */
-  body[data-theme="tiles"] .card { min-height: 88px; }
-  body[data-theme="tiles"] .card-value { font-size: 40px; }
-  body[data-theme="tiles"] .card[data-metric="pressure"] .card-value { font-size: 33px; }
 
   /* Design-specific trimmings that only make sense at this density. */
   body[data-theme="night"] .card[data-metric="temp"] { flex: 1 1 47%; }
@@ -91,12 +81,9 @@
     body[data-theme] .card { margin: 0 3px 3px 0; padding: 2px 5px 4px 5px; }
     body[data-theme] .seg { height: 7px; }
     body[data-theme] .scale { padding-top: 7px; }
-    body[data-theme]:not([data-theme="tiles"]) .card-value { font-size: 24px; }
-    body[data-theme]:not([data-theme="tiles"]) .card-band { font-size: 10px; margin-top: 2px; }
-    body[data-theme]:not([data-theme="tiles"]) .card-note { font-size: 9px; }
-    body[data-theme="tiles"] .card { min-height: 78px; }
-    body[data-theme="tiles"] .card-value { font-size: 34px; }
-    body[data-theme="tiles"] .card[data-metric="pressure"] .card-value { font-size: 28px; }
+    body[data-theme] .card-value { font-size: 24px; }
+    body[data-theme] .card-band { font-size: 10px; margin-top: 2px; }
+    body[data-theme] .card-note { font-size: 9px; }
     body[data-theme="night"] .topbar { padding: 6px 10px; }
   }
 }

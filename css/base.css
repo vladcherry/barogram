@@ -68,7 +68,11 @@ button, input { font-family: inherit; font-size: inherit; }
 .cards { display: flex; flex-wrap: wrap; margin-top: 12px; }
 .card { flex: 1 1 260px; margin: 0 8px 12px 0; padding: 10px 12px; min-width: 0; }
 .card-head { display: flex; align-items: baseline; justify-content: space-between; }
-.card-title { margin: 0; font-weight: 700; }
+/* The title yields first: it clips instead of pushing the icon off the card. */
+.card-title {
+  margin: 0; font-weight: 700; min-width: 0;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
 .card-badge { }
 /* Card icons follow the card's text colour, so they work on white paper, on a
    dark tile and on a coloured comfort ground alike. */
