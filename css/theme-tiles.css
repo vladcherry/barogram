@@ -52,7 +52,10 @@ body[data-theme="tiles"] .card[data-metric="pressure"] .card-value { font-size: 
 body[data-theme="tiles"] .card-head,
 body[data-theme="tiles"] .card-band,
 body[data-theme="tiles"] .card-note { margin-left: 44%; }
-body[data-theme="tiles"] .card-head { display: block; }
+body[data-theme="tiles"] .card-head {
+  display: flex; align-items: center; justify-content: space-between;
+}
+body[data-theme="tiles"] .card-icon svg { width: 20px; height: 20px; }
 body[data-theme="tiles"] .card-title {
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; display: inline;
 }

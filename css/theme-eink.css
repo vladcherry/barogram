@@ -19,6 +19,8 @@ body[data-theme="eink"] .btn {
 body[data-theme="eink"] .btn:active { background: #000; color: #fff; }
 /* Heavier strokes: thin lines disappear on electronic ink. */
 body[data-theme="eink"] .btn-icon svg { width: 24px; height: 24px; stroke-width: 2.4; }
+/* Thin strokes fade on electronic ink, so the card icons are drawn heavier. */
+body[data-theme="eink"] .card-icon svg { width: 24px; height: 24px; stroke-width: 2.1; }
 body[data-theme="eink"] .btn.is-active { background: #000; color: #fff; }
 body[data-theme="eink"] .input { border-color: #000; border-radius: 0; font-size: 16px; }
 body[data-theme="eink"] .panel { border-color: #000; }

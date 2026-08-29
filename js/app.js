@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.29-6';
+  var APP_VERSION = '2026.08.29-7';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -72,6 +72,52 @@
       buttons[i].className = 'btn btn-design' + (active ? ' is-active' : '');
       buttons[i].setAttribute('aria-pressed', active ? 'true' : 'false');
     }
+  }
+
+  /* Step through the designs — used by the left/right swipe. */
+  function stepTheme(direction) {
+    var count = THEMES.length;
+    var theme = THEMES[(themeIndex(settings.theme) + direction + count) % count];
+    applyTheme(theme.id);
+    setStatus(I18N.t('ui.design', { name: I18N.t(theme.name) }));
+    setTimeout(refreshStatus, 2500);
+  }
+
+  /* A horizontal swipe switches designs. Vertical movement wins ties so the
+     page still scrolls, and swipes that start inside the open menu are left to
+     its buttons. Nothing is prevented, so taps and scrolling behave as before. */
+  function bindSwipe() {
+    var startX = null, startY = null, startedAt = 0;
+
+    document.addEventListener('touchstart', function (e) {
+      if (!e.touches || e.touches.length !== 1 || insideMenu(e.target)) {
+        startX = null;
+        return;
+      }
+      startX = e.touches[0].clientX;
+      startY = e.touches[0].clientY;
+      startedAt = Date.now();
+    }, false);
+
+    document.addEventListener('touchend', function (e) {
+      if (startX === null || !e.changedTouches || !e.changedTouches.length) { return; }
+      var dx = e.changedTouches[0].clientX - startX;
+      var dy = e.changedTouches[0].clientY - startY;
+      var elapsed = Date.now() - startedAt;
+      startX = null;
+      if (elapsed > 700) { return; }
+      if (Math.abs(dx) < 60 || Math.abs(dx) < Math.abs(dy) * 2) { return; }
+      stepTheme(dx < 0 ? 1 : -1);
+    }, false);
+  }
+
+  /* No Element.closest on the reader's browser, so walk up by hand. */
+  function insideMenu(target) {
+    var panel = U.$('#panel');
+    for (var n = target; n; n = n.parentNode) {
+      if (n === panel) { return true; }
+    }
+    return false;
   }
 
   /* ---------- menu ---------- */
@@ -165,6 +211,16 @@
     return I18N.t('note.why', { list: parts.join(', ') });
   }
 
+  /* Sky and rain show the weather itself, the sports show the sport with a
+     verdict, everything else shows the face of its comfort band. */
+  function iconFor(key, value, w) {
+    if (key === 'clouds') { return Icons.sky(w.code, w.clouds); }
+    if (key === 'rain') { return Icons.rain(w.rain); }
+    if (key === 'snorkel' || key === 'bike') { return Icons.sport(key, value); }
+    if (value === null || value === undefined) { return Icons.mood(null); }
+    return Icons.mood(Metrics.band(Metrics.SPEC[key].bands, value).cls);
+  }
+
   function appendSpark(card, values, spec, captionKey) {
     if (!values || !values.length) { return; }
     var spark = Scale.sparkBars(values, spec, I18N.t(captionKey));
@@ -190,7 +246,8 @@
           feels: U.fmt(w.feels, 1), min: U.fmt(w.tempMin, 0), max: U.fmt(w.tempMax, 0)
         })
       : I18N.t('note.temp', { feels: U.fmt(w.feels, 1) });
-    var tempCard = Scale.card({ key: 'temp', spec: Metrics.SPEC.temp, value: w.temp, note: tempNote });
+    var tempCard = Scale.card({ key: 'temp', spec: Metrics.SPEC.temp, value: w.temp, note: tempNote,
+      icon: iconFor('temp', w.temp, w) });
     appendSpark(tempCard, w.tempSeries, Metrics.SPEC.temp, 'spark.temp');
     host.appendChild(tempCard);
 
@@ -200,31 +257,36 @@
           gust: U.fmt(w.gust, 1), dir: U.windDir(w.windDir), deg: U.fmt(w.windDir, 0)
         })
       : I18N.t('note.wind', { gust: U.fmt(w.gust, 1) });
-    host.appendChild(Scale.card({ key: 'wind', spec: Metrics.SPEC.wind, value: w.wind, note: windNote }));
+    host.appendChild(Scale.card({ key: 'wind', spec: Metrics.SPEC.wind, value: w.wind, note: windNote,
+      icon: iconFor('wind', w.wind, w) }));
 
     /* 3. Precipitation */
     var prob = w.rainProb === null ? '—' : U.fmt(w.rainProb, 0) + '%';
     var rainNote = (w.rainSum !== null)
       ? I18N.t('note.rainSum', { prob: prob, sum: U.fmt(w.rainSum, 1) })
       : I18N.t('note.rain', { prob: prob });
-    var rainCard = Scale.card({ key: 'rain', spec: Metrics.SPEC.rain, value: w.rain, note: rainNote });
+    var rainCard = Scale.card({ key: 'rain', spec: Metrics.SPEC.rain, value: w.rain, note: rainNote,
+      icon: iconFor('rain', w.rain, w) });
     appendSpark(rainCard, w.rainSeries, Metrics.SPEC.rain, 'spark.rain');
     host.appendChild(rainCard);
 
     /* 4. Cloud cover */
     host.appendChild(Scale.card({
-      key: 'clouds', spec: Metrics.SPEC.clouds, value: w.clouds, note: U.wmoText(w.code)
+      key: 'clouds', spec: Metrics.SPEC.clouds, value: w.clouds, note: U.wmoText(w.code),
+      icon: iconFor('clouds', w.clouds, w)
     }));
 
     /* 5. UV */
     host.appendChild(Scale.card({
       key: 'uv', spec: Metrics.SPEC.uv, value: w.uv,
+      icon: iconFor('uv', w.uv, w),
       note: w.uvMax === null ? I18N.t('note.uvDefault') : I18N.t('note.uvMax', { max: U.fmt(w.uvMax, 1) })
     }));
 
     /* 6. Humidity */
     host.appendChild(Scale.card({
-      key: 'humidity', spec: Metrics.SPEC.humidity, value: w.humidity, note: I18N.t('note.humidity')
+      key: 'humidity', spec: Metrics.SPEC.humidity, value: w.humidity, note: I18N.t('note.humidity'),
+      icon: iconFor('humidity', w.humidity, w)
     }));
 
     /* 7. Pressure with the barogram */
@@ -235,7 +297,8 @@
         : I18N.t('note.pressure', { mmhg: toMmHg(w.pressure) });
     }
     var pressureCard = Scale.card({
-      key: 'pressure', spec: Metrics.SPEC.pressure, value: w.pressure, note: pressureNote
+      key: 'pressure', spec: Metrics.SPEC.pressure, value: w.pressure, note: pressureNote,
+      icon: iconFor('pressure', w.pressure, w)
     });
     appendSpark(pressureCard, w.pressureSeries, Metrics.SPEC.pressure, 'spark.pressure');
     host.appendChild(pressureCard);
@@ -245,7 +308,8 @@
       ? I18N.t('note.waves', { period: U.fmt(w.wavePeriod, 1), temp: U.fmt(w.seaTemp, 1) })
       : I18N.t('note.noSea');
     host.appendChild(Scale.card({
-      key: 'waves', spec: Metrics.SPEC.waves, value: w.waveHeight, note: waveNote
+      key: 'waves', spec: Metrics.SPEC.waves, value: w.waveHeight, note: waveNote,
+      icon: iconFor('waves', w.waveHeight, w)
     }));
 
     /* 9. Snorkeling */
@@ -253,6 +317,7 @@
     host.appendChild(Scale.card({
       key: 'snorkel', spec: Metrics.SPEC.snorkel, value: snorkel ? snorkel.value : null,
       badge: I18N.t('card.index'),
+      icon: Icons.sport('snorkel', snorkel ? snorkel.value : null),
       note: snorkel ? whyNote(snorkel) : I18N.t('note.needSea')
     }));
 
@@ -261,6 +326,7 @@
     host.appendChild(Scale.card({
       key: 'bike', spec: Metrics.SPEC.bike, value: bike ? bike.value : null,
       badge: I18N.t('card.index'),
+      icon: Icons.sport('bike', bike ? bike.value : null),
       note: whyNote(bike)
     }));
   }
@@ -570,6 +636,7 @@
       if (Date.now() - settings.lastTs > 30 * 60 * 1000) { refresh(); }
     }, false);
 
+    bindSwipe();
     registerWorker();
   }
 

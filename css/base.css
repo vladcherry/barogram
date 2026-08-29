@@ -70,6 +70,19 @@ button, input { font-family: inherit; font-size: inherit; }
 .card-head { display: flex; align-items: baseline; justify-content: space-between; }
 .card-title { margin: 0; font-weight: 700; }
 .card-badge { }
+/* Card icons follow the card's text colour, so they work on white paper, on a
+   dark tile and on a coloured comfort ground alike. */
+.card-icon { flex: 0 0 auto; line-height: 0; margin-left: 6px; }
+.card-icon svg {
+  display: block; width: 22px; height: 22px;
+  fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.card-icon .ico-solid { fill: currentColor; stroke: none; }
+.card-icon .ico-mark {
+  fill: currentColor; stroke: none; font-size: 11px; font-weight: 700;
+  text-anchor: middle;
+}
 .card-value-row { display: flex; align-items: baseline; }
 .card-value { font-weight: 700; letter-spacing: -0.03em; }
 .card-unit { margin-left: 6px; }

@@ -38,6 +38,11 @@ Four designs ship with the app and are cycled with the grid icon in the top bar.
 The chosen design is remembered. `?theme=tiles` forces one, which is handy for
 screenshots.
 
+A horizontal swipe steps through the designs — left for the next one, right for
+the previous — and the footer names the one you land on. Vertical movement wins
+ties so the page still scrolls, and swipes that start inside the open menu are
+left to its buttons.
+
 The top bar holds the clock and a single hamburger button, so the readings get
 the rest of the screen. It opens the menu, which carries everything: one button
 per design with the current one marked (picking directly beats cycling through
@@ -68,6 +73,16 @@ current value and a verbal band label.
 | Waves | 0…3 m | glassy → storm, with wave period and water temperature |
 | Snorkeling | index 0…10 | from waves, water temperature, wind, rain and light |
 | Cycling | index 0…10 | from temperature, wind with gusts, rain, UV and mugginess |
+
+Every card also carries an icon. The cloud-cover and precipitation cards show
+the weather itself — sun, sun behind cloud, fog, rain, snow, thunderstorm, or a
+struck-through drop when it is dry. The other readings show a comfort face for
+the band they are in, from a smile down to crossed-out eyes. The two sport
+indices show the sport: the mask or the bicycle on its own when it is worth
+going, with a question mark when conditions are middling (index 4–6), and struck
+through when they are bad (below 4). Icons are inline SVG stroked in
+`currentColor`, so they follow the card's text colour — including white text on
+a coloured tile.
 
 The comfort indices live in `js/metrics.js` (`snorkel`, `bike`): each condition
 adds a penalty, the penalties are subtracted from 10, and the card lists what
@@ -180,6 +195,7 @@ js/i18n.js              all user-facing strings: English source + ru/uk/es local
 js/util.js              helpers, XHR, formatting, weather codes
 js/store.js             settings and cache in localStorage
 js/metrics.js           scale bands and comfort-index maths
+js/icons.js             card icons: weather, comfort faces, sports with a verdict
 js/scale.js             scale, card and mini-chart rendering
 js/weather.js           Open-Meteo requests and normalisation
 js/app.js               screen, clock, schedule, background work

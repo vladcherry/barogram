@@ -53,7 +53,11 @@
 
   /* Everything but Tiles shares one compact card; Tiles keeps its own layout,
      where the number already owns the left half of the cell. */
-  body[data-theme]:not([data-theme="tiles"]) .card-head { display: block; }
+  /* Flex, not block: the icon belongs on the right of the title, not under it. */
+  body[data-theme]:not([data-theme="tiles"]) .card-head {
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  body[data-theme] .card-icon svg { width: 19px; height: 19px; }
   body[data-theme]:not([data-theme="tiles"]) .card-title { font-size: 10px; letter-spacing: 0.04em; }
   body[data-theme]:not([data-theme="tiles"]) .card-value-row { margin-top: -1px; }
   body[data-theme]:not([data-theme="tiles"]) .card-value { font-size: 27px; line-height: 1.05; }
@@ -83,6 +87,7 @@
   /* Short screens need one more notch of density to clear the fold. */
   @media (max-height: 660px) {
     body[data-theme] .clock { font-size: 30px; }
+    body[data-theme] .card-icon svg { width: 15px; height: 15px; }
     body[data-theme] .card { margin: 0 3px 3px 0; padding: 2px 5px 4px 5px; }
     body[data-theme] .seg { height: 7px; }
     body[data-theme] .scale { padding-top: 7px; }
