@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.29-11';
+  var APP_VERSION = '2026.08.29-12';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -201,7 +201,8 @@
 
   var SPORTS = {
     snorkel: 1, bike: 1, run: 1, swim: 1, tennis: 1,
-    hike: 1, fishing: 1, golf: 1, surf: 1, windsport: 1, drone: 1
+    hike: 1, fishing: 1, golf: 1, surf: 1, windsport: 1, drone: 1,
+    boatFishing: 1, camping: 1
   };
 
   function pct(v) { return v === null ? '—' : U.fmt(v, 0) + '%'; }
@@ -333,7 +334,7 @@
           note: function (w) {
             var r = Metrics[key](w);
             if (r) { return whyNote(r); }
-            return (key === 'swim' || key === 'surf' || key === 'snorkel')
+            return (key === 'swim' || key === 'surf' || key === 'snorkel' || key === 'boatFishing')
               ? I18N.t('note.needSea') : I18N.t('note.noData');
           }
         };
@@ -349,7 +350,7 @@
                  'clouds', 'uv', 'humidity', 'dewPoint', 'pressure', 'visibility',
                  'airQuality', 'pm25', 'pollen', 'waves', 'waterTemp',
                  'snorkel', 'swim', 'surf', 'windsport', 'bike', 'run', 'hike',
-                 'tennis', 'golf', 'fishing', 'drone'];
+                 'tennis', 'golf', 'fishing', 'boatFishing', 'camping', 'drone'];
 
   function cardList() {
     var list = settings.cards;

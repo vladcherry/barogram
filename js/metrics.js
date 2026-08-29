@@ -246,6 +246,14 @@ var Metrics = (function () {
     drone: {
       title: 'metric.drone', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
       bands: INDEX_BANDS()
+    },
+    boatFishing: {
+      title: 'metric.boatFishing', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
+      bands: INDEX_BANDS()
+    },
+    camping: {
+      title: 'metric.camping', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
+      bands: INDEX_BANDS()
     }
   };
 
@@ -548,8 +556,58 @@ var Metrics = (function () {
     return { value: U.clamp(10 - p, 0, 10), why: why };
   }
 
+  /* Fishing from a boat is the same sport with the sea added: the chop decides
+     first, and fog on the water is its own problem. */
+  function boatFishing(w) {
+    if (w.wind === null && w.waveHeight === null) { return null; }
+    var p = 0, why = [];
+    if (w.waveHeight !== null) {
+      var pv = penalty([[0.3, 0], [0.6, 1], [1, 2.5], [1.5, 4.5], [99, 7]], w.waveHeight);
+      p += pv; if (pv >= 1) { why.push(reason('why.waves', { v: w.waveHeight.toFixed(2) })); }
+    }
+    if (w.wind !== null) {
+      var pw = penalty([[4, 0], [6, 1], [8, 2.5], [11, 4], [99, 6]], w.wind);
+      p += pw; if (pw >= 1) { why.push(reason('why.wind', { v: Math.round(w.wind) })); }
+      if (w.gust !== null && w.gust - w.wind > 5) { p += 1; why.push(reason('why.gusts')); }
+    }
+    if (w.rain !== null && w.rain > 1) { p += 1.5; why.push(reason('why.rain')); }
+    if (w.pressureTrend3h !== null) {
+      var swing = Math.abs(w.pressureTrend3h);
+      if (swing > 2) { p += 1.5; why.push(reason('why.pressureSwing')); }
+      else if (swing > 1) { p += 0.8; why.push(reason('why.pressureSwing')); }
+    }
+    if (w.visibility !== null && w.visibility < 2) { p += 1.5; why.push(reason('why.haze')); }
+    if (w.temp !== null && w.temp < 0) { p += 1; why.push(reason('why.temp', { v: Math.round(w.temp) })); }
+    return { value: U.clamp(10 - p, 0, 10), why: why };
+  }
+
+  /* Camping is judged on the night, not the afternoon: the low temperature is
+     what you actually sleep in, and a wet tent ruins the rest. */
+  function camping(w) {
+    if (w.temp === null) { return null; }
+    var p = 0, why = [];
+    var night = (w.tempMin === null) ? w.temp : w.tempMin;
+    if (night < 0) { p += 3; why.push(reason('why.coldNight', { v: Math.round(night) })); }
+    else if (night < 5) { p += 2; why.push(reason('why.coldNight', { v: Math.round(night) })); }
+    else if (night < 10) { p += 0.8; why.push(reason('why.coldNight', { v: Math.round(night) })); }
+    if (w.temp > 30) { p += 1.5; why.push(reason('why.temp', { v: Math.round(w.temp) })); }
+    if (w.rain !== null && w.rain > 0.2) {
+      p += (w.rain > 2 ? 4 : 2.5);
+      why.push(reason('why.rain'));
+    } else if (w.rainProb !== null && w.rainProb >= 60) {
+      p += 1.2; why.push(reason('why.rainLikely'));
+    }
+    if (w.wind !== null) {
+      var pw = penalty([[5, 0], [8, 1], [12, 2.5], [99, 4.5]], w.wind);
+      p += pw; if (pw >= 1) { why.push(reason('why.wind', { v: Math.round(w.wind) })); }
+    }
+    if (w.gust !== null && w.gust > 12) { p += 1; why.push(reason('why.gusts')); }
+    if (w.dewPoint !== null && w.dewPoint > 20) { p += 1; why.push(reason('why.mugginess')); }
+    return { value: U.clamp(10 - p, 0, 10), why: why };
+  }
+
   return {
-    SPEC: SPEC, band: band, drone: drone,
+    SPEC: SPEC, band: band, drone: drone, boatFishing: boatFishing, camping: camping,
     snorkel: snorkel, bike: bike, run: run, swim: swim, tennis: tennis,
     hike: hike, fishing: fishing, golf: golf, surf: surf, windsport: windsport
   };

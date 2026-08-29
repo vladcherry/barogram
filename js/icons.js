@@ -264,10 +264,34 @@ var Icons = (function () {
     ];
   }
 
+  /* A boat with a rod over the side — the shore version is a rod alone. */
+  function boatFishingParts() {
+    return [
+      path('M3.5 15.5h13.5l-1.8 3.6a2 2 0 0 1-1.8 1.1H7.1a2 2 0 0 1-1.8-1.1z'),
+      line(9, 15.5, 9, 11.5),
+      path('M9 11.5l7.5-6.4'),
+      line(16.5, 5.1, 20.5, 8.4),
+      line(20.5, 8.4, 20.5, 12.5)
+    ];
+  }
+
+  /* Ridge tent: two slopes, a door and guy pegs. Without the pegs the outline
+     reads as a warning triangle. */
+  function campingParts() {
+    return [
+      path('M3.5 18.5L12 4l8.5 14.5z'),
+      line(1.5, 18.5, 22.5, 18.5),
+      path('M12 9l3 9.5'),
+      path('M12 9l-3 9.5'),
+      line(3.5, 18.5, 2, 21), line(20.5, 18.5, 22, 21)
+    ];
+  }
+
   var SPORT_PARTS = {
     snorkel: maskParts, bike: bikeParts, run: runParts, swim: swimParts,
     tennis: tennisParts, hike: hikeParts, fishing: fishingParts, golf: golfParts,
-    surf: surfParts, windsport: windsportParts, drone: droneParts
+    surf: surfParts, windsport: windsportParts, drone: droneParts,
+    boatFishing: boatFishingParts, camping: campingParts
   };
 
   /* Wind direction is not a comfort reading, so it gets a compass instead of a
