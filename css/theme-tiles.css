@@ -1,0 +1,78 @@
+/* Design 4 "Tiles" — every reading at once on one e-ink screen, no scrolling.
+   Each tile keeps the number and a mini slider showing where the value sits in
+   its comfort range; the notes and the 24 h charts are hidden here because on a
+   6" screen they are what pushes the last tiles below the fold. */
+
+body[data-theme="tiles"] { background: #ffffff; color: #000000; }
+body[data-theme="tiles"] .app { padding: 4px 5px 8px 5px; }
+
+body[data-theme="tiles"] .topbar { border-bottom: 3px solid #000; padding-bottom: 4px; align-items: center; }
+body[data-theme="tiles"] .clock { font-size: 34px; line-height: 1; }
+body[data-theme="tiles"] .date { font-size: 11px; }
+body[data-theme="tiles"] .place { font-size: 14px; }
+body[data-theme="tiles"] .updated { font-size: 11px; }
+body[data-theme="tiles"] .cond { font-size: 12px; font-weight: 700; }
+
+body[data-theme="tiles"] .btn {
+  border-color: #000; color: #000; background: #fff;
+  border-radius: 0; font-size: 13px; font-weight: 700; padding: 5px 8px;
+}
+body[data-theme="tiles"] .btn:active { background: #000; color: #fff; }
+body[data-theme="tiles"] .btn-icon { padding: 5px; }
+body[data-theme="tiles"] .btn-icon svg { width: 20px; height: 20px; }
+body[data-theme="tiles"] .input { border-color: #000; border-radius: 0; }
+body[data-theme="tiles"] .panel { border-color: #000; }
+body[data-theme="tiles"] .hint { font-size: 12px; }
+
+body[data-theme="tiles"] .cards { margin-top: 6px; }
+body[data-theme="tiles"] .card {
+  border: 2px solid #000; border-radius: 0;
+  flex: 1 1 46%; min-width: 130px;
+  margin: 0 5px 5px 0; padding: 3px 6px 5px 6px;
+}
+body[data-theme="tiles"] .card-head { display: block; }
+body[data-theme="tiles"] .card-title {
+  font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; display: inline;
+}
+body[data-theme="tiles"] .card-badge { display: none; }
+body[data-theme="tiles"] .card-value { font-size: 28px; line-height: 1.05; }
+body[data-theme="tiles"] .card-unit { font-size: 12px; font-weight: 700; }
+body[data-theme="tiles"] .card-band { font-size: 11px; margin-top: 3px; text-transform: uppercase; }
+/* The 24 h charts are what push the last tiles below the fold, so they only
+   live on the roomier designs; the note stays, clipped to a single line. */
+body[data-theme="tiles"] .spark,
+body[data-theme="tiles"] .spark-cap,
+body[data-theme="tiles"] .scale-ends { display: none; }
+body[data-theme="tiles"] .card-note {
+  font-size: 11px; margin-top: 1px;
+  white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
+}
+
+/* The mini slider: a short segmented track with the marker riding on top. */
+body[data-theme="tiles"] .scale { padding-top: 9px; }
+body[data-theme="tiles"] .seg { height: 9px; border: 1px solid #000; margin-right: 2px; }
+body[data-theme="tiles"] .seg-off { background: #ffffff; }
+body[data-theme="tiles"] .scale-marker {
+  border-top-width: 8px; border-left-width: 5px; border-right-width: 5px;
+  margin-left: -5px; border-top-color: #000;
+}
+
+body[data-theme="tiles"] .footbar { font-size: 11px; border-top: 2px solid #000; padding-top: 3px; }
+body[data-theme="tiles"] .empty { border: 2px solid #000; }
+
+body[data-theme="tiles"] .seg-on.lv-deep { background: #3b2f8f; }
+body[data-theme="tiles"] .seg-on.lv-cold { background: #2b5fd9; }
+body[data-theme="tiles"] .seg-on.lv-calm { background: #2f9bd4; }
+body[data-theme="tiles"] .seg-on.lv-good { background: #2e8b3d; }
+body[data-theme="tiles"] .seg-on.lv-mid  { background: #d8b21a; }
+body[data-theme="tiles"] .seg-on.lv-warn { background: #d9741a; }
+body[data-theme="tiles"] .seg-on.lv-bad  { background: #c8341f; }
+body[data-theme="tiles"] .seg-on.lv-crit { background: #6f1010; }
+
+/* Three columns once the screen is wide enough for them. */
+@media (min-width: 620px) {
+  body[data-theme="tiles"] .card { flex: 1 1 30%; }
+}
+@media (max-width: 430px) {
+  body[data-theme="tiles"] .card { flex: 1 1 46%; margin-right: 5px; }
+}

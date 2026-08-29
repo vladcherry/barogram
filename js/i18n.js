@@ -1,6 +1,7 @@
 /* i18n.js — every user-facing string lives here. English is the source
-   language, Russian is a locale on top of it. Locale is picked from the
-   browser, can be overridden with ?lang=ru and is remembered afterwards. */
+   language; Russian, Ukrainian and Spanish are locales on top of it. The
+   locale is picked from the browser, can be overridden with ?lang=uk and is
+   remembered afterwards. Missing keys fall back to English. */
 var I18N = (function () {
 
   var EN = {
@@ -9,6 +10,7 @@ var I18N = (function () {
     'theme.eink': 'E-Ink',
     'theme.night': 'Night',
     'theme.paper': 'Analytics',
+    'theme.tiles': 'Tiles',
 
     'ui.design': 'Design: {name}',
     'ui.refresh': 'Refresh',
@@ -210,7 +212,9 @@ var I18N = (function () {
     'compass.points': 'N,NE,E,SE,S,SW,W,NW',
 
     'lang.en': 'English',
-    'lang.ru': 'Русский'
+    'lang.ru': 'Русский',
+    'lang.uk': 'Українська',
+    'lang.es': 'Español'
   };
 
   var RU = {
@@ -219,6 +223,7 @@ var I18N = (function () {
     'theme.eink': 'E-Ink',
     'theme.night': 'Тёмный',
     'theme.paper': 'Аналитика',
+    'theme.tiles': 'Плитки',
 
     'ui.design': 'Дизайн: {name}',
     'ui.refresh': 'Обновить',
@@ -417,15 +422,423 @@ var I18N = (function () {
     'compass.points': 'С,СВ,В,ЮВ,Ю,ЮЗ,З,СЗ'
   };
 
-  var DICTS = { en: EN, ru: RU };
-  var order = ['en', 'ru'];
+  var UK = {
+    'app.title': 'Barogram — погода зі шкалами інтенсивності',
+
+    'theme.eink': 'E-Ink',
+    'theme.night': 'Темний',
+    'theme.paper': 'Аналітика',
+    'theme.tiles': 'Плитки',
+
+    'ui.design': 'Дизайн: {name}',
+    'ui.refresh': 'Оновити',
+    'ui.place': 'Місце',
+    'ui.myLocation': 'Моє місцезнаходження',
+    'ui.background': 'Фонове оновлення: {state}',
+    'ui.keepScreen': 'Не гасити екран: {state}',
+    'ui.language': 'Мова: {name}',
+    'ui.on': 'увімк',
+    'ui.off': 'вимк',
+    'ui.cityPlaceholder': 'Місто (наприклад, Одеса)',
+    'ui.find': 'Знайти',
+    'ui.noPlace': 'Місце не вибрано',
+    'ui.demoPlace': 'Демо-режим',
+    'ui.locating': 'Визначаємо місце…',
+    'ui.noData': 'Немає даних. Натисніть «Оновити» або виберіть місце.',
+
+    'time.never': 'немає даних',
+    'time.justNow': 'оновлено щойно',
+    'time.minutes': 'оновлено {n} хв тому',
+    'time.hours': 'оновлено {n} год тому',
+    'time.days': 'оновлено {n} дн тому',
+
+    'status.initial': 'Дані Open-Meteo. Оновлення раз на годину.',
+    'status.updating': 'Оновлюємо…',
+    'status.ok': 'Дані Open-Meteo · наступне оновлення на початку години',
+    'status.failed': 'Не вдалося оновити ({err}), показано останні дані',
+    'status.noPlace': 'Місце не вибрано — відкрийте «Місце».',
+    'status.demo': 'Демо-дані, мережа не використовується.',
+
+    'hint.pickPlace': 'Виберіть місце: кнопка нижче або пошук за назвою.',
+    'hint.enterCity': 'Введіть назву міста.',
+    'hint.searching': 'Шукаємо…',
+    'hint.nothingFound': 'Нічого не знайдено.',
+    'hint.chooseCity': 'Виберіть місто:',
+    'hint.searchFailed': 'Пошук не вдався: {err}',
+    'hint.placeSet': 'Місце: {name}',
+    'hint.locating': 'Визначаємо координати…',
+    'hint.geoOk': 'Координати отримано.',
+    'hint.geoFailed': 'Не вдалося визначити місце ({err}).',
+    'hint.geoUnsupported': 'Геолокація недоступна, знайдіть місто за назвою.',
+    'hint.bgOff': 'Фонові сповіщення вимкнено.',
+    'hint.bgOn': 'Фонове оновлення раз на годину увімкнено.',
+    'hint.bgNoPermission': 'Без дозволу на сповіщення розбудити екран не вийде.',
+    'hint.bgNoNotifications': 'Сповіщення недоступні: оновлення працює, поки застосунок відкритий.',
+    'hint.swUnavailable': 'Service Worker недоступний: тримайте застосунок відкритим, він оновиться сам.',
+    'hint.syncUnsupported': 'Фонова синхронізація не підтримується браузером. Поки застосунок відкритий, оновлення йде раз на годину.',
+    'hint.syncRejected': 'Браузер відхилив фонову синхронізацію: {err}',
+    'hint.syncPermission': 'Дозвольте «періодичну фонову синхронізацію» для встановленого застосунку.',
+    'hint.wakeLockUnsupported': 'Wake Lock не підтримується цим браузером.',
+    'hint.wakeLockRejected': 'Wake Lock відхилено: {err}',
+
+    'metric.temp': 'Температура',
+    'metric.wind': 'Вітер',
+    'metric.rain': 'Опади',
+    'metric.clouds': 'Хмарність',
+    'metric.uv': 'УФ-індекс',
+    'metric.humidity': 'Вологість',
+    'metric.pressure': 'Тиск',
+    'metric.waves': 'Хвилі',
+    'metric.snorkel': 'Снорклінг',
+    'metric.bike': 'Велосипед',
+
+    'unit.wind': 'м/с',
+    'unit.rain': 'мм/год',
+    'unit.pressure': 'гПа',
+    'unit.wave': 'м',
+
+    'card.index': 'індекс',
+
+    'note.temp': 'відчувається {feels}°',
+    'note.tempRange': 'відчувається {feels}° · сьогодні {min}…{max}°',
+    'note.wind': 'пориви {gust} м/с',
+    'note.windDir': 'пориви {gust} м/с · {dir} ({deg}°)',
+    'note.rain': 'ймовірність {prob}',
+    'note.rainSum': 'ймовірність {prob} · за добу {sum} мм',
+    'note.uvMax': 'максимум сьогодні {max}',
+    'note.uvDefault': 'захист потрібен починаючи з УФ 3',
+    'note.humidity': 'комфортний коридор 40–60%',
+    'note.pressure': '{mmhg} мм рт. ст.',
+    'note.pressureTrend': '{mmhg} мм рт. ст. · {trend}',
+    'note.waves': 'період {period} с · вода {temp}°',
+    'note.noSea': 'морських даних для цієї точки немає',
+    'note.needSea': 'потрібні дані про море',
+    'note.noData': 'немає даних',
+    'note.noIssues': 'умови без зауважень',
+    'note.why': 'мінуси: {list}',
+
+    'spark.temp': 'температура, найближчі 24 год',
+    'spark.rain': 'опади, найближчі 24 год',
+    'spark.pressure': 'барограма, минулі 24 год',
+
+    'trend.unit': 'гПа/3год',
+    'trend.riseFast': 'зростає швидко {v}',
+    'trend.rise': 'зростає {v}',
+    'trend.steady': 'рівно {v}',
+    'trend.fall': 'падає {v}',
+    'trend.fallFast': 'падає швидко {v}',
+
+    'why.waves': 'хвиля {v} м',
+    'why.water': 'вода {v}°',
+    'why.wind': 'вітер {v} м/с',
+    'why.rain': 'дощ',
+    'why.rainLikely': 'ймовірний дощ',
+    'why.lowLight': 'мало світла',
+    'why.harshUv': 'жорсткий УФ',
+    'why.temp': '{v}°',
+    'why.gusts': 'пориви',
+    'why.uv': 'УФ {v}',
+    'why.mugginess': 'задуха',
+
+    'band.temp.deepFrost': 'Сильний мороз',
+    'band.temp.frost': 'Мороз',
+    'band.temp.cold': 'Холодно',
+    'band.temp.cool': 'Прохолодно',
+    'band.temp.comfort': 'Комфортно',
+    'band.temp.warm': 'Тепло',
+    'band.temp.hot': 'Спекотно',
+    'band.temp.scorching': 'Пекло',
+
+    'band.wind.calm': 'Штиль',
+    'band.wind.light': 'Легкий',
+    'band.wind.gentle': 'Слабкий',
+    'band.wind.moderate': 'Помірний',
+    'band.wind.fresh': 'Свіжий',
+    'band.wind.strong': 'Сильний',
+    'band.wind.nearGale': 'Міцний',
+    'band.wind.storm': 'Шторм',
+
+    'band.uv.low': 'Низький',
+    'band.uv.moderate': 'Помірний',
+    'band.uv.high': 'Високий',
+    'band.uv.veryHigh': 'Дуже високий',
+    'band.uv.extreme': 'Екстремальний',
+
+    'band.humidity.veryDry': 'Дуже сухо',
+    'band.humidity.dry': 'Сухо',
+    'band.humidity.comfort': 'Комфортно',
+    'band.humidity.humid': 'Волого',
+    'band.humidity.veryHumid': 'Дуже волого',
+    'band.humidity.muggy': 'Задуха',
+
+    'band.clouds.clear': 'Ясно',
+    'band.clouds.few': 'Мала хмарність',
+    'band.clouds.partly': 'Мінлива',
+    'band.clouds.cloudy': 'Хмарно',
+    'band.clouds.overcast': 'Похмуро',
+
+    'band.rain.dry': 'Сухо',
+    'band.rain.drizzle': 'Мряка',
+    'band.rain.rain': 'Дощ',
+    'band.rain.heavy': 'Сильний дощ',
+    'band.rain.downpour': 'Злива',
+
+    'band.pressure.veryLow': 'Дуже низький',
+    'band.pressure.low': 'Низький',
+    'band.pressure.belowNormal': 'Нижче норми',
+    'band.pressure.normal': 'Норма',
+    'band.pressure.high': 'Високий',
+    'band.pressure.veryHigh': 'Дуже високий',
+
+    'band.waves.glassy': 'Дзеркало',
+    'band.waves.ripple': 'Брижі',
+    'band.waves.small': 'Невелика хвиля',
+    'band.waves.choppy': 'Хвилювання',
+    'band.waves.rough': 'Сильне хвилювання',
+    'band.waves.storm': 'Шторм',
+
+    'band.index.avoid': 'Не варто',
+    'band.index.poor': 'Погано',
+    'band.index.soso': 'Так собі',
+    'band.index.good': 'Добре',
+    'band.index.great': 'Відмінно',
+
+    'notify.title': 'Погода: {place}',
+    'notify.titlePlain': 'Погоду оновлено',
+    'notify.wind': 'вітер',
+    'notify.uv': 'УФ',
+    'notify.humidity': 'вологість',
+
+    'wmo.0': 'Ясно', 'wmo.1': 'Мала хмарність', 'wmo.2': 'Мінлива хмарність', 'wmo.3': 'Похмуро',
+    'wmo.45': 'Туман', 'wmo.48': 'Паморозь',
+    'wmo.51': 'Мряка слабка', 'wmo.53': 'Мряка', 'wmo.55': 'Мряка сильна',
+    'wmo.56': 'Крижана мряка', 'wmo.57': 'Крижана мряка',
+    'wmo.61': 'Дощ слабкий', 'wmo.63': 'Дощ', 'wmo.65': 'Злива',
+    'wmo.66': 'Крижаний дощ', 'wmo.67': 'Крижаний дощ',
+    'wmo.71': 'Сніг слабкий', 'wmo.73': 'Сніг', 'wmo.75': 'Снігопад', 'wmo.77': 'Снігова крупа',
+    'wmo.80': 'Зливи місцями', 'wmo.81': 'Зливи', 'wmo.82': 'Сильні зливи',
+    'wmo.85': 'Снігові заряди', 'wmo.86': 'Снігові заряди',
+    'wmo.95': 'Гроза', 'wmo.96': 'Гроза з градом', 'wmo.99': 'Гроза з градом',
+    'wmo.unknown': 'код {code}',
+
+    'date.months': 'січня,лютого,березня,квітня,травня,червня,липня,серпня,вересня,жовтня,листопада,грудня',
+    'date.weekdays': 'неділя,понеділок,вівторок,середа,четвер,пʼятниця,субота',
+    'date.format': '{day} {month}, {weekday}',
+    'compass.points': 'Пн,ПнСх,Сх,ПдСх,Пд,ПдЗх,Зх,ПнЗх'
+  };
+
+  var ES = {
+    'app.title': 'Barogram — el tiempo con escalas de intensidad',
+
+    'theme.eink': 'E-Ink',
+    'theme.night': 'Nocturno',
+    'theme.paper': 'Analítico',
+    'theme.tiles': 'Mosaico',
+
+    'ui.design': 'Diseño: {name}',
+    'ui.refresh': 'Actualizar',
+    'ui.place': 'Lugar',
+    'ui.myLocation': 'Mi ubicación',
+    'ui.background': 'Segundo plano: {state}',
+    'ui.keepScreen': 'Pantalla siempre activa: {state}',
+    'ui.language': 'Idioma: {name}',
+    'ui.on': 'sí',
+    'ui.off': 'no',
+    'ui.cityPlaceholder': 'Ciudad (por ejemplo, Odesa)',
+    'ui.find': 'Buscar',
+    'ui.noPlace': 'Sin lugar seleccionado',
+    'ui.demoPlace': 'Modo demo',
+    'ui.locating': 'Localizando…',
+    'ui.noData': 'Sin datos. Pulsa «Actualizar» o elige un lugar.',
+
+    'time.never': 'sin datos',
+    'time.justNow': 'actualizado ahora mismo',
+    'time.minutes': 'actualizado hace {n} min',
+    'time.hours': 'actualizado hace {n} h',
+    'time.days': 'actualizado hace {n} d',
+
+    'status.initial': 'Datos de Open-Meteo. Actualización cada hora.',
+    'status.updating': 'Actualizando…',
+    'status.ok': 'Datos de Open-Meteo · próxima actualización al inicio de la hora',
+    'status.failed': 'No se pudo actualizar ({err}), se muestran los últimos datos',
+    'status.noPlace': 'Sin lugar seleccionado: abre «Lugar».',
+    'status.demo': 'Datos de demostración, sin red.',
+
+    'hint.pickPlace': 'Elige un lugar: el botón de abajo o la búsqueda por nombre.',
+    'hint.enterCity': 'Escribe el nombre de una ciudad.',
+    'hint.searching': 'Buscando…',
+    'hint.nothingFound': 'No se encontró nada.',
+    'hint.chooseCity': 'Elige una ciudad:',
+    'hint.searchFailed': 'La búsqueda falló: {err}',
+    'hint.placeSet': 'Lugar: {name}',
+    'hint.locating': 'Obteniendo coordenadas…',
+    'hint.geoOk': 'Coordenadas obtenidas.',
+    'hint.geoFailed': 'No se pudo determinar la ubicación ({err}).',
+    'hint.geoUnsupported': 'La geolocalización no está disponible; busca por nombre de ciudad.',
+    'hint.bgOff': 'Notificaciones en segundo plano desactivadas.',
+    'hint.bgOn': 'Actualización horaria en segundo plano activada.',
+    'hint.bgNoPermission': 'Sin permiso de notificaciones no se puede despertar la pantalla.',
+    'hint.bgNoNotifications': 'Notificaciones no disponibles: la actualización funciona con la app abierta.',
+    'hint.swUnavailable': 'Service worker no disponible: mantén la app abierta, se actualiza sola.',
+    'hint.syncUnsupported': 'Este navegador no admite la sincronización periódica. Con la app abierta se actualiza cada hora.',
+    'hint.syncRejected': 'El navegador rechazó la sincronización en segundo plano: {err}',
+    'hint.syncPermission': 'Permite la «sincronización periódica en segundo plano» para la app instalada.',
+    'hint.wakeLockUnsupported': 'Este navegador no admite Wake Lock.',
+    'hint.wakeLockRejected': 'Wake Lock rechazado: {err}',
+
+    'metric.temp': 'Temperatura',
+    'metric.wind': 'Viento',
+    'metric.rain': 'Precipitación',
+    'metric.clouds': 'Nubosidad',
+    'metric.uv': 'Índice UV',
+    'metric.humidity': 'Humedad',
+    'metric.pressure': 'Presión',
+    'metric.waves': 'Olas',
+    'metric.snorkel': 'Snorkel',
+    'metric.bike': 'Ciclismo',
+
+    'card.index': 'índice',
+
+    'note.temp': 'sensación {feels}°',
+    'note.tempRange': 'sensación {feels}° · hoy {min}…{max}°',
+    'note.wind': 'rachas {gust} m/s',
+    'note.windDir': 'rachas {gust} m/s · {dir} ({deg}°)',
+    'note.rain': 'probabilidad {prob}',
+    'note.rainSum': 'probabilidad {prob} · {sum} mm en 24 h',
+    'note.uvMax': 'máximo de hoy {max}',
+    'note.uvDefault': 'protección necesaria a partir de UV 3',
+    'note.humidity': 'rango cómodo 40–60%',
+    'note.pressure': '{mmhg} mmHg',
+    'note.pressureTrend': '{mmhg} mmHg · {trend}',
+    'note.waves': 'periodo {period} s · agua {temp}°',
+    'note.noSea': 'sin datos marinos para este punto',
+    'note.needSea': 'se necesitan datos marinos',
+    'note.noData': 'sin datos',
+    'note.noIssues': 'sin inconvenientes',
+    'note.why': 'contras: {list}',
+
+    'spark.temp': 'temperatura, próximas 24 h',
+    'spark.rain': 'precipitación, próximas 24 h',
+    'spark.pressure': 'barograma, últimas 24 h',
+
+    'trend.unit': 'hPa/3h',
+    'trend.riseFast': 'sube rápido {v}',
+    'trend.rise': 'sube {v}',
+    'trend.steady': 'estable {v}',
+    'trend.fall': 'baja {v}',
+    'trend.fallFast': 'baja rápido {v}',
+
+    'why.waves': 'olas {v} m',
+    'why.water': 'agua {v}°',
+    'why.wind': 'viento {v} m/s',
+    'why.rain': 'lluvia',
+    'why.rainLikely': 'lluvia probable',
+    'why.lowLight': 'poca luz',
+    'why.harshUv': 'UV fuerte',
+    'why.temp': '{v}°',
+    'why.gusts': 'rachas',
+    'why.uv': 'UV {v}',
+    'why.mugginess': 'bochorno',
+
+    'band.temp.deepFrost': 'Helada intensa',
+    'band.temp.frost': 'Helada',
+    'band.temp.cold': 'Frío',
+    'band.temp.cool': 'Fresco',
+    'band.temp.comfort': 'Agradable',
+    'band.temp.warm': 'Cálido',
+    'band.temp.hot': 'Calor',
+    'band.temp.scorching': 'Calor extremo',
+
+    'band.wind.calm': 'Calma',
+    'band.wind.light': 'Brisa muy débil',
+    'band.wind.gentle': 'Brisa débil',
+    'band.wind.moderate': 'Moderado',
+    'band.wind.fresh': 'Fresco',
+    'band.wind.strong': 'Fuerte',
+    'band.wind.nearGale': 'Muy fuerte',
+    'band.wind.storm': 'Temporal',
+
+    'band.uv.low': 'Bajo',
+    'band.uv.moderate': 'Moderado',
+    'band.uv.high': 'Alto',
+    'band.uv.veryHigh': 'Muy alto',
+    'band.uv.extreme': 'Extremo',
+
+    'band.humidity.veryDry': 'Muy seco',
+    'band.humidity.dry': 'Seco',
+    'band.humidity.comfort': 'Agradable',
+    'band.humidity.humid': 'Húmedo',
+    'band.humidity.veryHumid': 'Muy húmedo',
+    'band.humidity.muggy': 'Bochorno',
+
+    'band.clouds.clear': 'Despejado',
+    'band.clouds.few': 'Poco nuboso',
+    'band.clouds.partly': 'Parcialmente nuboso',
+    'band.clouds.cloudy': 'Nuboso',
+    'band.clouds.overcast': 'Cubierto',
+
+    'band.rain.dry': 'Seco',
+    'band.rain.drizzle': 'Llovizna',
+    'band.rain.rain': 'Lluvia',
+    'band.rain.heavy': 'Lluvia fuerte',
+    'band.rain.downpour': 'Aguacero',
+
+    'band.pressure.veryLow': 'Muy baja',
+    'band.pressure.low': 'Baja',
+    'band.pressure.belowNormal': 'Bajo lo normal',
+    'band.pressure.normal': 'Normal',
+    'band.pressure.high': 'Alta',
+    'band.pressure.veryHigh': 'Muy alta',
+
+    'band.waves.glassy': 'Espejo',
+    'band.waves.ripple': 'Rizada',
+    'band.waves.small': 'Marejadilla',
+    'band.waves.choppy': 'Marejada',
+    'band.waves.rough': 'Fuerte marejada',
+    'band.waves.storm': 'Temporal',
+
+    'band.index.avoid': 'No merece la pena',
+    'band.index.poor': 'Malo',
+    'band.index.soso': 'Regular',
+    'band.index.good': 'Bueno',
+    'band.index.great': 'Excelente',
+
+    'notify.title': 'Tiempo: {place}',
+    'notify.titlePlain': 'Tiempo actualizado',
+    'notify.wind': 'viento',
+    'notify.uv': 'UV',
+    'notify.humidity': 'humedad',
+
+    'wmo.0': 'Despejado', 'wmo.1': 'Poco nuboso', 'wmo.2': 'Parcialmente nuboso', 'wmo.3': 'Cubierto',
+    'wmo.45': 'Niebla', 'wmo.48': 'Niebla helada',
+    'wmo.51': 'Llovizna débil', 'wmo.53': 'Llovizna', 'wmo.55': 'Llovizna intensa',
+    'wmo.56': 'Llovizna helada', 'wmo.57': 'Llovizna helada',
+    'wmo.61': 'Lluvia débil', 'wmo.63': 'Lluvia', 'wmo.65': 'Lluvia fuerte',
+    'wmo.66': 'Lluvia helada', 'wmo.67': 'Lluvia helada',
+    'wmo.71': 'Nieve débil', 'wmo.73': 'Nieve', 'wmo.75': 'Nevada intensa', 'wmo.77': 'Granos de nieve',
+    'wmo.80': 'Chubascos', 'wmo.81': 'Chubascos', 'wmo.82': 'Chubascos violentos',
+    'wmo.85': 'Chubascos de nieve', 'wmo.86': 'Chubascos de nieve',
+    'wmo.95': 'Tormenta', 'wmo.96': 'Tormenta con granizo', 'wmo.99': 'Tormenta con granizo',
+    'wmo.unknown': 'código {code}',
+
+    'date.months': 'enero,febrero,marzo,abril,mayo,junio,julio,agosto,septiembre,octubre,noviembre,diciembre',
+    'date.weekdays': 'domingo,lunes,martes,miércoles,jueves,viernes,sábado',
+    'date.format': '{day} de {month}, {weekday}',
+    'compass.points': 'N,NE,E,SE,S,SO,O,NO'
+  };
+
+  var DICTS = { en: EN, ru: RU, uk: UK, es: ES };
+  var order = ['en', 'ru', 'uk', 'es'];
   var current = 'en';
 
   function detect() {
     var q = /[?&]lang=([a-z]{2})/.exec(location.search);
     if (q && DICTS[q[1]]) { return q[1]; }
     var nav = (navigator.language || navigator.userLanguage || 'en').toLowerCase();
-    return nav.indexOf('ru') === 0 ? 'ru' : 'en';
+    for (var i = 0; i < order.length; i++) {
+      if (nav.indexOf(order[i]) === 0) { return order[i]; }
+    }
+    return 'en';
   }
 
   function use(lang) { current = DICTS[lang] ? lang : 'en'; return current; }

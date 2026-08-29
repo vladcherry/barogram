@@ -31,6 +31,16 @@ button, input { font-family: inherit; font-size: inherit; }
 }
 .input { flex: 1 1 160px; padding: 8px 10px; border-width: 2px; border-style: solid; }
 
+/* Icon buttons in the top bar. Strokes follow the theme colour, so one icon
+   set works on white paper and on the dark tiles alike. */
+.btn-icon { padding: 7px; line-height: 0; }
+.btn-icon svg {
+  display: block; width: 22px; height: 22px;
+  fill: none; stroke: currentColor; stroke-width: 2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.btn-icon .ico-fill { fill: currentColor; }
+
 /* ---- settings panel ---- */
 .panel { margin-top: 10px; padding: 10px; border-width: 2px; border-style: solid; }
 .panel-row { display: flex; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }

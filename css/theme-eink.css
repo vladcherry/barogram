@@ -17,6 +17,8 @@ body[data-theme="eink"] .btn {
   font-size: 15px; font-weight: 700; border-radius: 0;
 }
 body[data-theme="eink"] .btn:active { background: #000; color: #fff; }
+/* Heavier strokes: thin lines disappear on electronic ink. */
+body[data-theme="eink"] .btn-icon svg { width: 24px; height: 24px; stroke-width: 2.4; }
 body[data-theme="eink"] .input { border-color: #000; border-radius: 0; font-size: 16px; }
 body[data-theme="eink"] .panel { border-color: #000; }
 body[data-theme="eink"] .hint { font-size: 14px; }

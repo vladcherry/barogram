@@ -3,6 +3,7 @@
 
   var THEMES = [
     { id: 'eink',  name: 'theme.eink',  color: '#ffffff' },
+    { id: 'tiles', name: 'theme.tiles', color: '#ffffff' },
     { id: 'night', name: 'theme.night', color: '#0b0f14' },
     { id: 'paper', name: 'theme.paper', color: '#f6f3ec' }
   ];
@@ -21,17 +22,28 @@
     return 0;
   }
 
+  /* Icon buttons have no text, so their label goes into title and aria-label. */
+  function setLabel(node, text) {
+    if (!node) { return; }
+    node.setAttribute('title', text);
+    node.setAttribute('aria-label', text);
+  }
+
   function applyTheme(id) {
     var theme = THEMES[themeIndex(id)];
     document.body.setAttribute('data-theme', theme.id);
     var meta = document.querySelector('meta[name="theme-color"]');
     if (meta) { meta.setAttribute('content', theme.color); }
-    U.setText(U.$('#btn-theme'), I18N.t('ui.design', { name: I18N.t(theme.name) }));
+    setLabel(U.$('#btn-theme'), I18N.t('ui.design', { name: I18N.t(theme.name) }));
     Store.set({ theme: theme.id });
   }
 
+  /* The button is an icon, so the footer names the design that was just picked. */
   function nextTheme() {
-    applyTheme(THEMES[(themeIndex(settings.theme) + 1) % THEMES.length].id);
+    var theme = THEMES[(themeIndex(settings.theme) + 1) % THEMES.length];
+    applyTheme(theme.id);
+    setStatus(I18N.t('ui.design', { name: I18N.t(theme.name) }));
+    setTimeout(refreshStatus, 2500);
   }
 
   /* ---------- language ---------- */
@@ -67,6 +79,10 @@
     var nodes = document.querySelectorAll('[data-i18n]');
     for (var i = 0; i < nodes.length; i++) {
       U.setText(nodes[i], I18N.t(nodes[i].getAttribute('data-i18n')));
+    }
+    var labelled = document.querySelectorAll('[data-i18n-label]');
+    for (i = 0; i < labelled.length; i++) {
+      setLabel(labelled[i], I18N.t(labelled[i].getAttribute('data-i18n-label')));
     }
     var placeholders = document.querySelectorAll('[data-i18n-placeholder]');
     for (i = 0; i < placeholders.length; i++) {

@@ -16,6 +16,7 @@
 <link rel="stylesheet" href="css/theme-eink.css">
 <link rel="stylesheet" href="css/theme-night.css">
 <link rel="stylesheet" href="css/theme-paper.css">
+<link rel="stylesheet" href="css/theme-tiles.css">
 </head>
 <body data-theme="eink">
 
@@ -31,10 +32,30 @@
       <div class="updated" id="updated" data-i18n="time.never">no data yet</div>
       <div class="cond" id="cond">&nbsp;</div>
     </div>
+    <!-- Icon buttons: the labels live in title/aria-label so they translate too. -->
     <div class="tools">
-      <button class="btn" id="btn-theme" type="button">Design</button>
-      <button class="btn" id="btn-refresh" type="button" data-i18n="ui.refresh">Refresh</button>
-      <button class="btn" id="btn-settings" type="button" data-i18n="ui.place">Place</button>
+      <button class="btn btn-icon" id="btn-theme" type="button" title="Design" aria-label="Design">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <rect x="3" y="3" width="8" height="8"></rect>
+          <rect x="13" y="3" width="8" height="8" class="ico-fill"></rect>
+          <rect x="3" y="13" width="8" height="8" class="ico-fill"></rect>
+          <rect x="13" y="13" width="8" height="8"></rect>
+        </svg>
+      </button>
+      <button class="btn btn-icon" id="btn-refresh" type="button"
+              data-i18n-label="ui.refresh" title="Refresh" aria-label="Refresh">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M20 12a8 8 0 1 1-2.6-5.9"></path>
+          <polyline points="20 4 20 10 14 10"></polyline>
+        </svg>
+      </button>
+      <button class="btn btn-icon" id="btn-settings" type="button"
+              data-i18n-label="ui.place" title="Place" aria-label="Place">
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
+          <circle cx="12" cy="10" r="2.6"></circle>
+        </svg>
+      </button>
     </div>
   </header>
 

@@ -4,11 +4,11 @@ A weather PWA for the **PocketBook Verse Pro Color** e-reader and for ordinary
 phones. Next to every number there is an intensity scale, so you see not just
 "6.2 m/s" but where that value sits between dead calm and a storm.
 
-Three designs ship with the app and are switched with the **Design** button.
+Four designs ship with the app and are cycled with the grid icon in the top bar.
 
-| 1 · E-Ink | 2 · Night | 3 · Analytics |
-|---|---|---|
-| ![](docs/design-1-eink.png) | ![](docs/design-2-night.png) | ![](docs/design-3-paper.png) |
+| 1 · E-Ink | 2 · Tiles | 3 · Night | 4 · Analytics |
+|---|---|---|---|
+| ![](docs/design-1-eink.png) | ![](docs/design-4-tiles.png) | ![](docs/design-2-night.png) | ![](docs/design-3-paper.png) |
 
 ## Designs
 
@@ -17,15 +17,25 @@ Three designs ship with the app and are switched with the **Design** button.
    outlined blocks. No shadows, gradients or animation — half-tones smear on
    e-ink and repaints are expensive. Colour appears only inside the scales,
    where Kaleido actually shows it.
-2. **Night** (`night`) — for phones: two tiles per row, temperature across the
+2. **Tiles** (`tiles`) — all ten readings on one 6" screen with no scrolling:
+   a two-column grid (three columns from 620 px), and every tile carries the
+   number, a mini slider showing where the value sits in its comfort range, the
+   band label and one clipped line of detail. The 24-hour charts are dropped
+   here — they are what pushes the last tiles below the fold.
+3. **Night** (`night`) — for phones: two tiles per row, temperature across the
    full width, 18 px corners, a thin solid scale bar. The dark background is
    easy on an OLED panel and on the eyes at night.
-3. **Analytics** (`paper`) — light paper, a single column of dense rows: label,
+4. **Analytics** (`paper`) — light paper, a single column of dense rows: label,
    large number, a full-width ruler-like scale and a coloured band marker down
    the left edge of the card. Maximum data per screen.
 
-The chosen design is remembered. `?theme=night` forces one, which is handy for
+The chosen design is remembered. `?theme=tiles` forces one, which is handy for
 screenshots.
+
+The top bar holds only the clock and three icon buttons — cycle design, refresh,
+place — so the readings get the rest of the screen. Their labels live in
+`title`/`aria-label` and translate with the interface; after switching design the
+footer names the one that was picked.
 
 ## What it shows
 
@@ -89,9 +99,11 @@ hourly timer.
 
 ## Language
 
-All strings live in `js/i18n.js`. English is the source language, Russian is a
-locale on top of it. The locale is picked from the browser, can be forced with
-`?lang=ru`, is switchable from the **Place** panel and is remembered.
+All strings live in `js/i18n.js`. English is the source language; Russian,
+Ukrainian and Spanish are locales on top of it, and any key a locale misses
+falls back to English. The locale is picked from the browser, can be forced with
+`?lang=uk`, is cycled with the language button in the **Place** panel and is
+remembered. Dates, weekday names and the compass points are localised too.
 
 ## Running it
 
@@ -130,9 +142,10 @@ minimal set of fields so the app still shows the weather.
 index.html              markup (one shell for all three designs)
 css/base.css            structure and geometry
 css/theme-eink.css      design 1
-css/theme-night.css     design 2
-css/theme-paper.css     design 3
-js/i18n.js              all user-facing strings: English source + Russian locale
+css/theme-night.css     design 3
+css/theme-paper.css     design 4
+css/theme-tiles.css     design 2
+js/i18n.js              all user-facing strings: English source + ru/uk/es locales
 js/util.js              helpers, XHR, formatting, weather codes
 js/store.js             settings and cache in localStorage
 js/metrics.js           scale bands and comfort-index maths

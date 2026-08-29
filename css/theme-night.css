@@ -17,6 +17,7 @@ body[data-theme="night"] .btn {
   border-radius: 12px; border-color: #26313d; background: #1b232d; color: #cfe0f0; font-size: 13px;
 }
 body[data-theme="night"] .btn:active { background: #2a3542; }
+body[data-theme="night"] .btn-icon svg { width: 20px; height: 20px; }
 body[data-theme="night"] .input { border-radius: 12px; border-color: #26313d; background: #121820; color: #e8eef5; }
 body[data-theme="night"] .panel { border-radius: 16px; border-color: #26313d; background: #131a22; }
 body[data-theme="night"] .hint { font-size: 13px; color: #8ea0b5; }
