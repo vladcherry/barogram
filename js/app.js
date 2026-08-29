@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.29-2';
+  var APP_VERSION = '2026.08.29-3';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -37,17 +37,52 @@
     document.body.setAttribute('data-theme', theme.id);
     var meta = document.querySelector('meta[name="theme-color"]');
     if (meta) { meta.setAttribute('content', theme.color); }
-    setLabel(U.$('#btn-theme'), I18N.t('ui.design', { name: I18N.t(theme.name) }));
     Store.set({ theme: theme.id });
+    markActiveTheme();
   }
 
-  /* The button is an icon, so the footer names the design that was just picked. */
-  function nextTheme() {
-    var theme = THEMES[(themeIndex(settings.theme) + 1) % THEMES.length];
-    applyTheme(theme.id);
-    setStatus(I18N.t('ui.design', { name: I18N.t(theme.name) }));
-    setTimeout(refreshStatus, 2500);
+  /* One button per design, the current one marked — on e-ink picking directly
+     beats cycling through four full-screen repaints. */
+  function buildDesignRow() {
+    var row = U.$('#design-row');
+    if (!row) { return; }
+    U.clear(row);
+    row.appendChild(U.el('span', 'menu-label', I18N.t('ui.designs')));
+    for (var i = 0; i < THEMES.length; i++) {
+      row.appendChild(designButton(THEMES[i]));
+    }
+    markActiveTheme();
   }
+
+  function designButton(theme) {
+    var button = U.el('button', 'btn btn-design', I18N.t(theme.name));
+    button.type = 'button';
+    button.setAttribute('data-theme-id', theme.id);
+    button.onclick = function () {
+      applyTheme(theme.id);
+      closeMenu();
+    };
+    return button;
+  }
+
+  function markActiveTheme() {
+    var buttons = document.querySelectorAll('.btn-design');
+    for (var i = 0; i < buttons.length; i++) {
+      var active = buttons[i].getAttribute('data-theme-id') === settings.theme;
+      buttons[i].className = 'btn btn-design' + (active ? ' is-active' : '');
+      buttons[i].setAttribute('aria-pressed', active ? 'true' : 'false');
+    }
+  }
+
+  /* ---------- menu ---------- */
+
+  function setMenu(open) {
+    U.$('#panel').hidden = !open;
+    U.$('#btn-menu').setAttribute('aria-expanded', open ? 'true' : 'false');
+  }
+
+  function toggleMenu() { setMenu(U.$('#panel').hidden); }
+  function closeMenu() { setMenu(false); }
 
   /* ---------- language ---------- */
 
@@ -61,6 +96,7 @@
     updateBackgroundButton();
     updateScreenButton();
     U.setText(U.$('#btn-language'), I18N.t('ui.language', { name: I18N.t('lang.' + active) }));
+    buildDesignRow();
     U.setText(U.$('#version'), I18N.t('ui.version', { v: APP_VERSION }));
     U.setText(U.$('#place'), settings.place || I18N.t(demoMode ? 'ui.demoPlace' : 'ui.noPlace'));
     U.setText(U.$('#date'), U.dateText(new Date()));
@@ -470,7 +506,7 @@
       setPlace(U.num(result.latitude, 4), U.num(result.longitude, 4), result.name);
       U.clear(list);
       setHint(I18N.t('hint.placeSet', { name: result.name }));
-      U.$('#panel').hidden = true;
+      closeMenu();
     };
     item.appendChild(button);
     return item;
@@ -479,12 +515,8 @@
   /* ---------- start ---------- */
 
   function bindControls() {
-    U.$('#btn-theme').onclick = nextTheme;
-    U.$('#btn-refresh').onclick = refresh;
-    U.$('#btn-settings').onclick = function () {
-      var panel = U.$('#panel');
-      panel.hidden = !panel.hidden;
-    };
+    U.$('#btn-menu').onclick = toggleMenu;
+    U.$('#btn-refresh').onclick = function () { refresh(); closeMenu(); };
     U.$('#btn-language').onclick = function () { applyLanguage(I18N.next()); };
     U.$('#btn-geo').onclick = detectLocation;
     U.$('#btn-city').onclick = searchCity;
@@ -524,7 +556,7 @@
     if (demoMode || settings.lat !== null) {
       refresh();
     } else {
-      U.$('#panel').hidden = false;
+      setMenu(true);
       setHint(I18N.t('hint.pickPlace'));
       setStatus(I18N.t('status.noPlace'));
     }

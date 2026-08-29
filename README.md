@@ -34,16 +34,18 @@ Four designs ship with the app and are cycled with the grid icon in the top bar.
 The chosen design is remembered. `?theme=tiles` forces one, which is handy for
 screenshots.
 
-The top bar holds only the clock and three icon buttons — cycle design, refresh,
-place — so the readings get the rest of the screen. Their labels live in
-`title`/`aria-label` and translate with the interface; after switching design the
-footer names the one that was picked.
+The top bar holds the clock and a single hamburger button, so the readings get
+the rest of the screen. It opens the menu, which carries everything: one button
+per design with the current one marked (picking directly beats cycling through
+four full-screen e-ink repaints), refresh, location and city search, the
+background and wake-lock toggles, and the language switch. Picking a design,
+refreshing or choosing a city closes the menu again.
 
 A full-screen browser (the way a reader is usually set up) hides its own address
-bar and reload button, so the **Place** panel carries them instead: *Reload page*
-reloads, *Update app* unregisters the service worker, drops its caches and
-reloads — the reliable way to pick up a new build with no browser chrome around.
-The version string next to them shows which build is actually running.
+bar and reload button, so the menu carries them instead: *Reload page* reloads,
+*Update app* unregisters the service worker, drops its caches and reloads — the
+reliable way to pick up a new build with no browser chrome around. The version
+string next to them shows which build is actually running.
 
 ## What it shows
 

@@ -13,6 +13,8 @@ var I18N = (function () {
     'theme.tiles': 'Tiles',
 
     'ui.design': 'Design: {name}',
+    'ui.designs': 'Design',
+    'ui.menu': 'Menu',
     'ui.refresh': 'Refresh',
     'ui.place': 'Place',
     'ui.myLocation': 'My location',
@@ -230,6 +232,8 @@ var I18N = (function () {
     'theme.tiles': 'Плитки',
 
     'ui.design': 'Дизайн: {name}',
+    'ui.designs': 'Дизайн',
+    'ui.menu': 'Меню',
     'ui.refresh': 'Обновить',
     'ui.place': 'Место',
     'ui.myLocation': 'Моё местоположение',
@@ -439,6 +443,8 @@ var I18N = (function () {
     'theme.tiles': 'Плитки',
 
     'ui.design': 'Дизайн: {name}',
+    'ui.designs': 'Дизайн',
+    'ui.menu': 'Меню',
     'ui.refresh': 'Оновити',
     'ui.place': 'Місце',
     'ui.myLocation': 'Моє місцезнаходження',
@@ -648,6 +654,8 @@ var I18N = (function () {
     'theme.tiles': 'Mosaico',
 
     'ui.design': 'Diseño: {name}',
+    'ui.designs': 'Diseño',
+    'ui.menu': 'Menú',
     'ui.refresh': 'Actualizar',
     'ui.place': 'Lugar',
     'ui.myLocation': 'Mi ubicación',

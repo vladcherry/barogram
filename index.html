@@ -32,35 +32,25 @@
       <div class="updated" id="updated" data-i18n="time.never">no data yet</div>
       <div class="cond" id="cond">&nbsp;</div>
     </div>
-    <!-- Icon buttons: the labels live in title/aria-label so they translate too. -->
+    <!-- One button opens everything; its label lives in title/aria-label so it
+         translates like the rest of the interface. -->
     <div class="tools">
-      <button class="btn btn-icon" id="btn-theme" type="button" title="Design" aria-label="Design">
+      <button class="btn btn-icon" id="btn-menu" type="button" aria-expanded="false"
+              data-i18n-label="ui.menu" title="Menu" aria-label="Menu">
         <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <rect x="3" y="3" width="8" height="8"></rect>
-          <rect x="13" y="3" width="8" height="8" class="ico-fill"></rect>
-          <rect x="3" y="13" width="8" height="8" class="ico-fill"></rect>
-          <rect x="13" y="13" width="8" height="8"></rect>
-        </svg>
-      </button>
-      <button class="btn btn-icon" id="btn-refresh" type="button"
-              data-i18n-label="ui.refresh" title="Refresh" aria-label="Refresh">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M20 12a8 8 0 1 1-2.6-5.9"></path>
-          <polyline points="20 4 20 10 14 10"></polyline>
-        </svg>
-      </button>
-      <button class="btn btn-icon" id="btn-settings" type="button"
-              data-i18n-label="ui.place" title="Place" aria-label="Place">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
-          <path d="M12 22s7-6.4 7-12a7 7 0 1 0-14 0c0 5.6 7 12 7 12z"></path>
-          <circle cx="12" cy="10" r="2.6"></circle>
+          <line x1="4" y1="7" x2="20" y2="7"></line>
+          <line x1="4" y1="12" x2="20" y2="12"></line>
+          <line x1="4" y1="17" x2="20" y2="17"></line>
         </svg>
       </button>
     </div>
   </header>
 
   <div class="panel" id="panel" hidden>
+    <!-- Design row is built in app.js: one button per design, active one marked. -->
+    <div class="panel-row" id="design-row"></div>
     <div class="panel-row">
+      <button class="btn" id="btn-refresh" type="button" data-i18n="ui.refresh">Refresh</button>
       <button class="btn" id="btn-geo" type="button" data-i18n="ui.myLocation">My location</button>
       <button class="btn" id="btn-background" type="button">Background updates</button>
       <button class="btn" id="btn-screen" type="button">Keep screen on</button>
@@ -79,7 +69,7 @@
       <button class="btn" id="btn-city" type="button" data-i18n="ui.find">Find</button>
     </div>
     <div class="panel-row"><ul class="found" id="found"></ul></div>
-    <div class="panel-row"><p class="hint" id="hint">&nbsp;</p></div>
+    <div class="panel-row"><p class="hint" id="hint"></p></div>
   </div>
 
   <main class="cards" id="cards"></main>

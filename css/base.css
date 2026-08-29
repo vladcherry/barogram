@@ -41,10 +41,19 @@ button, input { font-family: inherit; font-size: inherit; }
 }
 .btn-icon .ico-fill { fill: currentColor; }
 
+/* Menu: a caption in front of a row of choices, the current one marked. */
+.menu-label {
+  align-self: center; margin-right: 4px;
+  font-size: 12px; text-transform: uppercase; letter-spacing: 0.08em;
+}
+
 /* ---- settings panel ---- */
 .panel { margin-top: 10px; padding: 10px; border-width: 2px; border-style: solid; }
 .panel-row { display: flex; flex-wrap: wrap; align-items: center; margin-bottom: 6px; }
 .found { list-style: none; margin: 0; padding: 0; width: 100%; }
+/* Empty rows would still cost vertical space in the menu. */
+.found:empty, .hint:empty { display: none; }
+.panel-row:last-child { margin-bottom: 0; }
 .found-item { margin: 0; }
 .btn-found { display: block; width: 100%; text-align: left; margin-left: 0; }
 .hint { margin: 4px 0 0 0; }
