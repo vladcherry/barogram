@@ -1,5 +1,8 @@
 # Barogram — weather with intensity scales
 
+**Open the app: https://vladcherry.github.io/barogram/**
+Add it to the home screen on a phone, or open it in the reader's browser.
+
 A weather PWA for the **PocketBook Verse Pro Color** e-reader and for ordinary
 phones. Next to every number there is an intensity scale, so you see not just
 "6.2 m/s" but where that value sits between dead calm and a storm.
