@@ -19,6 +19,9 @@ var I18N = (function () {
     'ui.background': 'Background updates: {state}',
     'ui.keepScreen': 'Keep screen on: {state}',
     'ui.language': 'Language: {name}',
+    'ui.reload': 'Reload page',
+    'ui.update': 'Update app',
+    'ui.version': 'Version {v}',
     'ui.on': 'on',
     'ui.off': 'off',
     'ui.cityPlaceholder': 'City (for example, Odesa)',
@@ -62,6 +65,7 @@ var I18N = (function () {
     'hint.syncPermission': 'Allow "periodic background sync" for the installed app.',
     'hint.wakeLockUnsupported': 'Wake Lock is not supported by this browser.',
     'hint.wakeLockRejected': 'Wake Lock rejected: {err}',
+    'hint.updating': 'Clearing the cache and reloading…',
 
     'metric.temp': 'Temperature',
     'metric.wind': 'Wind',
@@ -232,6 +236,9 @@ var I18N = (function () {
     'ui.background': 'Фоновое обновление: {state}',
     'ui.keepScreen': 'Не гасить экран: {state}',
     'ui.language': 'Язык: {name}',
+    'ui.reload': 'Перезагрузить страницу',
+    'ui.update': 'Обновить версию',
+    'ui.version': 'Версия {v}',
     'ui.on': 'вкл',
     'ui.off': 'выкл',
     'ui.cityPlaceholder': 'Город (например, Одесса)',
@@ -275,6 +282,7 @@ var I18N = (function () {
     'hint.syncPermission': 'Разрешите «периодическую фоновую синхронизацию» для установленного приложения.',
     'hint.wakeLockUnsupported': 'Wake Lock не поддерживается этим браузером.',
     'hint.wakeLockRejected': 'Wake Lock отклонён: {err}',
+    'hint.updating': 'Чистим кеш и перезагружаем…',
 
     'metric.temp': 'Температура',
     'metric.wind': 'Ветер',
@@ -437,6 +445,9 @@ var I18N = (function () {
     'ui.background': 'Фонове оновлення: {state}',
     'ui.keepScreen': 'Не гасити екран: {state}',
     'ui.language': 'Мова: {name}',
+    'ui.reload': 'Перезавантажити сторінку',
+    'ui.update': 'Оновити версію',
+    'ui.version': 'Версія {v}',
     'ui.on': 'увімк',
     'ui.off': 'вимк',
     'ui.cityPlaceholder': 'Місто (наприклад, Одеса)',
@@ -480,6 +491,7 @@ var I18N = (function () {
     'hint.syncPermission': 'Дозвольте «періодичну фонову синхронізацію» для встановленого застосунку.',
     'hint.wakeLockUnsupported': 'Wake Lock не підтримується цим браузером.',
     'hint.wakeLockRejected': 'Wake Lock відхилено: {err}',
+    'hint.updating': 'Чистимо кеш і перезавантажуємо…',
 
     'metric.temp': 'Температура',
     'metric.wind': 'Вітер',
@@ -642,6 +654,9 @@ var I18N = (function () {
     'ui.background': 'Segundo plano: {state}',
     'ui.keepScreen': 'Pantalla siempre activa: {state}',
     'ui.language': 'Idioma: {name}',
+    'ui.reload': 'Recargar la página',
+    'ui.update': 'Actualizar la versión',
+    'ui.version': 'Versión {v}',
     'ui.on': 'sí',
     'ui.off': 'no',
     'ui.cityPlaceholder': 'Ciudad (por ejemplo, Odesa)',
@@ -685,6 +700,7 @@ var I18N = (function () {
     'hint.syncPermission': 'Permite la «sincronización periódica en segundo plano» para la app instalada.',
     'hint.wakeLockUnsupported': 'Este navegador no admite Wake Lock.',
     'hint.wakeLockRejected': 'Wake Lock rechazado: {err}',
+    'hint.updating': 'Limpiando la caché y recargando…',
 
     'metric.temp': 'Temperatura',
     'metric.wind': 'Viento',
@@ -841,6 +857,7 @@ var I18N = (function () {
     return 'en';
   }
 
+  function supports(lang) { return !!DICTS[lang]; }
   function use(lang) { current = DICTS[lang] ? lang : 'en'; return current; }
   function lang() { return current; }
   function next() { return use(order[(order.indexOf(current) + 1) % order.length]); }
@@ -862,5 +879,8 @@ var I18N = (function () {
 
   function list(key) { return t(key).split(','); }
 
-  return { t: t, list: list, use: use, lang: lang, next: next, detect: detect, languages: order };
+  return {
+    t: t, list: list, use: use, lang: lang, next: next,
+    detect: detect, supports: supports, languages: order
+  };
 })();

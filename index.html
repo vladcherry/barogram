@@ -66,6 +66,13 @@
       <button class="btn" id="btn-screen" type="button">Keep screen on</button>
       <button class="btn" id="btn-language" type="button">Language</button>
     </div>
+    <!-- In full-screen browsers there is no address bar, so the app has to
+         offer the page reload and the version update itself. -->
+    <div class="panel-row">
+      <button class="btn" id="btn-reload" type="button" data-i18n="ui.reload">Reload page</button>
+      <button class="btn" id="btn-update" type="button" data-i18n="ui.update">Update app</button>
+      <span class="version" id="version"></span>
+    </div>
     <div class="panel-row">
       <input class="input" id="city-input" type="text"
              data-i18n-placeholder="ui.cityPlaceholder" placeholder="City (for example, Odesa)">

@@ -37,6 +37,12 @@ place — so the readings get the rest of the screen. Their labels live in
 `title`/`aria-label` and translate with the interface; after switching design the
 footer names the one that was picked.
 
+A full-screen browser (the way a reader is usually set up) hides its own address
+bar and reload button, so the **Place** panel carries them instead: *Reload page*
+reloads, *Update app* unregisters the service worker, drops its caches and
+reloads — the reliable way to pick up a new build with no browser chrome around.
+The version string next to them shows which build is actually running.
+
 ## What it shows
 
 Every reading comes with a number, a scale with coloured bands, a marker at the

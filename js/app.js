@@ -9,6 +9,9 @@
   ];
 
   var HOUR = 60 * 60 * 1000;
+  /* Shown in the Place panel: on a full-screen browser it is the only way to
+     tell whether a new build actually arrived. Bump it with every release. */
+  var APP_VERSION = '2026.08.29';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -58,6 +61,7 @@
     updateBackgroundButton();
     updateScreenButton();
     U.setText(U.$('#btn-language'), I18N.t('ui.language', { name: I18N.t('lang.' + active) }));
+    U.setText(U.$('#version'), I18N.t('ui.version', { v: APP_VERSION }));
     U.setText(U.$('#place'), settings.place || I18N.t(demoMode ? 'ui.demoPlace' : 'ui.noPlace'));
     U.setText(U.$('#date'), U.dateText(new Date()));
     U.setText(U.$('#updated'), U.agoText(settings.lastTs));
@@ -389,6 +393,33 @@
     });
   }
 
+  /* ---------- reload and version update ---------- */
+
+  /* A full-screen browser hides its own reload button, so the app carries one. */
+  function reloadPage() { location.reload(); }
+
+  /* Drop the service worker and its caches, then reload: the only reliable way
+     to pick up a new build when there is no address bar to force-refresh. */
+  function updateApp() {
+    setHint(I18N.t('hint.updating'));
+    if (!navigator.serviceWorker || !navigator.serviceWorker.getRegistrations) {
+      setTimeout(reloadPage, 300);
+      return;
+    }
+    navigator.serviceWorker.getRegistrations().then(function (regs) {
+      var jobs = [], i;
+      for (i = 0; i < regs.length; i++) { jobs.push(regs[i].unregister()); }
+      return Promise.all(jobs);
+    }).then(function () {
+      if (!window.caches || !caches.keys) { return null; }
+      return caches.keys().then(function (keys) {
+        var jobs = [], i;
+        for (i = 0; i < keys.length; i++) { jobs.push(caches['delete'](keys[i])); }
+        return Promise.all(jobs);
+      });
+    }).then(reloadPage, reloadPage);
+  }
+
   /* ---------- place ---------- */
 
   function detectLocation() {
@@ -460,6 +491,8 @@
     U.$('#city-input').onkeydown = function (e) { if (e.keyCode === 13) { searchCity(); } };
     U.$('#btn-background').onclick = toggleBackground;
     U.$('#btn-screen').onclick = toggleScreenLock;
+    U.$('#btn-reload').onclick = reloadPage;
+    U.$('#btn-update').onclick = updateApp;
   }
 
   function registerWorker() {
@@ -474,7 +507,10 @@
   }
 
   function boot() {
-    I18N.use(settings.lang || I18N.detect());
+    /* An explicit ?lang= in the URL outranks the remembered locale. */
+    var langParam = /[?&]lang=([a-z]{2})/.exec(location.search);
+    var forced = (langParam && I18N.supports(langParam[1])) ? langParam[1] : null;
+    I18N.use(forced || settings.lang || I18N.detect());
     var themeParam = /[?&]theme=([a-z]+)/.exec(location.search);
     if (themeParam) { settings.theme = themeParam[1]; }
 
