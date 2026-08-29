@@ -9,8 +9,8 @@ var I18N = (function () {
 
     'theme.eink': 'E-Ink',
     'theme.night': 'Night',
-    'theme.paper': 'Analytics',
-    'theme.tiles': 'Tiles',
+    'theme.paper': 'Light',
+    'theme.tiles': 'E-Ink Color',
 
     'ui.design': 'Design: {name}',
     'ui.designs': 'Design',
@@ -228,8 +228,8 @@ var I18N = (function () {
 
     'theme.eink': 'E-Ink',
     'theme.night': 'Тёмный',
-    'theme.paper': 'Аналитика',
-    'theme.tiles': 'Плитки',
+    'theme.paper': 'Светлый',
+    'theme.tiles': 'E-Ink Color',
 
     'ui.design': 'Дизайн: {name}',
     'ui.designs': 'Дизайн',
@@ -439,8 +439,8 @@ var I18N = (function () {
 
     'theme.eink': 'E-Ink',
     'theme.night': 'Темний',
-    'theme.paper': 'Аналітика',
-    'theme.tiles': 'Плитки',
+    'theme.paper': 'Світлий',
+    'theme.tiles': 'E-Ink Color',
 
     'ui.design': 'Дизайн: {name}',
     'ui.designs': 'Дизайн',
@@ -650,8 +650,8 @@ var I18N = (function () {
 
     'theme.eink': 'E-Ink',
     'theme.night': 'Nocturno',
-    'theme.paper': 'Analítico',
-    'theme.tiles': 'Mosaico',
+    'theme.paper': 'Claro',
+    'theme.tiles': 'E-Ink Color',
 
     'ui.design': 'Diseño: {name}',
     'ui.designs': 'Diseño',

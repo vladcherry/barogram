@@ -7,7 +7,22 @@
 
 @media (max-width: 520px) {
 
-  body[data-theme] .app { padding: 6px 6px 8px 6px; }
+  /* Fill the screen: the app is a column the height of the viewport, the card
+     grid takes whatever the header and footer leave, and its rows stretch into
+     it instead of leaving dead space at the bottom. dvh follows the browser
+     chrome on phones; vh is the fallback where it is unknown. */
+  html, body { height: 100%; }
+  body[data-theme] .app {
+    padding: 6px 6px 8px 6px;
+    min-height: 100vh; min-height: 100dvh;
+    display: flex; flex-direction: column;
+  }
+  body[data-theme] .cards { flex: 1 1 auto; align-content: stretch; }
+  body[data-theme] .footbar { margin-top: 4px; }
+  /* Stretched cards would otherwise leave their content clinging to the top. */
+  body[data-theme]:not([data-theme="tiles"]) .card {
+    display: flex; flex-direction: column; justify-content: center;
+  }
 
   /* A compact header: the clock still reads across the room, the rest shrinks. */
   body[data-theme] .topbar { padding: 0 8px 4px 8px; }
@@ -52,8 +67,8 @@
   /* Tiles: shorter cells and a smaller number, so the grid clears the shortest
      phone screens too. */
   body[data-theme="tiles"] .card { min-height: 88px; }
-  body[data-theme="tiles"] .card-value { font-size: 34px; }
-  body[data-theme="tiles"] .card[data-metric="pressure"] .card-value { font-size: 28px; }
+  body[data-theme="tiles"] .card-value { font-size: 40px; }
+  body[data-theme="tiles"] .card[data-metric="pressure"] .card-value { font-size: 33px; }
 
   /* Design-specific trimmings that only make sense at this density. */
   body[data-theme="night"] .card[data-metric="temp"] { flex: 1 1 47%; }
@@ -75,8 +90,8 @@
     body[data-theme]:not([data-theme="tiles"]) .card-band { font-size: 10px; margin-top: 2px; }
     body[data-theme]:not([data-theme="tiles"]) .card-note { font-size: 9px; }
     body[data-theme="tiles"] .card { min-height: 78px; }
-    body[data-theme="tiles"] .card-value { font-size: 30px; }
-    body[data-theme="tiles"] .card[data-metric="pressure"] .card-value { font-size: 25px; }
+    body[data-theme="tiles"] .card-value { font-size: 34px; }
+    body[data-theme="tiles"] .card[data-metric="pressure"] .card-value { font-size: 28px; }
     body[data-theme="night"] .topbar { padding: 6px 10px; }
   }
 }

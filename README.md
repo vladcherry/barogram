@@ -6,7 +6,7 @@ phones. Next to every number there is an intensity scale, so you see not just
 
 Four designs ship with the app and are cycled with the grid icon in the top bar.
 
-| 1 · E-Ink | 2 · Tiles | 3 · Night | 4 · Analytics |
+| 1 · E-Ink | 2 · E-Ink Color | 3 · Night | 4 · Light |
 |---|---|---|---|
 | ![](docs/design-1-eink.png) | ![](docs/design-4-tiles.png) | ![](docs/design-2-night.png) | ![](docs/design-3-paper.png) |
 
@@ -17,7 +17,7 @@ Four designs ship with the app and are cycled with the grid icon in the top bar.
    outlined blocks. No shadows, gradients or animation — half-tones smear on
    e-ink and repaints are expensive. Colour appears only inside the scales,
    where Kaleido actually shows it.
-2. **Tiles** (`tiles`) — all ten readings on one 6" screen with no scrolling:
+2. **E-Ink Color** (`tiles`) — all ten readings on one 6" screen with no scrolling:
    a two-column grid (three columns from 620 px). Inside each tile the number is
    as large as the cell allows and owns the left half over its full height, with
    the unit beneath it; the title, the band label and one clipped line of detail
@@ -31,7 +31,7 @@ Four designs ship with the app and are cycled with the grid icon in the top bar.
 3. **Night** (`night`) — for phones: two tiles per row, temperature across the
    full width, 18 px corners, a thin solid scale bar. The dark background is
    easy on an OLED panel and on the eyes at night.
-4. **Analytics** (`paper`) — light paper, a single column of dense rows: label,
+4. **Light** (`paper`) — light paper, a single column of dense rows: label,
    large number, a full-width ruler-like scale and a coloured band marker down
    the left edge of the card. Maximum data per screen.
 
@@ -116,10 +116,16 @@ hourly timer.
 Below 520 px every design switches to a compact layout so the whole set of
 readings fits on one screen with no scrolling: two columns, tighter boxes, and
 no 24-hour charts — a chart makes a card three times taller than the reading it
-carries. Short screens get one more notch of density. Each design keeps its own
-colour, borders and typography, only the density changes. Measured from 320×568
-to 430×932, all four designs fit with headroom; e-ink readers (536 px and wider)
-stay on the roomy layout with the charts.
+carries. Short screens get one more notch of density.
+
+The grid then stretches to fill the screen rather than leaving dead space under
+the last row: the app is a column the height of the viewport (`dvh`, so it
+follows the browser chrome, with `vh` as the fallback), the card grid takes
+whatever the header and footer leave, and its rows share that height. Cards that
+grow this way centre their contents instead of clinging to the top. Measured
+from 320×568 to 430×932, all four designs fill 99% of the screen with no
+scrolling; e-ink readers (536 px and wider) stay on the roomy layout with the
+charts.
 
 ## Language
 
@@ -167,8 +173,8 @@ index.html              markup (one shell for all three designs)
 css/base.css            structure and geometry
 css/theme-eink.css      design 1
 css/theme-night.css     design 3
-css/theme-paper.css     design 4
-css/theme-tiles.css     design 2
+css/theme-paper.css     design 4 (Light)
+css/theme-tiles.css     design 2 (E-Ink Color)
 css/compact.css         phone layout: one screen, no scrolling (loaded last)
 js/i18n.js              all user-facing strings: English source + ru/uk/es locales
 js/util.js              helpers, XHR, formatting, weather codes
