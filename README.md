@@ -183,6 +183,26 @@ falls back to English. The locale is picked from the browser, can be forced with
 `?lang=uk`, is cycled with the language button in the **Place** panel and is
 remembered. Dates, weekday names and the compass points are localised too.
 
+## Installing it
+
+**iPhone / iPad.** Open https://vladcherry.github.io/barogram/ **in Safari** —
+other iOS browsers cannot install a web app — then Share → *Add to Home Screen*.
+It launches full-screen with its own icon and keeps working offline from the
+cache. Two iOS limits are worth knowing: there is no Periodic Background Sync,
+so the weather refreshes when the app is open (on launch, hourly while it runs,
+and whenever you return to it), and notifications would need a push server, so
+the "Background updates" button has nothing to switch on there. The layout keeps
+clear of the notch and the home indicator via the safe-area insets.
+
+**Android.** Open the same link in Chrome and take *Install app* / *Add to Home
+screen*. Background Sync does work here, so the hourly wake-up and its
+notification are available once the app is installed.
+
+**PocketBook and other e-readers.** Open the link in the reader's browser, or
+copy the folder onto the device and open `index.html`. The menu carries its own
+*Reload page* and *Update app*, because a full-screen reader browser has no
+address bar.
+
 ## Running it
 
 Any static server works (a service worker needs http(s) or localhost):

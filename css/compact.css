@@ -14,7 +14,8 @@
   html, body { height: 100%; }
   body[data-theme] .app {
     padding: 6px 6px 8px 6px;
-    min-height: 100vh; min-height: 100dvh;
+    min-height: calc(100vh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
+    min-height: calc(100dvh - env(safe-area-inset-top, 0px) - env(safe-area-inset-bottom, 0px));
     display: flex; flex-direction: column;
   }
   body[data-theme] .cards { flex: 1 1 auto; align-content: stretch; }

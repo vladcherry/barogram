@@ -6,6 +6,12 @@
 /* A class with display: flex outranks the UA rule for [hidden], so say it here. */
 [hidden] { display: none !important; }
 html, body { margin: 0; padding: 0; }
+/* Installed on an iPhone the page runs full-screen under the notch and the home
+   indicator, so it keeps clear of them itself. Zero everywhere else. */
+body {
+  padding: env(safe-area-inset-top, 0px) env(safe-area-inset-right, 0px)
+           env(safe-area-inset-bottom, 0px) env(safe-area-inset-left, 0px);
+}
 body {
   font-family: "Helvetica Neue", Helvetica, Arial, "Liberation Sans", sans-serif;
   -webkit-text-size-adjust: 100%;

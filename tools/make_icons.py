@@ -59,6 +59,7 @@ def write_png(path, px):
         f.write(png)
 
 
-for n in (192, 512):
+# 180 is what iOS asks for as the home-screen icon.
+for n in (180, 192, 512):
     write_png('icons/icon-%d.png' % n, render(n))
     print('icons/icon-%d.png' % n)
