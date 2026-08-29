@@ -88,3 +88,5 @@ body[data-theme="paper"] .lv-mid-text  { color: #8a761f; }
 body[data-theme="paper"] .lv-warn-text { color: #9c6027; }
 body[data-theme="paper"] .lv-bad-text  { color: #a83f2c; }
 body[data-theme="paper"] .lv-crit-text { color: #6f2320; }
+
+body[data-theme="paper"] .install { border-width: 1px; border-color: #cfc7b6; background: #fffdf8; border-radius: 6px; font-size: 13px; }

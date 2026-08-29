@@ -102,3 +102,5 @@ body[data-theme="tiles"] .empty { border: 2px solid #000; }
 @media (min-width: 620px) {
   body[data-theme="tiles"] .card { flex: 1 1 30%; max-width: 33.4%; }
 }
+
+body[data-theme="tiles"] .install { background: #ffffff; border-color: #000; font-size: 13px; }

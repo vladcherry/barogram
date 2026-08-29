@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.29-13';
+  var APP_VERSION = '2026.08.29-14';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -19,6 +19,7 @@
   var refreshing = false;
   var editing = false;
   var dragKey = null;
+  var installPrompt = null;
 
   /* ---------- theme ---------- */
 
@@ -145,6 +146,7 @@
     updateScreenButton();
     U.setText(U.$('#btn-language'), I18N.t('ui.language', { name: I18N.t('lang.' + active) }));
     buildDesignRow();
+    if (!U.$('#install').hidden) { showInstall(true); }
     if (editing) {
       U.setText(U.$('#edit-hint'), I18N.t('hint.editMode'));
       renderLibrary();
@@ -822,6 +824,79 @@
     }).then(reloadPage, reloadPage);
   }
 
+  /* ---------- installing ----------
+     Chromium hands us a real install prompt through beforeinstallprompt; Safari
+     never will, so there the banner carries the Share → Add to Home Screen
+     instructions instead. Either way it appears once and can be dismissed. */
+
+  function isInstalled() {
+    if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) { return true; }
+    return navigator.standalone === true;
+  }
+
+  function isIOS() {
+    var ua = navigator.userAgent || '';
+    if (/iPhone|iPad|iPod/i.test(ua)) { return true; }
+    /* iPadOS reports itself as a Mac, but a Mac has no touch points. */
+    return /Macintosh/.test(ua) && navigator.maxTouchPoints > 1;
+  }
+
+  function showInstall(force) {
+    if (isInstalled()) { return; }
+    if (!force && settings.installDismissed) { return; }
+    var text = installPrompt ? I18N.t('install.ready')
+                             : (isIOS() ? I18N.t('install.ios') : I18N.t('install.other'));
+    U.setText(U.$('#install-text'), text);
+    U.$('#btn-install').hidden = !installPrompt;
+    U.$('#install').hidden = false;
+  }
+
+  function hideInstall(remember) {
+    U.$('#install').hidden = true;
+    if (remember) { Store.set({ installDismissed: true }); }
+  }
+
+  function runInstallPrompt() {
+    if (!installPrompt) { return; }
+    var deferred = installPrompt;
+    installPrompt = null;
+    U.$('#btn-install').hidden = true;
+    deferred.prompt();
+    if (deferred.userChoice && deferred.userChoice.then) {
+      deferred.userChoice.then(function (choice) {
+        if (choice && choice.outcome === 'accepted') {
+          U.setText(U.$('#install-text'), I18N.t('install.done'));
+          Store.set({ installDismissed: true });
+          setTimeout(function () { hideInstall(false); }, 2500);
+        } else {
+          hideInstall(true);
+        }
+      });
+    }
+  }
+
+  function bindInstall() {
+    U.$('#btn-install').onclick = runInstallPrompt;
+    U.$('#btn-install-close').onclick = function () { hideInstall(true); };
+    U.$('#btn-install-help').onclick = function () { showInstall(true); closeMenu(); };
+
+    window.addEventListener('beforeinstallprompt', function (e) {
+      if (e.preventDefault) { e.preventDefault(); }
+      installPrompt = e;
+      showInstall(false);
+    }, false);
+
+    window.addEventListener('appinstalled', function () {
+      installPrompt = null;
+      Store.set({ installDismissed: true });
+      hideInstall(false);
+    }, false);
+
+    /* Give the browser a moment to fire its own prompt before falling back to
+       the instructions. */
+    setTimeout(function () { showInstall(false); }, 2500);
+  }
+
   /* ---------- place ---------- */
 
   function detectLocation() {
@@ -941,6 +1016,7 @@
 
     bindSwipe();
     bindCardGestures();
+    bindInstall();
     registerWorker();
   }
 

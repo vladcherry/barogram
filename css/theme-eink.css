@@ -81,3 +81,5 @@ body[data-theme="eink"] .spark-bar.lv-crit { background: #6f1010; }
 
 /* Band labels stay black: coloured text washes out on e-ink. */
 body[data-theme="eink"] .card-band { color: #000; }
+
+body[data-theme="eink"] .install { background: #ffffff; border-color: #000; font-size: 14px; }

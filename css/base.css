@@ -123,6 +123,21 @@ button, input { font-family: inherit; font-size: inherit; }
 .spark-gap { height: 2px; }
 .spark-cap { }
 
+/* ---- install banner ----
+   Floating, not in the flow: in the flow it stole 30-60 px and pushed the cards
+   off the short screens the phone layout works so hard to fit. */
+.install {
+  position: fixed; z-index: 20;
+  left: 8px; right: 8px;
+  bottom: calc(8px + env(safe-area-inset-bottom, 0px));
+  display: flex; flex-wrap: wrap; align-items: center;
+  padding: 8px 10px;
+  border-width: 2px; border-style: solid;
+  max-width: 1084px; margin: 0 auto;
+}
+.install-text { flex: 1 1 200px; margin: 0; }
+.install-actions { flex: 0 0 auto; display: flex; }
+
 /* ---- card editor ---- */
 .editbar { display: flex; flex-wrap: wrap; align-items: center; margin-top: 8px; }
 .editbar .hint { flex: 1 1 200px; margin-left: 8px; }

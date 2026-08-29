@@ -300,6 +300,14 @@ var I18N = (function () {
     'hint.cardAdded': 'Added: {name}',
     'hint.allCards': 'Every card is already on the screen.',
 
+    'ui.install': 'Install',
+    'ui.installLater': 'Later',
+    'ui.installHelp': 'Install app',
+    'install.ready': 'Barogram can be installed on this device: full screen, own icon, works offline.',
+    'install.ios': 'On iPhone: open this page in Safari, tap Share and choose "Add to Home Screen".',
+    'install.other': 'In the browser menu choose "Install app" or "Add to Home screen".',
+    'install.done': 'Installed. Launch it from the home screen from now on.',
+
     'date.months': 'January,February,March,April,May,June,July,August,September,October,November,December',
     'date.weekdays': 'Sunday,Monday,Tuesday,Wednesday,Thursday,Friday,Saturday',
     'date.format': '{month} {day}, {weekday}',
@@ -604,6 +612,14 @@ var I18N = (function () {
     'hint.cardAdded': 'Добавлено: {name}',
     'hint.allCards': 'Все карточки уже на экране.',
 
+    'ui.install': 'Установить',
+    'ui.installLater': 'Позже',
+    'ui.installHelp': 'Установить приложение',
+    'install.ready': 'Barogram можно установить на устройство: во весь экран, со своей иконкой, работает офлайн.',
+    'install.ios': 'На iPhone: откройте страницу в Safari, нажмите «Поделиться» и выберите «На экран „Домой“».',
+    'install.other': 'В меню браузера выберите «Установить приложение» или «Добавить на главный экран».',
+    'install.done': 'Установлено. Дальше запускайте с домашнего экрана.',
+
     'date.months': 'января,февраля,марта,апреля,мая,июня,июля,августа,сентября,октября,ноября,декабря',
     'date.weekdays': 'воскресенье,понедельник,вторник,среда,четверг,пятница,суббота',
     'date.format': '{day} {month}, {weekday}',
@@ -903,6 +919,14 @@ var I18N = (function () {
     'hint.cardAdded': 'Додано: {name}',
     'hint.allCards': 'Усі картки вже на екрані.',
 
+    'ui.install': 'Встановити',
+    'ui.installLater': 'Пізніше',
+    'ui.installHelp': 'Встановити застосунок',
+    'install.ready': 'Barogram можна встановити на пристрій: на весь екран, з власною іконкою, працює офлайн.',
+    'install.ios': 'На iPhone: відкрийте сторінку в Safari, натисніть «Поділитися» та виберіть «На екран „Домівка“».',
+    'install.other': 'У меню браузера виберіть «Встановити застосунок» або «Додати на головний екран».',
+    'install.done': 'Встановлено. Далі запускайте з домашнього екрана.',
+
     'date.months': 'січня,лютого,березня,квітня,травня,червня,липня,серпня,вересня,жовтня,листопада,грудня',
     'date.weekdays': 'неділя,понеділок,вівторок,середа,четвер,пʼятниця,субота',
     'date.format': '{day} {month}, {weekday}',
@@ -1196,6 +1220,14 @@ var I18N = (function () {
     'hint.editMode': 'Arrastra una tarjeta para reordenarla, × la quita, + añade una. Mantén pulsada una tarjeta para empezar; pulsa Listo para salir.',
     'hint.cardAdded': 'Añadido: {name}',
     'hint.allCards': 'Todas las tarjetas ya están en pantalla.',
+
+    'ui.install': 'Instalar',
+    'ui.installLater': 'Más tarde',
+    'ui.installHelp': 'Instalar la app',
+    'install.ready': 'Barogram se puede instalar en este dispositivo: pantalla completa, icono propio, funciona sin red.',
+    'install.ios': 'En el iPhone: abre esta página en Safari, pulsa Compartir y elige «Añadir a pantalla de inicio».',
+    'install.other': 'En el menú del navegador elige «Instalar aplicación» o «Añadir a pantalla de inicio».',
+    'install.done': 'Instalada. A partir de ahora ábrela desde la pantalla de inicio.',
 
     'date.months': 'enero,febrero,marzo,abril,mayo,junio,julio,agosto,septiembre,octubre,noviembre,diciembre',
     'date.weekdays': 'domingo,lunes,martes,miércoles,jueves,viernes,sábado',

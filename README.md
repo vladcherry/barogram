@@ -185,6 +185,13 @@ remembered. Dates, weekday names and the compass points are localised too.
 
 ## Installing it
 
+The app asks to be installed itself: on Chromium it catches the browser's own
+install prompt and offers an *Install* button, and where no such prompt exists —
+Safari, most of all — the same banner carries the Share → Add to Home Screen
+instructions instead. *Later* dismisses it for good; the menu's *Install app*
+brings it back. The banner floats over the cards rather than sitting in the
+flow, which would push the last row off a short screen.
+
 **iPhone / iPad.** Open https://vladcherry.github.io/barogram/ **in Safari** —
 other iOS browsers cannot install a web app — then Share → *Add to Home Screen*.
 It launches full-screen with its own icon and keeps working offline from the

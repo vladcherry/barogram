@@ -76,3 +76,5 @@ body[data-theme="night"] .lv-mid-text  { color: #ecd873; }
 body[data-theme="night"] .lv-warn-text { color: #f6a670; }
 body[data-theme="night"] .lv-bad-text  { color: #ff8574; }
 body[data-theme="night"] .lv-crit-text { color: #ff6b5c; }
+
+body[data-theme="night"] .install { border-color: #26313d; background: #131a22; border-radius: 14px; font-size: 13px; }
