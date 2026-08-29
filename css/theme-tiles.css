@@ -1,7 +1,8 @@
 /* Design 4 "Tiles" — every reading at once on one e-ink screen, no scrolling.
-   Each tile keeps the number and a mini slider showing where the value sits in
-   its comfort range; the notes and the 24 h charts are hidden here because on a
-   6" screen they are what pushes the last tiles below the fold. */
+   Inside a tile the number is as large as the cell allows and owns the left
+   half over its full height; the words sit top right and the comfort slider
+   bottom right. The 24 h charts are dropped here — on a 6" screen they are what
+   pushes the last tiles below the fold. */
 
 body[data-theme="tiles"] { background: #ffffff; color: #000000; }
 body[data-theme="tiles"] .app { padding: 4px 5px 8px 5px; }
@@ -24,32 +25,51 @@ body[data-theme="tiles"] .input { border-color: #000; border-radius: 0; }
 body[data-theme="tiles"] .panel { border-color: #000; }
 body[data-theme="tiles"] .hint { font-size: 12px; }
 
+/* Tile layout: the number owns the left half over the full height of the cell,
+   the words sit in the top right and the comfort slider in the bottom right.
+   Absolute positioning rather than reordered flex children — the DOM is shared
+   with the other designs and old WebKit places absolute boxes reliably. */
 body[data-theme="tiles"] .cards { margin-top: 6px; }
 body[data-theme="tiles"] .card {
+  position: relative; min-height: 96px;
   border: 2px solid #000; border-radius: 0;
   flex: 1 1 46%; min-width: 130px;
   margin: 0 5px 5px 0; padding: 3px 6px 5px 6px;
 }
+body[data-theme="tiles"] .card-value-row {
+  position: absolute; left: 6px; top: 2px; bottom: 3px; width: 41%;
+  display: flex; flex-direction: column; justify-content: center; align-items: center;
+}
+body[data-theme="tiles"] .card-value {
+  font-size: 40px; line-height: 0.92; letter-spacing: -0.04em; white-space: nowrap;
+}
+body[data-theme="tiles"] .card-unit { font-size: 12px; font-weight: 700; margin: 1px 0 0 0; }
+/* Four-digit readings (pressure) need a smaller step to stay on one line. */
+body[data-theme="tiles"] .card[data-metric="pressure"] .card-value { font-size: 32px; }
+
+body[data-theme="tiles"] .card-head,
+body[data-theme="tiles"] .card-band,
+body[data-theme="tiles"] .card-note { margin-left: 44%; }
 body[data-theme="tiles"] .card-head { display: block; }
 body[data-theme="tiles"] .card-title {
   font-size: 11px; text-transform: uppercase; letter-spacing: 0.03em; display: inline;
 }
 body[data-theme="tiles"] .card-badge { display: none; }
-body[data-theme="tiles"] .card-value { font-size: 28px; line-height: 1.05; }
-body[data-theme="tiles"] .card-unit { font-size: 12px; font-weight: 700; }
-body[data-theme="tiles"] .card-band { font-size: 11px; margin-top: 3px; text-transform: uppercase; }
+body[data-theme="tiles"] .card-band { font-size: 12px; margin-top: 2px; text-transform: uppercase; }
 /* The 24 h charts are what push the last tiles below the fold, so they only
-   live on the roomier designs; the note stays, clipped to a single line. */
+   live on the roomier designs; the note stays, clipped to one line. */
 body[data-theme="tiles"] .spark,
 body[data-theme="tiles"] .spark-cap,
 body[data-theme="tiles"] .scale-ends { display: none; }
 body[data-theme="tiles"] .card-note {
-  font-size: 11px; margin-top: 1px;
+  font-size: 10px; margin-top: 1px;
   white-space: nowrap; overflow: hidden; text-overflow: ellipsis;
 }
 
-/* The mini slider: a short segmented track with the marker riding on top. */
-body[data-theme="tiles"] .scale { padding-top: 9px; }
+/* The mini slider sits along the bottom of the right-hand column. */
+body[data-theme="tiles"] .scale {
+  position: absolute; left: 44%; right: 6px; bottom: 5px; padding-top: 9px;
+}
 body[data-theme="tiles"] .seg { height: 9px; border: 1px solid #000; margin-right: 2px; }
 body[data-theme="tiles"] .seg-off { background: #ffffff; }
 body[data-theme="tiles"] .scale-marker {
@@ -69,9 +89,18 @@ body[data-theme="tiles"] .seg-on.lv-warn { background: #d9741a; }
 body[data-theme="tiles"] .seg-on.lv-bad  { background: #c8341f; }
 body[data-theme="tiles"] .seg-on.lv-crit { background: #6f1010; }
 
-/* Three columns once the screen is wide enough for them. */
+/* From this width the number column is wide enough for a much bigger step. */
+@media (min-width: 480px) {
+  body[data-theme="tiles"] .card-value { font-size: 54px; }
+  body[data-theme="tiles"] .card[data-metric="pressure"] .card-value { font-size: 45px; }
+  body[data-theme="tiles"] .card { min-height: 112px; }
+  body[data-theme="tiles"] .card-value-row { width: 43%; }
+}
+
+/* Three columns once the screen is wide enough. The width cap keeps the last
+   tile of an incomplete row the same size as the rest instead of stretching. */
 @media (min-width: 620px) {
-  body[data-theme="tiles"] .card { flex: 1 1 30%; }
+  body[data-theme="tiles"] .card { flex: 1 1 30%; max-width: 33.4%; }
 }
 @media (max-width: 430px) {
   body[data-theme="tiles"] .card { flex: 1 1 46%; margin-right: 5px; }
