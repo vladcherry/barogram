@@ -79,15 +79,19 @@ current value and a verbal band label.
 Another eighteen cards wait in the library and can be put on the screen at any
 time: feels-like, gusts, wind direction (a compass instead of a face), rain
 chance, dew point, visibility, water temperature, air quality, PM2.5 and pollen,
-plus eleven more outdoor pursuits — running, open-water swimming, tennis,
+plus twelve more outdoor pursuits — running, open-water swimming, tennis,
 hiking, fishing from the shore or from a boat, golf, surfing, kite/windsurfing,
-camping and drone flying. Each one weighs what actually decides the outing, so
+camping, drone flying and walking the dog. Each one weighs what actually decides the outing, so
 their optima disagree on purpose: the runner wants cool, clean, pollen-free air,
 the surfer needs the swell the swimmer is complaining about, the kite card is
 the only one that wants it blowing hard, the drone grounds itself on gusts, rain,
 haze or a battery-cold morning, the boat adds the chop and the fog the shore
-angler can ignore, and camping is judged on the night you sleep in rather than
-the afternoon.
+angler can ignore, camping is judged on the night you sleep in rather than the
+afternoon, and the dog walk treats heat as the hazard it is for an animal that
+cools itself by panting — including the sun-baked pavement that burns paws well
+before the air feels dangerous, estimated from sunshine and temperature. Its
+thresholds are those of an average mid-sized dog; a husky and a pug sit on
+either side of them.
 
 Every card also carries an icon, sitting large in the empty half of the value
 row next to the number and painted in the colour of the reading's comfort band —

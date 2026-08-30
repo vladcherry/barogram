@@ -287,11 +287,26 @@ var Icons = (function () {
     ];
   }
 
+  /* Dog in profile: back, head with an ear and a muzzle, four legs, tail. */
+  function dogWalkParts() {
+    return [
+      node('rect', { x: 4.6, y: 9.4, width: 9.6, height: 4, rx: 2 }),
+      node('circle', { cx: 17.2, cy: 8.4, r: 2.6 }),
+      path('M19.4 9.6h2.3'),
+      path('M15.6 6l0.5-2.4 2 1.5'),
+      line(6.2, 13.4, 6.2, 19.6),
+      line(8.8, 13.4, 8.8, 19.6),
+      line(11.4, 13.4, 11.4, 19.6),
+      line(13.4, 13.4, 13.4, 19.6),
+      path('M4.6 10.6c-1.7-0.5-2.4-2.2-1.5-3.7')
+    ];
+  }
+
   var SPORT_PARTS = {
     snorkel: maskParts, bike: bikeParts, run: runParts, swim: swimParts,
     tennis: tennisParts, hike: hikeParts, fishing: fishingParts, golf: golfParts,
     surf: surfParts, windsport: windsportParts, drone: droneParts,
-    boatFishing: boatFishingParts, camping: campingParts
+    boatFishing: boatFishingParts, camping: campingParts, dogWalk: dogWalkParts
   };
 
   /* Wind direction is not a comfort reading, so it gets a compass instead of a

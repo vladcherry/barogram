@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.29-14';
+  var APP_VERSION = '2026.08.29-15';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -204,7 +204,7 @@
   var SPORTS = {
     snorkel: 1, bike: 1, run: 1, swim: 1, tennis: 1,
     hike: 1, fishing: 1, golf: 1, surf: 1, windsport: 1, drone: 1,
-    boatFishing: 1, camping: 1
+    boatFishing: 1, camping: 1, dogWalk: 1
   };
 
   function pct(v) { return v === null ? '—' : U.fmt(v, 0) + '%'; }
@@ -352,7 +352,7 @@
                  'clouds', 'uv', 'humidity', 'dewPoint', 'pressure', 'visibility',
                  'airQuality', 'pm25', 'pollen', 'waves', 'waterTemp',
                  'snorkel', 'swim', 'surf', 'windsport', 'bike', 'run', 'hike',
-                 'tennis', 'golf', 'fishing', 'boatFishing', 'camping', 'drone'];
+                 'tennis', 'golf', 'fishing', 'boatFishing', 'camping', 'drone', 'dogWalk'];
 
   function cardList() {
     var list = settings.cards;

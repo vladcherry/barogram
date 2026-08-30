@@ -254,6 +254,10 @@ var Metrics = (function () {
     camping: {
       title: 'metric.camping', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
       bands: INDEX_BANDS()
+    },
+    dogWalk: {
+      title: 'metric.dogWalk', unit: 'unit.index', min: 0, max: 10, segments: 10, decimals: 1,
+      bands: INDEX_BANDS()
     }
   };
 
@@ -606,8 +610,71 @@ var Metrics = (function () {
     return { value: U.clamp(10 - p, 0, 10), why: why };
   }
 
+  /* Walking the dog. Heat is the real hazard, not cold: a dog sheds heat by
+     panting, so it overheats where a person is merely uncomfortable, and humid
+     air takes that away too. Sun-baked pavement burns paws well before the air
+     feels dangerous, so it is estimated from sunshine and temperature — an
+     estimate, not a measurement, and labelled as such. Thresholds are for an
+     average mid-sized dog; a husky and a pug sit on either side of them. */
+  function dogWalk(w) {
+    if (w.temp === null) { return null; }
+    var p = 0, why = [], t = w.temp;
+
+    var heat = penalty([[20, 0], [24, 0.5], [27, 1.5], [30, 3], [33, 5], [99, 7]], t);
+    p += heat;
+    if (heat >= 1.5) { why.push(reason('why.temp', { v: Math.round(t) })); }
+    if (t > 22 && w.dewPoint !== null && w.dewPoint > 18) {
+      p += 1.5; why.push(reason('why.mugginess'));
+    }
+
+    /* Sunny and hot means the asphalt is far hotter than the air. */
+    var sunny = (w.clouds === null || w.clouds < 50) && w.isDay !== 0;
+    if (sunny && t >= 25) {
+      p += (t >= 30 ? 2.5 : 1.5);
+      why.push(reason('why.hotPavement'));
+    }
+
+    if (t < 5) {
+      var cold = (t >= 0) ? 0.8 : (t >= -5 ? 2 : (t >= -10 ? 3.5 : 5));
+      p += cold;
+      if (cold >= 2) { why.push(reason('why.temp', { v: Math.round(t) })); }
+      if (w.wind !== null && w.wind > 5) { p += 1; why.push(reason('why.windChill')); }
+    }
+
+    if (w.code !== null && w.code >= 95) { p += 5; why.push(reason('why.thunder')); }
+
+    if (w.rain !== null && w.rain > 0.2) {
+      p += (w.rain > 2 ? 2.5 : 1.5);
+      why.push(reason('why.rain'));
+    } else if (w.rainProb !== null && w.rainProb >= 70) {
+      p += 0.8; why.push(reason('why.rainLikely'));
+    }
+
+    /* Freezing rain around zero: the hazard is the human on the other end. */
+    if (t > -3 && t < 1 && w.rain !== null && w.rain > 0.1) {
+      p += 1; why.push(reason('why.ice'));
+    }
+
+    if (w.wind !== null && w.wind > 12) {
+      p += (w.wind > 15 ? 2.5 : 1.5);
+      why.push(reason('why.wind', { v: Math.round(w.wind) }));
+    }
+
+    /* A dog breathes 30 cm off the ground, where the exhaust sits. */
+    if (w.airQuality !== null && w.airQuality > 60) {
+      p += (w.airQuality > 80 ? 2 : 1);
+      why.push(reason('why.air', { v: Math.round(w.airQuality) }));
+    }
+
+    if (w.uv !== null && w.uv >= 9) { p += 0.5; why.push(reason('why.uv', { v: Math.round(w.uv) })); }
+    if (w.visibility !== null && w.visibility < 1) { p += 0.8; why.push(reason('why.haze')); }
+
+    return { value: U.clamp(10 - p, 0, 10), why: why };
+  }
+
   return {
     SPEC: SPEC, band: band, drone: drone, boatFishing: boatFishing, camping: camping,
+    dogWalk: dogWalk,
     snorkel: snorkel, bike: bike, run: run, swim: swim, tennis: tennis,
     hike: hike, fishing: fishing, golf: golf, surf: surf, windsport: windsport
   };
