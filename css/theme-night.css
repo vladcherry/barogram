@@ -102,3 +102,9 @@ body[data-theme="night"] .btn-menu svg { width: 22px; height: 22px; stroke-width
 
 body[data-theme="night"] .card-add { flex: 1 1 100%; max-width: 100%; padding: 0; }
 body[data-theme="night"] .btn-add { border-radius: 18px; color: #cfe0f0; }
+
+/* Detail sheet: the same rules and mutings as the library rows. */
+body[data-theme="night"] .det-row, body[data-theme="night"] .det-field { border-bottom-color: #1e2733; }
+body[data-theme="night"] .det-field, body[data-theme="night"] .det-note,
+body[data-theme="night"] .det-row-val { color: #8ea0b5; }
+body[data-theme="night"] .det-src { border-top-color: #26313d; }

@@ -125,3 +125,24 @@ body[data-theme="tiles"] .btn-menu:active { background: #fff; color: #000; }
 body[data-theme="tiles"] .btn-menu svg { width: 22px; height: 22px; stroke-width: 2.4; }
 
 body[data-theme="tiles"] .card-add { flex: 1 1 100%; max-width: 100%; padding: 0; }
+
+/* Detail sheet: the same rules and mutings as the library rows. */
+body[data-theme="tiles"] .det-row, body[data-theme="tiles"] .det-field { border-bottom-color: #000000; }
+body[data-theme="tiles"] .det-field, body[data-theme="tiles"] .det-note,
+body[data-theme="tiles"] .det-row-val { color: #444444; }
+body[data-theme="tiles"] .det-src { border-top-color: #000000; }
+
+/* Inside a sheet the ground is white again, so the scale can carry the band
+   colours it has to give up on a coloured tile. */
+body[data-theme="tiles"] .sheet .seg { border-color: #000; }
+body[data-theme="tiles"] .sheet .seg-off { background: #ffffff; }
+body[data-theme="tiles"] .sheet .seg-on.lv-deep { background: #3b2f8f; }
+body[data-theme="tiles"] .sheet .seg-on.lv-cold { background: #2b5fd9; }
+body[data-theme="tiles"] .sheet .seg-on.lv-calm { background: #2f9bd4; }
+body[data-theme="tiles"] .sheet .seg-on.lv-good { background: #2e8b3d; }
+body[data-theme="tiles"] .sheet .seg-on.lv-mid  { background: #d8b21a; }
+body[data-theme="tiles"] .sheet .seg-on.lv-warn { background: #d9741a; }
+body[data-theme="tiles"] .sheet .seg-on.lv-bad  { background: #c8341f; }
+body[data-theme="tiles"] .sheet .seg-on.lv-crit { background: #6f1010; }
+body[data-theme="tiles"] .sheet .scale-marker { border-top-color: #000; }
+

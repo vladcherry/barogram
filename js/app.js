@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.30-5';
+  var APP_VERSION = '2026.08.30-6';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -150,11 +150,12 @@
     }, false);
   }
 
-  /* No Element.closest on the reader's browser, so walk up by hand. */
+  /* No Element.closest on the reader's browser, so walk up by hand. A swipe
+     that starts inside the menu or inside a sheet belongs to that sheet. */
   function insideMenu(target) {
-    var panel = U.$('#panel');
+    var stops = [U.$('#panel'), U.$('#library'), U.$('#detail')];
     for (var n = target; n; n = n.parentNode) {
-      if (n === panel) { return true; }
+      for (var i = 0; i < stops.length; i++) { if (n === stops[i]) { return true; } }
     }
     return false;
   }
@@ -226,6 +227,8 @@
     for (i = 0; i < labelled.length; i++) {
       setLabel(labelled[i], I18N.t(labelled[i].getAttribute('data-i18n-label')));
     }
+    /* A sheet built in the old language cannot be patched string by string. */
+    Detail.close();
     /* The menu button says Close while the panel is open. */
     setLabel(U.$('#btn-menu'), I18N.t(U.$('#panel').hidden ? 'ui.menu' : 'ui.close'));
     var placeholders = document.querySelectorAll('[data-i18n-placeholder]');
@@ -580,6 +583,7 @@
 
   function setEditing(on) {
     editing = !!on;
+    Detail.close();
     document.body.setAttribute('data-editing', editing ? '1' : '0');
     showEditBars(editing);
     closeLibrary();
@@ -738,10 +742,11 @@
     render(settings.lastData);
   }
 
-  /* Hold a card to enter the editor; in the editor a drag reorders instead. */
+  /* Hold a card to enter the editor; in the editor a drag reorders instead;
+     a plain tap opens the card at length. */
   function bindCardGestures() {
     var host = U.$('#cards');
-    var holdTimer = null, startX = 0, startY = 0;
+    var holdTimer = null, startX = 0, startY = 0, moved = false, tapKey = null;
 
     function cardKeyAt(x, y) {
       var node = document.elementFromPoint(x, y);
@@ -755,18 +760,24 @@
     }
 
     function down(x, y) {
-      startX = x; startY = y;
+      startX = x; startY = y; moved = false;
       var key = cardKeyAt(x, y);
+      tapKey = key;
       if (!key) { return; }
       if (editing) { dragKey = key; return; }
       holdTimer = setTimeout(function () {
         holdTimer = null;
+        tapKey = null;          /* the hold has taken it: no tap follows */
         setEditing(true);
       }, 550);
     }
 
     function move(x, y) {
-      if (holdTimer && (Math.abs(x - startX) > 10 || Math.abs(y - startY) > 10)) {
+      if (Math.abs(x - startX) > 10 || Math.abs(y - startY) > 10) {
+        moved = true;           /* a swipe or a drag, not a tap */
+        tapKey = null;
+      }
+      if (holdTimer && moved) {
         clearTimeout(holdTimer);
         holdTimer = null;
       }
@@ -784,6 +795,10 @@
     function up() {
       if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
       dragKey = null;
+      /* A tap that neither moved nor turned into a hold: open the card. In the
+         editor the taps belong to the ‹ × › buttons instead. */
+      if (tapKey && !moved && !editing) { openDetail(tapKey); }
+      tapKey = null;
     }
 
     host.addEventListener('touchstart', function (e) {
@@ -801,6 +816,33 @@
     host.addEventListener('mousedown', function (e) { down(e.clientX, e.clientY); }, false);
     document.addEventListener('mousemove', function (e) { move(e.clientX, e.clientY); }, false);
     document.addEventListener('mouseup', up, false);
+  }
+
+  /* ---------- one card at length ---------- */
+
+  function openDetail(key) {
+    var w = settings.lastData;
+    var def = CARDS[key];
+    if (!def || !Metrics.SPEC[key] || !w) { return; }
+    var value = def.value(w);
+    if (value !== null && value !== undefined && isNaN(value)) { value = null; }
+    var index = def.index ? Metrics[key](w) : null;
+    var icon;
+    try { icon = iconFor(key, value, w); }
+    catch (e) { icon = Icons.mood(null); }
+    icon.setAttribute('class', 'det-icon-svg');
+
+    Detail.open({
+      key: key,
+      value: (value === undefined) ? null : value,
+      icon: icon,
+      note: def.note ? def.note(w) : '',
+      bandText: def.bandText ? def.bandText(w) : null,
+      why: index ? index.why : null,
+      w: w,
+      place: settings.place || '',
+      updated: U.agoText(settings.lastTs)
+    });
   }
 
   /* ---------- data ---------- */
@@ -830,6 +872,8 @@
       refreshing = false;
       Store.set({ lastData: data, lastTs: data.ts });
       render(data);
+      /* An open card sheet is looking at the old reading: rebuild it. */
+      if (Detail.isOpen()) { openDetail(Detail.key()); }
       U.setText(U.$('#updated'), U.agoText(settings.lastTs));
       setStatus(I18N.t('status.ok'));
       refreshPanelValues();
@@ -1192,6 +1236,13 @@
     bindAll('.js-edit-done', function () { setEditing(false); });
     bindAll('.js-cards-reset', resetCards);
     U.$('#btn-library-close').onclick = closeLibrary;
+    U.$('#btn-detail-close').onclick = function () { Detail.close(); };
+    /* A hardware key on the reader and Escape on a desktop both close a sheet. */
+    document.addEventListener('keydown', function (e) {
+      if (e.keyCode !== 27) { return; }
+      if (Detail.isOpen()) { Detail.close(); }
+      else if (!U.$('#library').hidden) { closeLibrary(); }
+    }, false);
     bindLibrarySearch();
   }
 
@@ -1215,6 +1266,9 @@
     if (themeParam) { settings.theme = themeParam[1]; }
     /* First run: no design remembered, so match the screen we are on. */
     else if (!settings.theme) { Store.set({ theme: detectTheme() }); }
+
+    /* A snapshot from an older build may not have every field this one reads. */
+    settings.lastData = Weather.fill(settings.lastData);
 
     applyLanguage(I18N.lang());
     tickClock();

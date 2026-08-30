@@ -113,3 +113,9 @@ body[data-theme="paper"] .btn-menu:active { background: #3f3a30; }
 body[data-theme="paper"] .btn-menu svg { width: 22px; height: 22px; stroke-width: 2.2; }
 
 body[data-theme="paper"] .card-add { flex: 1 1 100%; max-width: 100%; padding: 0; }
+
+/* Detail sheet: the same rules and mutings as the library rows. */
+body[data-theme="paper"] .det-row, body[data-theme="paper"] .det-field { border-bottom-color: #ddd5c6; }
+body[data-theme="paper"] .det-field, body[data-theme="paper"] .det-note,
+body[data-theme="paper"] .det-row-val { color: #6d6555; }
+body[data-theme="paper"] .det-src { border-top-color: #cfc7b6; }

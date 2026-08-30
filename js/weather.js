@@ -227,8 +227,21 @@ var Weather = (function () {
     };
   }
 
+  /* A snapshot cached by an older build can be missing fields this one reads.
+     The comfort maths tests for null, and undefined is not null, so anything
+     absent is filled in from the shape of the demo record. */
+  function fill(data) {
+    if (!data) { return data; }
+    var shape = demo(), k;
+    for (k in shape) {
+      if (!shape.hasOwnProperty(k) || data[k] !== undefined) { continue; }
+      data[k] = (Object.prototype.toString.call(shape[k]) === '[object Array]') ? [] : null;
+    }
+    return data;
+  }
+
   return {
-    load: load, demo: demo, normalize: normalize, searchCity: searchCity,
+    load: load, demo: demo, normalize: normalize, searchCity: searchCity, fill: fill,
     forecastUrl: forecastUrl, marineUrl: marineUrl
   };
 })();

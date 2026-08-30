@@ -230,6 +230,44 @@ button, input { font-family: inherit; font-size: inherit; }
 .lib-now { flex: 0 0 auto; margin-left: 8px; font-size: 12px; }
 .lib-plus { flex: 0 0 auto; margin-left: 10px; font-size: 20px; font-weight: 700; line-height: 1; }
 .lib-note { margin: 10px 4px; }
+
+/* ---- the detail sheet ----
+   The card again, with room this time: the full scale with its end labels, then
+   plain rows for everything that had to be squeezed out of a tile. */
+.det-hero { margin-bottom: 6px; }
+.det-value-row { display: flex; align-items: baseline; }
+.det-value { font-size: 40px; font-weight: 700; letter-spacing: -0.03em; }
+.det-unit { margin-left: 6px; font-size: 14px; }
+.det-icon { flex: 0 0 auto; margin-left: auto; align-self: center; line-height: 0; }
+.det-icon svg {
+  display: block; width: 44px; height: 44px;
+  fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.det-icon .ico-solid { fill: currentColor; stroke: none; }
+.det-icon .ico-mark { fill: currentColor; stroke: none; font-size: 11px; font-weight: 700; text-anchor: middle; }
+.det-band { margin-top: 4px; font-weight: 700; }
+/* There is room here for the ends of the scale the cards have to do without. */
+body[data-theme] .det-hero .scale-ends { display: flex; font-size: 11px; }
+.det-note { margin-top: 2px; font-size: 13px; }
+.det-text { margin: 4px 2px 8px 2px; font-size: 14px; line-height: 1.4; }
+.det-row {
+  display: flex; align-items: baseline; width: 100%;
+  padding: 7px 4px; border-bottom-width: 1px; border-bottom-style: solid;
+}
+.det-row-name { flex: 1 1 auto; min-width: 0; }
+/* Shrinkable, so a long value wraps instead of running over the name. */
+.det-row-val { flex: 0 1 auto; margin-left: 10px; text-align: right; }
+.det-row.is-now { font-weight: 700; }
+/* API field names: verbatim, so they can be looked up in the Open-Meteo docs. */
+.det-field {
+  padding: 2px 4px 7px 4px; font-size: 12px;
+  font-family: "Courier New", Courier, monospace;
+  border-bottom-width: 1px; border-bottom-style: solid;
+  word-break: break-word;
+}
+.det-src { margin-top: 14px; padding-top: 6px; border-top-width: 2px; border-top-style: solid; }
+.det-math { margin-top: 10px; }
 .card-edit { display: flex; justify-content: space-between; margin-top: 6px; }
 .btn-edit { flex: 1 1 auto; margin: 0 3px 0 0; padding: 4px 0; text-align: center; font-weight: 700; }
 .btn-edit:last-child { margin-right: 0; }

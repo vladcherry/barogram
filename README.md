@@ -171,6 +171,28 @@ stock PocketBook browser almost certainly does not support it; there the working
 setup is the app kept open with the wake lock on, refreshing on the page's own
 hourly timer.
 
+## Tapping a card
+
+A tap opens the card at length, as a sheet over the screen:
+
+* the reading again, with the full scale and its end labels;
+* **what it means** — a sentence or two on what the number actually says and
+  where its thresholds come from;
+* for a comfort index, **what is costing it points right now** and **what went
+  into it**: every reading it weighed, with the value each one has at this
+  moment;
+* **the whole scale** as a table — every band with its range, the current one
+  in bold, because a scale whose thresholds cannot be read explains nothing;
+* **how it is calculated** — for an index, that it starts at 10 and subtracts
+  penalties, plus the conditions that would score full marks; for a reading,
+  whatever conversion the app does to it, or that it does none;
+* **where the numbers come from** — the Open-Meteo endpoint and the field name
+  verbatim, so it can be looked up in their docs, the refresh cadence, the point
+  and the time of the last read.
+
+Holding a card still opens the editor instead, a swipe still changes the design,
+and Escape (or ×) closes the sheet.
+
 ## Rearranging the cards
 
 Hold any card and the screen becomes an editor: drag a card to move it, use the
@@ -289,6 +311,7 @@ js/store.js             settings and cache in localStorage
 js/metrics.js           scale bands and comfort-index maths
 js/icons.js             card icons: weather, comfort faces, sports with a verdict
 js/scale.js             scale, card and mini-chart rendering
+js/detail.js            the card sheet: meaning, bands, inputs, sources
 js/weather.js           Open-Meteo requests and normalisation
 js/app.js               screen, clock, schedule, background work
 sw.js                   offline cache, hourly periodicsync, notifications
