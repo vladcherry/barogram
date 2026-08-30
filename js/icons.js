@@ -342,20 +342,10 @@ var Icons = (function () {
      Drawn in the same stroke language as the weather icons, so the editor does
      not look like it came from another app. */
 
-  function chevron(dir) {
-    return svg([dir < 0 ? node('polyline', { points: '15,5 8,12 15,19' })
-                        : node('polyline', { points: '9,5 16,12 9,19' })]);
-  }
-
   function cross() {
     return svg([line(6, 6, 18, 18), line(18, 6, 6, 18)]);
   }
 
-  /* The grab handle: three short rules, the universal "drag me". */
-  function grip() {
-    return svg([line(6, 9, 18, 9), line(6, 12.5, 18, 12.5), line(6, 16, 18, 16)]);
-  }
-
   return { sky: sky, rain: rain, mood: mood, sport: sport, face: face, compass: compass,
-           chevron: chevron, cross: cross, grip: grip };
+           cross: cross };
 })();

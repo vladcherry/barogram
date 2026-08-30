@@ -195,10 +195,16 @@ and Escape (or ×) closes the sheet.
 
 ## Rearranging the cards
 
-Hold any card and the screen becomes an editor: each card grows a grab handle
-across its foot with an arrow at either end — dragging on e-ink is a lottery, so
-the arrows stay — and a round × on its corner, half off the card, where it
-cannot be hit while reaching for something else. The wide bar opens the library. *Default set* restores the ten cards the app ships with, *Done*
+Hold any card and the screen becomes an editor. A card carries one control
+there: a round × on its corner, half off the card, where it cannot be hit while
+reaching for something else. The order is changed by dragging — the whole tile
+is the handle, and the card under the finger fades so it is clear what is
+moving. The wide bar opens the library.
+
+The drag moves the card's own element rather than re-rendering the grid on every
+swap: a touch keeps firing at the element it started on, so a redraw mid-drag
+detaches that element and the rest of the gesture goes nowhere. The new order is
+read back out of the grid and saved when the finger comes up. *Default set* restores the ten cards the app ships with, *Done*
 leaves the editor. The two of them are one strip the width of the grid — *Done*
 filled and the wider half, *Defaults* the outline beside it — and it sits above
 the grid and again below it, as does the full-width *Add a card* bar, so nothing

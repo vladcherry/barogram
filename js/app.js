@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.30-8';
+  var APP_VERSION = '2026.08.30-9';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -498,10 +498,7 @@
       icon: iconFor(key, value, w)
     });
     if (def.spark) { appendSpark(card, w[def.spark.series], spec, def.spark.caption); }
-    if (editing) {
-      card.appendChild(editControls(key));
-      card.appendChild(deleteBadge(key));
-    }
+    if (editing) { card.appendChild(deleteBadge(key)); }
     return card;
   }
 
@@ -527,6 +524,8 @@
       card = buildCard(list[i], w);
       if (card) {
         card.setAttribute('data-index', i);
+        /* The grid is rebuilt on every swap, so the lifted card is marked anew. */
+        if (editing && list[i] === dragKey) { card.className += ' is-dragging'; }
         host.appendChild(card);
       }
     }
@@ -540,21 +539,9 @@
      buttons do the same job as dragging, because dragging on electronic ink is
      a lottery. */
 
-  /* The card in the editor: a grab handle across the foot with an arrow at each
-     end — dragging on electronic ink is a lottery, so the arrows stay — and the
-     removal on the corner, as a badge, where it cannot be hit by accident. */
-  function editControls(key) {
-    var box = U.el('div', 'card-edit');
-    box.appendChild(editButton(Icons.chevron(-1), 'ui.moveLeft', 'btn-move',
-      function () { moveCard(key, -1); }));
-    var grip = U.el('span', 'card-grip');
-    grip.appendChild(Icons.grip());
-    box.appendChild(grip);
-    box.appendChild(editButton(Icons.chevron(1), 'ui.moveRight', 'btn-move',
-      function () { moveCard(key, 1); }));
-    return box;
-  }
-
+  /* In the editor a card carries one control: the removal badge on its corner.
+     The order is changed by dragging the card itself — the whole tile is the
+     handle, which is why nothing else is drawn on it. */
   function deleteBadge(key) {
     return editButton(Icons.cross(), 'ui.removeCard', 'card-del',
       function () { removeCard(key); });
@@ -609,16 +596,6 @@
       editHint(I18N.t('hint.editMode'));
       renderLibrary();
     }
-    render(settings.lastData);
-  }
-
-  function moveCard(key, direction) {
-    var list = cardList();
-    var from = indexOfKey(list, key);
-    var to = from + direction;
-    if (from < 0 || to < 0 || to >= list.length) { return; }
-    list.splice(to, 0, list.splice(from, 1)[0]);
-    saveCards(list);
     render(settings.lastData);
   }
 
@@ -759,29 +736,63 @@
     render(settings.lastData);
   }
 
-  /* Hold a card to enter the editor; in the editor a drag reorders instead;
-     a plain tap opens the card at length. */
+  /* Hold a card to enter the editor; in the editor a drag reorders; a plain tap
+     opens the card at length.
+
+     The drag moves the card node itself rather than re-rendering the grid on
+     every swap: a touch keeps firing at the element it started on, so redrawing
+     mid-drag detaches that element and the rest of the gesture is lost. The
+     order is read back out of the DOM and saved when the finger comes up. */
   function bindCardGestures() {
     var host = U.$('#cards');
     var holdTimer = null, startX = 0, startY = 0, moved = false, tapKey = null;
+    var dragNode = null;
 
-    function cardKeyAt(x, y) {
+    function cardNodeAt(x, y) {
       var node = document.elementFromPoint(x, y);
       for (; node; node = node.parentNode) {
-        if (node.className && String(node.className).indexOf('card') === 0 &&
-            node.getAttribute && node.getAttribute('data-metric')) {
-          return node.getAttribute('data-metric');
+        if (node.getAttribute && node.getAttribute('data-metric') &&
+            String(node.className).indexOf('card') === 0) {
+          return node;
         }
       }
       return null;
     }
 
+    function indexInGrid(node) {
+      var kids = host.childNodes, at = 0, i;
+      for (i = 0; i < kids.length; i++) {
+        if (kids[i] === node) { return at; }
+        if (kids[i].nodeType === 1) { at++; }
+      }
+      return -1;
+    }
+
+    function orderFromGrid() {
+      var kids = host.childNodes, out = [], key, i;
+      for (i = 0; i < kids.length; i++) {
+        key = kids[i].getAttribute && kids[i].getAttribute('data-metric');
+        if (key) { out.push(key); }
+      }
+      return out;
+    }
+
+    function lift(node, on) {
+      var cls = String(node.className).replace(/ ?is-dragging/, '');
+      node.className = on ? cls + ' is-dragging' : cls;
+    }
+
     function down(x, y) {
       startX = x; startY = y; moved = false;
-      var key = cardKeyAt(x, y);
-      tapKey = key;
-      if (!key) { return; }
-      if (editing) { dragKey = key; return; }
+      var node = cardNodeAt(x, y);
+      tapKey = node ? node.getAttribute('data-metric') : null;
+      if (!node) { return; }
+      if (editing) {
+        dragNode = node;
+        dragKey = tapKey;
+        lift(dragNode, true);
+        return;
+      }
       holdTimer = setTimeout(function () {
         holdTimer = null;
         tapKey = null;          /* the hold has taken it: no tap follows */
@@ -798,22 +809,34 @@
         clearTimeout(holdTimer);
         holdTimer = null;
       }
-      if (!editing || !dragKey) { return; }
-      var over = cardKeyAt(x, y);
-      if (!over || over === dragKey) { return; }
-      var list = cardList();
-      var from = indexOfKey(list, dragKey), to = indexOfKey(list, over);
-      if (from < 0 || to < 0) { return; }
-      list.splice(to, 0, list.splice(from, 1)[0]);
-      saveCards(list);
-      render(settings.lastData);
+      if (!editing || !dragNode) { return; }
+      var over = cardNodeAt(x, y);
+      if (!over || over === dragNode || over.parentNode !== host) { return; }
+      /* Past its own place the card goes after the one it landed on, before it
+         otherwise — the same thing a hand does with a photograph. */
+      if (indexInGrid(dragNode) < indexInGrid(over)) {
+        host.insertBefore(dragNode, over.nextSibling);
+      } else {
+        host.insertBefore(dragNode, over);
+      }
     }
 
     function up() {
       if (holdTimer) { clearTimeout(holdTimer); holdTimer = null; }
-      dragKey = null;
-      /* A tap that neither moved nor turned into a hold: open the card. In the
-         editor the taps belong to the ‹ × › buttons instead. */
+      if (dragNode) {
+        lift(dragNode, false);
+        dragNode = null;
+        dragKey = null;
+        /* Only when something actually moved: a redraw here would tear the
+           removal badge out from under a tap before its click could fire. */
+        var order = orderFromGrid();
+        if (order.join(',') !== cardList().join(',')) {
+          saveCards(order);
+          render(settings.lastData);
+        }
+      }
+      /* A tap that neither moved nor turned into a hold opens the card; in the
+         editor the taps belong to the removal badge instead. */
       if (tapKey && !moved && !editing) { openDetail(tapKey); }
       tapKey = null;
     }
@@ -824,7 +847,8 @@
     }, false);
     host.addEventListener('touchmove', function (e) {
       if (!e.touches || !e.touches.length) { return; }
-      if (editing && dragKey && e.preventDefault) { e.preventDefault(); }
+      /* Without this the browser scrolls the page instead of moving the card. */
+      if (editing && dragNode && e.preventDefault) { e.preventDefault(); }
       move(e.touches[0].clientX, e.touches[0].clientY);
     }, false);
     host.addEventListener('touchend', up, false);

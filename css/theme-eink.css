@@ -125,4 +125,3 @@ body[data-theme="eink"] .act-reset:active { background: #000; color: #fff; }
 /* Editor: the removal badge on the corner of a card. */
 body[data-theme="eink"] .card-del { background: #c8341f; border-color: #000000; color: #ffffff; }
 body[data-theme="eink"] .card-del:active { background: #ffffff; color: #c8341f; }
-body[data-theme="eink"] .btn-move:active { opacity: 0.5; }

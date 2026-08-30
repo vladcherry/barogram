@@ -288,16 +288,6 @@ body[data-theme] .det-hero .scale-ends { display: flex; font-size: 11px; }
 }
 .det-src { margin-top: 14px; padding-top: 6px; border-top-width: 2px; border-top-style: solid; }
 .det-math { margin-top: 10px; }
-/* The editor foot: an arrow at each end of a grab handle. */
-.card-edit { display: flex; align-items: center; justify-content: space-between; margin-top: 6px; }
-.btn-move {
-  flex: 0 0 auto; display: flex; align-items: center; justify-content: center;
-  width: 34px; height: 28px; margin: 0; padding: 0; border: 0;
-  background: transparent; color: inherit; cursor: pointer;
-  -webkit-appearance: none; appearance: none;
-}
-.card-grip { flex: 1 1 auto; display: flex; justify-content: center; line-height: 0; opacity: 0.55; }
-.card-grip .edit-ico { width: 26px; height: 20px; }
 /* Removal sits on the corner, half off the card: it is the one action here you
    must not be able to hit while reaching for something else. */
 .card-del {
@@ -323,12 +313,17 @@ body[data-theme] .det-hero .scale-ends { display: flex; font-size: 11px; }
 }
 .btn-add-plus { font-size: 24px; line-height: 1; margin-right: 8px; }
 .btn-add-label { font-size: 16px; }
-/* While editing, cards are handles: no text selection, no long-press callout.
+/* While editing, the whole card is the drag handle: no text selection, no
+   long-press callout, and no scrolling stolen by the browser mid-drag.
    Relative, so the removal badge can hang off the corner. */
 body[data-editing="1"] .card {
-  position: relative;
+  position: relative; cursor: move;
+  touch-action: none;
   -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
 }
+/* The card under the finger: lifted out of the grid so it is obvious what is
+   moving and where it will land. */
+body[data-editing="1"] .card.is-dragging { opacity: 0.55; }
 
 .footbar { margin-top: 6px; }
 
