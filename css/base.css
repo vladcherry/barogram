@@ -313,12 +313,14 @@ body[data-theme] .det-hero .scale-ends { display: flex; font-size: 11px; }
 }
 .btn-add-plus { font-size: 24px; line-height: 1; margin-right: 8px; }
 .btn-add-label { font-size: 16px; }
-/* While editing, the whole card is the drag handle: no text selection, no
-   long-press callout, and no scrolling stolen by the browser mid-drag.
+/* While editing, the whole card is the drag handle: no text selection and no
+   long-press callout. Deliberately no touch-action here — the browser decides
+   at the first touch whether a gesture may scroll, so forbidding it outright
+   would cost the grid its scrolling; the drag stops the scroll itself, once a
+   card has actually been picked up.
    Relative, so the removal badge can hang off the corner. */
 body[data-editing="1"] .card {
   position: relative; cursor: move;
-  touch-action: none;
   -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;
 }
 /* The card under the finger: lifted out of the grid so it is obvious what is

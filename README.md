@@ -198,8 +198,10 @@ and Escape (or ×) closes the sheet.
 Hold any card and the screen becomes an editor. A card carries one control
 there: a round × on its corner, half off the card, where it cannot be hit while
 reaching for something else. The order is changed by dragging — the whole tile
-is the handle, and the card under the finger fades so it is clear what is
-moving. The wide bar opens the library.
+is the handle. A finger has to rest on a card for a third of a second before it
+is picked up, so a swipe still scrolls the grid; the card fades when it is in
+hand. A mouse grabs on contact, having a wheel for scrolling. The wide bar opens
+the library.
 
 The drag moves the card's own element rather than re-rendering the grid on every
 swap: a touch keeps firing at the element it started on, so a redraw mid-drag

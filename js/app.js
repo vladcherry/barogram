@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.30-9';
+  var APP_VERSION = '2026.08.30-10';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -747,6 +747,8 @@
     var host = U.$('#cards');
     var holdTimer = null, startX = 0, startY = 0, moved = false, tapKey = null;
     var dragNode = null;
+    var HOLD_MS = 550;   /* holding a card opens the editor */
+    var GRAB_MS = 320;   /* and, once it is open, picks a card up */
 
     function cardNodeAt(x, y) {
       var node = document.elementFromPoint(x, y);
@@ -782,22 +784,34 @@
       node.className = on ? cls + ' is-dragging' : cls;
     }
 
-    function down(x, y) {
+    function grab(node) {
+      dragNode = node;
+      dragKey = node.getAttribute('data-metric');
+      lift(node, true);
+    }
+
+    function down(x, y, byTouch) {
       startX = x; startY = y; moved = false;
       var node = cardNodeAt(x, y);
       tapKey = node ? node.getAttribute('data-metric') : null;
       if (!node) { return; }
       if (editing) {
-        dragNode = node;
-        dragKey = tapKey;
-        lift(dragNode, true);
+        /* A finger has to rest on the card for a moment before it is picked
+           up, otherwise the grid could not be scrolled at all: a drag that
+           armed on contact would swallow every swipe. The fade says when the
+           card is in hand. A mouse has a wheel and needs no such ceremony. */
+        if (!byTouch) { grab(node); return; }
+        holdTimer = setTimeout(function () {
+          holdTimer = null;
+          grab(node);
+        }, GRAB_MS);
         return;
       }
       holdTimer = setTimeout(function () {
         holdTimer = null;
         tapKey = null;          /* the hold has taken it: no tap follows */
         setEditing(true);
-      }, 550);
+      }, HOLD_MS);
     }
 
     function move(x, y) {
@@ -843,12 +857,13 @@
 
     host.addEventListener('touchstart', function (e) {
       if (!e.touches || e.touches.length !== 1) { return; }
-      down(e.touches[0].clientX, e.touches[0].clientY);
+      down(e.touches[0].clientX, e.touches[0].clientY, true);
     }, false);
     host.addEventListener('touchmove', function (e) {
       if (!e.touches || !e.touches.length) { return; }
-      /* Without this the browser scrolls the page instead of moving the card. */
-      if (editing && dragNode && e.preventDefault) { e.preventDefault(); }
+      /* Once a card is in hand the page must not scroll under it. Before that
+         it must, which is why the cards do not set touch-action. */
+      if (dragNode && e.preventDefault) { e.preventDefault(); }
       move(e.touches[0].clientX, e.touches[0].clientY);
     }, false);
     host.addEventListener('touchend', up, false);
