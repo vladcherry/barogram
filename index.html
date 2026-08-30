@@ -137,17 +137,37 @@
     <p class="hint" id="hint"></p>
   </div>
 
-  <!-- Shown only while the card editor is open. -->
-  <div class="editbar" id="editbar" hidden>
-    <button class="btn" id="btn-edit-done" type="button" data-i18n="ui.editDone">Done</button>
-    <button class="btn" id="btn-cards-reset" type="button" data-i18n="ui.resetCards">Default set</button>
-    <span class="hint" id="edit-hint"></span>
+  <!-- Shown only while the card editor is open, and repeated under the grid so
+       the controls are in reach whichever end of a long screen you are at. -->
+  <div class="editbar" hidden>
+    <button class="btn js-edit-done" type="button" data-i18n="ui.editDone">Done</button>
+    <button class="btn js-cards-reset" type="button" data-i18n="ui.resetCards">Default set</button>
+    <span class="hint edit-hint"></span>
   </div>
 
   <main class="cards" id="cards"></main>
 
-  <!-- The card library: everything not already on the screen. -->
-  <div class="library" id="library" hidden></div>
+  <div class="editbar editbar-bottom" hidden>
+    <button class="btn js-edit-done" type="button" data-i18n="ui.editDone">Done</button>
+    <button class="btn js-cards-reset" type="button" data-i18n="ui.resetCards">Default set</button>
+    <span class="hint edit-hint"></span>
+  </div>
+
+  <!-- The card library, as a sheet over the screen: on a phone a list under the
+       grid would start below the fold, so it takes the whole screen and scrolls
+       inside itself while the grid stays where it was. -->
+  <div class="sheet" id="library" hidden>
+    <div class="sheet-head">
+      <h3 class="sheet-title" data-i18n="ui.library">Add a card</h3>
+      <button class="btn" id="btn-library-close" type="button"
+              data-i18n-label="ui.close" title="Close" aria-label="Close">×</button>
+    </div>
+    <div class="row-search">
+      <input class="input" id="lib-search" type="text"
+             data-i18n-placeholder="ui.librarySearch" placeholder="Search cards">
+    </div>
+    <div class="sheet-body" id="lib-body"></div>
+  </div>
 
   <footer class="footbar">
     <span id="status" data-i18n="status.initial">Open-Meteo data. Hourly updates.</span>

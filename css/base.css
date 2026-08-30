@@ -179,10 +179,48 @@ button, input { font-family: inherit; font-size: inherit; }
 .install-actions { flex: 0 0 auto; display: flex; }
 
 /* ---- card editor ---- */
+/* The bar is on screen twice, above and below the grid, so the controls are in
+   reach at either end; the explanation is printed once, at the top. */
 .editbar { display: flex; flex-wrap: wrap; align-items: center; margin-top: 8px; }
 .editbar .hint { flex: 1 1 200px; margin-left: 8px; }
-.library { display: flex; flex-wrap: wrap; margin-top: 8px; }
-.btn-library { margin: 3px 6px 3px 0; }
+.editbar-bottom .edit-hint { display: none; }
+/* The library sheet: a full-screen layer with its own scroll, so the list never
+   starts below the fold and the card grid underneath does not move. */
+.sheet {
+  position: fixed; z-index: 40; left: 0; right: 0; top: 0; bottom: 0;
+  display: flex; flex-direction: column;
+  padding: 8px 8px calc(8px + env(safe-area-inset-bottom, 0px)) 8px;
+  padding-top: calc(8px + env(safe-area-inset-top, 0px));
+}
+.sheet-head { display: flex; align-items: center; padding: 2px 2px 6px 2px; }
+.sheet-title { flex: 1 1 auto; margin: 0; font-size: 16px; }
+.sheet-head .btn { margin: 0; padding: 4px 12px; font-weight: 700; }
+.sheet .row-search { flex: 0 0 auto; margin-bottom: 4px; }
+/* Only this box scrolls; the header and the search field stay put. */
+.sheet-body { flex: 1 1 auto; overflow-y: auto; -webkit-overflow-scrolling: touch; }
+.lib-group {
+  margin: 8px 2px 2px 2px; font-size: 11px; font-weight: 700;
+  letter-spacing: 0.12em; text-transform: uppercase;
+}
+.lib-row {
+  display: flex; align-items: center; width: 100%;
+  margin: 0; padding: 9px 8px; text-align: left;
+  border: 0; border-bottom-width: 1px; border-bottom-style: solid;
+  background: transparent; font: inherit; color: inherit;
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+}
+.lib-ico { flex: 0 0 auto; line-height: 0; margin-right: 10px; }
+.lib-ico svg {
+  display: block; width: 24px; height: 24px;
+  fill: none; stroke: currentColor; stroke-width: 1.8;
+  stroke-linecap: round; stroke-linejoin: round;
+}
+.lib-ico .ico-solid { fill: currentColor; stroke: none; }
+.lib-ico .ico-mark { fill: currentColor; stroke: none; font-size: 11px; font-weight: 700; text-anchor: middle; }
+.lib-name { flex: 1 1 auto; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.lib-now { flex: 0 0 auto; margin-left: 8px; font-size: 12px; }
+.lib-plus { flex: 0 0 auto; margin-left: 10px; font-size: 20px; font-weight: 700; line-height: 1; }
+.lib-note { margin: 10px 4px; }
 .card-edit { display: flex; justify-content: space-between; margin-top: 6px; }
 .btn-edit { flex: 1 1 auto; margin: 0 3px 0 0; padding: 4px 0; text-align: center; font-weight: 700; }
 .btn-edit:last-child { margin-right: 0; }

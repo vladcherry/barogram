@@ -3,6 +3,13 @@ var U = (function () {
 
   function $(sel, root) { return (root || document).querySelector(sel); }
 
+  /* A real array, so callers can loop it the old-fashioned way. */
+  function all(sel, root) {
+    var found = (root || document).querySelectorAll(sel), out = [], i;
+    for (i = 0; i < found.length; i++) { out.push(found[i]); }
+    return out;
+  }
+
   function el(tag, cls, text) {
     var n = document.createElement(tag);
     if (cls) { n.className = cls; }
@@ -104,7 +111,7 @@ var U = (function () {
   }
 
   return {
-    $: $, el: el, clear: clear, setText: setText, clamp: clamp, num: num, fmt: fmt, pad2: pad2,
+    $: $, all: all, el: el, clear: clear, setText: setText, clamp: clamp, num: num, fmt: fmt, pad2: pad2,
     getJSON: getJSON, hourlyNow: hourlyNow, isoLocalHour: isoLocalHour,
     agoText: agoText, dateText: dateText, wmoText: wmoText, windDir: windDir
   };

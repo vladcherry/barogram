@@ -88,3 +88,8 @@ body[data-theme="night"] .switch { border-color: #2f3c4a; background: #1b232d; }
 body[data-theme="night"] .switch i { border-color: #3a4756; background: #8ea0b5; }
 body[data-theme="night"] .switch.is-on { background: #2f6bd8; border-color: #4d8dfd; }
 body[data-theme="night"] .switch.is-on i { background: #ffffff; border-color: #4d8dfd; }
+
+body[data-theme="night"] .sheet { background: #0b0f14; color: #e8eef5; }
+body[data-theme="night"] .lib-row { border-bottom-color: #1e2733; }
+body[data-theme="night"] .lib-group { color: #8ea0b5; }
+body[data-theme="night"] .lib-now { color: #8ea0b5; }

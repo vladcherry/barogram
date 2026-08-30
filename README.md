@@ -37,7 +37,13 @@ Four designs ship with the app and are cycled with the grid icon in the top bar.
    large number, a full-width ruler-like scale and a coloured band marker down
    the left edge of the card. Maximum data per screen.
 
-The chosen design is remembered. `?theme=tiles` forces one, which is handy for
+On a first run nothing is chosen yet, so the app reads the device and picks for
+itself: an e-ink reader gets **E-Ink Color** on a colour screen and **Reader** on
+a grey one (recognised by the user agent, by `(monochrome)` or by `(update:
+slow)`, which is what an e-ink browser reports about a screen it cannot repaint
+smoothly), and a phone or a computer gets **Night** or **Light** depending on
+its dark-mode setting. From then on the chosen design is remembered and the
+detection never runs again. `?theme=tiles` forces one, which is handy for
 screenshots.
 
 A horizontal swipe steps through the designs — left for the next one, right for
@@ -161,10 +167,18 @@ hourly timer.
 
 Hold any card and the screen becomes an editor: drag a card to move it, use the
 arrows if dragging on e-ink is being uncooperative, × removes a card and + opens
-the library of everything not on the screen. *Default set* restores the ten
-cards the app ships with, *Done* leaves the editor. The set and its order live
-in `localStorage`, so the screen comes back the way it was left. The editor is
-also reachable from the menu, and design swipes are suspended while it is open.
+the library. *Default set* restores the ten cards the app ships with, *Done*
+leaves the editor. Both buttons sit above the grid and again below it, so they
+are in reach at either end of a long screen. The set and its order live in
+`localStorage`, so the screen comes back the way it was left. The editor is also
+reachable from the menu, and design swipes are suspended while it is open.
+
+The library opens as a sheet over the whole screen rather than as a list under
+the grid, which on a phone would start below the fold. It carries a search
+field and four groups — Weather, Air, Sea, Sport and outdoors — and every row
+shows the card's icon, its name and what it reads right now, so a card can be
+judged before it is added. Adding leaves the sheet open and the row simply
+disappears from the list; × closes it.
 
 ## On a phone
 

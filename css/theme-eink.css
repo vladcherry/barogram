@@ -93,3 +93,9 @@ body[data-theme="eink"] .switch { border-color: #000; border-width: 2px; backgro
 body[data-theme="eink"] .switch i { border-color: #000; background: #fff; }
 body[data-theme="eink"] .switch.is-on { background: #000; }
 body[data-theme="eink"] .switch.is-on i { background: #fff; }
+
+/* The library sheet covers the screen, so it paints its own ground. */
+body[data-theme="eink"] .sheet { background: #ffffff; color: #000000; }
+body[data-theme="eink"] .lib-row { border-bottom-color: #cccccc; }
+body[data-theme="eink"] .lib-group { color: #555555; }
+body[data-theme="eink"] .lib-now { color: #555555; }

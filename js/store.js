@@ -2,7 +2,7 @@
 var Store = (function () {
   var KEY = 'barogram.v2';
   var state = {
-    theme: 'eink',
+    theme: null,        /* null means: not chosen yet, pick one for the device */
     lang: null,
     lat: null, lon: null, place: '',
     lastData: null, lastTs: 0,

@@ -111,3 +111,9 @@ body[data-theme="tiles"] .switch { border-color: #000; background: #fff; }
 body[data-theme="tiles"] .switch i { border-color: #000; background: #fff; }
 body[data-theme="tiles"] .switch.is-on { background: #000; }
 body[data-theme="tiles"] .switch.is-on i { background: #fff; }
+
+body[data-theme="tiles"] .sheet { background: #ffffff; color: #000000; }
+body[data-theme="tiles"] .lib-row { border-bottom-color: #000000; }
+body[data-theme="tiles"] .lib-group { color: #000000; }
+body[data-theme="tiles"] .lib-now { color: #444444; }
+body[data-theme="tiles"] .sheet-title { text-transform: uppercase; letter-spacing: 0.04em; }

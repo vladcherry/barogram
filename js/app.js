@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.30-1';
+  var APP_VERSION = '2026.08.30-2';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -21,11 +21,48 @@
   var dragKey = null;
   var installPrompt = null;
 
-  /* ---------- theme ---------- */
+  /* ---------- theme ----------
+     Nothing is chosen on a first run, so the device decides. An e-ink reader
+     gets one of the two flat, high-contrast designs — E-Ink Color where the
+     screen has colour, Reader where it does not — and a phone or a computer
+     gets Night or Light, following whatever it says about dark mode. */
+
+  function media(query) {
+    try { return !!(window.matchMedia && window.matchMedia(query).matches); }
+    catch (e) { return false; }
+  }
+
+  function isReader() {
+    var ua = navigator.userAgent || '';
+    if (/PocketBook|Kobo|Kindle|Boox|Onyx|reMarkable|Bookeen|InkBook|Nook|EBRD|E-Ink/i.test(ua)) {
+      return true;
+    }
+    /* An e-ink browser reports a screen it cannot repaint smoothly. */
+    return media('(update: slow)');
+  }
+
+  /* Readers that have no colour screen at all, whatever the media query says. */
+  function isGreyReader() {
+    var ua = navigator.userAgent || '';
+    return /Kindle|Kobo|reMarkable|Nook|InkBook/i.test(ua) ||
+           media('(monochrome)') || media('(color: 0)');
+  }
+
+  function detectTheme() {
+    if (isReader()) { return isGreyReader() ? 'eink' : 'tiles'; }
+    return media('(prefers-color-scheme: dark)') ? 'night' : 'paper';
+  }
 
   function themeIndex(id) {
     for (var i = 0; i < THEMES.length; i++) { if (THEMES[i].id === id) { return i; } }
     return 0;
+  }
+
+  /* Some controls are on screen twice (the editor bar above and below the
+     grid), so they are bound by class rather than by id. */
+  function bindAll(selector, handler) {
+    var nodes = U.all(selector), i;
+    for (i = 0; i < nodes.length; i++) { nodes[i].onclick = handler; }
   }
 
   /* Icon buttons have no text, so their label goes into title and aria-label. */
@@ -149,7 +186,7 @@
     setHint('');
     if (!U.$('#install').hidden) { showInstall(true); }
     if (editing) {
-      U.setText(U.$('#edit-hint'), I18N.t('hint.editMode'));
+      editHint(I18N.t('hint.editMode'));
       renderLibrary();
     }
     U.setText(U.$('#place'), settings.place || I18N.t(demoMode ? 'ui.demoPlace' : 'ui.noPlace'));
@@ -361,11 +398,17 @@
   /* The screen as it comes out of the box, and the order of the library. */
   var DEFAULT_CARDS = ['temp', 'wind', 'rain', 'clouds', 'uv', 'humidity',
                        'pressure', 'waves', 'snorkel', 'bike'];
-  var LIBRARY = ['temp', 'feelsLike', 'wind', 'gusts', 'windDir', 'rain', 'rainProb',
-                 'clouds', 'uv', 'humidity', 'dewPoint', 'pressure', 'visibility',
-                 'airQuality', 'pm25', 'pollen', 'waves', 'waterTemp',
-                 'snorkel', 'swim', 'surf', 'windsport', 'bike', 'run', 'hike',
-                 'tennis', 'golf', 'fishing', 'boatFishing', 'camping', 'drone', 'dogWalk'];
+  /* The library, in the order and the grouping the picker shows. */
+  var LIBRARY_GROUPS = [
+    { title: 'group.weather',
+      keys: ['temp', 'feelsLike', 'wind', 'gusts', 'windDir', 'rain', 'rainProb',
+             'clouds', 'uv', 'humidity', 'dewPoint', 'pressure', 'visibility'] },
+    { title: 'group.air', keys: ['airQuality', 'pm25', 'pollen'] },
+    { title: 'group.sea', keys: ['waves', 'waterTemp'] },
+    { title: 'group.sport',
+      keys: ['snorkel', 'swim', 'surf', 'windsport', 'bike', 'run', 'hike',
+             'tennis', 'golf', 'fishing', 'boatFishing', 'camping', 'drone', 'dogWalk'] }
+  ];
 
   function cardList() {
     var list = settings.cards;
@@ -498,20 +541,31 @@
     var button = U.el('button', 'btn btn-add', '+');
     button.type = 'button';
     setLabel(button, I18N.t('ui.library'));
-    button.onclick = function () { U.$('#library').hidden = false; };
+    button.onclick = openLibrary;
     tile.appendChild(button);
     tile.appendChild(U.el('div', 'card-add-label', I18N.t('ui.library')));
     return tile;
   }
 
+  /* The editor bar exists twice, above and below the grid; both say the same. */
+  function editHint(text) {
+    var bars = U.all('.edit-hint'), i;
+    for (i = 0; i < bars.length; i++) { U.setText(bars[i], text); }
+  }
+
+  function showEditBars(on) {
+    var bars = U.all('.editbar'), i;
+    for (i = 0; i < bars.length; i++) { bars[i].hidden = !on; }
+  }
+
   function setEditing(on) {
     editing = !!on;
     document.body.setAttribute('data-editing', editing ? '1' : '0');
-    U.$('#editbar').hidden = !editing;
-    U.$('#library').hidden = true;
+    showEditBars(editing);
+    closeLibrary();
     if (editing) {
       setHint('');
-      U.setText(U.$('#edit-hint'), I18N.t('hint.editMode'));
+      editHint(I18N.t('hint.editMode'));
       renderLibrary();
     }
     render(settings.lastData);
@@ -537,6 +591,8 @@
     render(settings.lastData);
   }
 
+  /* The sheet stays open after an add: setting up a screen usually means
+     picking several cards, and the row just leaves the list. */
   function addCard(key) {
     var list = cardList();
     if (indexOfKey(list, key) >= 0) { return; }
@@ -544,8 +600,7 @@
     saveCards(list);
     renderLibrary();
     render(settings.lastData);
-    U.setText(U.$('#edit-hint'),
-      I18N.t('hint.cardAdded', { name: I18N.t(Metrics.SPEC[key].title) }));
+    editHint(I18N.t('hint.cardAdded', { name: I18N.t(Metrics.SPEC[key].title) }));
   }
 
   function indexOfKey(list, key) {
@@ -553,26 +608,108 @@
     return -1;
   }
 
-  /* The library only offers what is not on the screen already. */
-  function renderLibrary() {
-    var host = U.$('#library');
-    if (!host) { return; }
-    U.clear(host);
-    var list = cardList(), added = 0, i, key;
-    for (i = 0; i < LIBRARY.length; i++) {
-      key = LIBRARY[i];
-      if (indexOfKey(list, key) >= 0 || !Metrics.SPEC[key]) { continue; }
-      host.appendChild(libraryButton(key));
-      added++;
-    }
-    if (!added) { host.appendChild(U.el('p', 'hint', I18N.t('hint.allCards'))); }
+  /* ---------- the library sheet ----------
+     A layer over the whole screen: grouped rows, each with the card's icon, its
+     name and what it reads right now, so a card can be judged before it is
+     added. It scrolls inside itself, so nothing ever starts below the fold. */
+
+  function openLibrary() {
+    var input = U.$('#lib-search');
+    if (input) { input.value = ''; }
+    renderLibrary();
+    U.$('#library').hidden = false;
+    U.$('#library').scrollTop = 0;
   }
 
-  function libraryButton(key) {
-    var button = U.el('button', 'btn btn-library', I18N.t(Metrics.SPEC[key].title));
-    button.type = 'button';
-    button.onclick = function () { addCard(key); };
-    return button;
+  function closeLibrary() { U.$('#library').hidden = true; }
+
+  /* The library only offers what is not on the screen already. */
+  function renderLibrary() {
+    var host = U.$('#lib-body');
+    if (!host) { return; }
+    U.clear(host);
+
+    var query = libraryQuery();
+    var list = cardList(), shown = 0, left = 0;
+    var g, i, key, group, rows;
+
+    for (g = 0; g < LIBRARY_GROUPS.length; g++) {
+      group = LIBRARY_GROUPS[g];
+      rows = [];
+      for (i = 0; i < group.keys.length; i++) {
+        key = group.keys[i];
+        if (indexOfKey(list, key) >= 0 || !Metrics.SPEC[key]) { continue; }
+        left++;
+        if (query && !matchesQuery(key, query)) { continue; }
+        rows.push(libraryRow(key));
+      }
+      if (!rows.length) { continue; }
+      host.appendChild(U.el('div', 'lib-group', I18N.t(group.title)));
+      for (i = 0; i < rows.length; i++) { host.appendChild(rows[i]); }
+      shown += rows.length;
+    }
+
+    if (!shown) {
+      host.appendChild(U.el('p', 'hint lib-note',
+        I18N.t(left ? 'hint.noMatches' : 'hint.allCards')));
+    }
+  }
+
+  function libraryQuery() {
+    var input = U.$('#lib-search');
+    var value = input ? input.value : '';
+    return value ? value.toLowerCase().replace(/^\s+|\s+$/g, '') : '';
+  }
+
+  function matchesQuery(key, query) {
+    return I18N.t(Metrics.SPEC[key].title).toLowerCase().indexOf(query) >= 0;
+  }
+
+  /* One row: icon, name, current reading, plus. */
+  function libraryRow(key) {
+    var spec = Metrics.SPEC[key];
+    var row = U.el('button', 'lib-row');
+    row.type = 'button';
+
+    var value = currentValue(key);
+    var icon;
+    /* With no reading yet a card's own icon has nothing to draw from. */
+    try { icon = iconFor(key, value, settings.lastData || {}); }
+    catch (e) { icon = Icons.mood(null); }
+    icon.setAttribute('class', 'lib-ico-svg');
+    var box = U.el('span', 'lib-ico');
+    box.appendChild(icon);
+    row.appendChild(box);
+
+    row.appendChild(U.el('span', 'lib-name', I18N.t(spec.title)));
+    row.appendChild(U.el('span', 'lib-now', readingText(key, value)));
+    row.appendChild(U.el('span', 'lib-plus', '+'));
+    row.onclick = function () { addCard(key); };
+    return row;
+  }
+
+  /* oninput is the modern event; the reader's browser only fires onkeyup. */
+  function bindLibrarySearch() {
+    var input = U.$('#lib-search');
+    if (!input) { return; }
+    var redraw = function () { renderLibrary(); };
+    input.oninput = redraw;
+    input.onkeyup = redraw;
+    input.onchange = redraw;
+  }
+
+  function currentValue(key) {
+    var def = CARDS[key];
+    if (!def || !settings.lastData) { return null; }
+    var value = def.value(settings.lastData);
+    return (value === null || value === undefined || isNaN(value)) ? null : Number(value);
+  }
+
+  function readingText(key, value) {
+    var spec = Metrics.SPEC[key];
+    if (value === null) { return ''; }
+    var text = U.fmt(value, spec.decimals);
+    return spec.unit ? text + ' ' + I18N.t(spec.unit) : text;
   }
 
   function resetCards() {
@@ -988,8 +1125,10 @@
     U.$('#btn-reload').onclick = reloadPage;
     U.$('#btn-update').onclick = updateApp;
     U.$('#btn-edit').onclick = function () { setEditing(true); closeMenu(); };
-    U.$('#btn-edit-done').onclick = function () { setEditing(false); };
-    U.$('#btn-cards-reset').onclick = resetCards;
+    bindAll('.js-edit-done', function () { setEditing(false); });
+    bindAll('.js-cards-reset', resetCards);
+    U.$('#btn-library-close').onclick = closeLibrary;
+    bindLibrarySearch();
   }
 
   function registerWorker() {
@@ -1010,6 +1149,8 @@
     I18N.use(forced || settings.lang || I18N.detect());
     var themeParam = /[?&]theme=([a-z]+)/.exec(location.search);
     if (themeParam) { settings.theme = themeParam[1]; }
+    /* First run: no design remembered, so match the screen we are on. */
+    else if (!settings.theme) { Store.set({ theme: detectTheme() }); }
 
     applyLanguage(I18N.lang());
     tickClock();
