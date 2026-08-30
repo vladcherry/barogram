@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.30-2';
+  var APP_VERSION = '2026.08.30-3';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -164,7 +164,18 @@
   function setMenu(open) {
     if (open) { refreshPanelValues(); }
     U.$('#panel').hidden = !open;
-    U.$('#btn-menu').setAttribute('aria-expanded', open ? 'true' : 'false');
+    var button = U.$('#btn-menu');
+    button.setAttribute('aria-expanded', open ? 'true' : 'false');
+    /* The button carries both glyphs and shows one: open it with the bars,
+       close it with the ×, without a second control in the bar. An SVG element
+       has no hidden property, so the attribute is set by hand. */
+    showGlyph(U.$('#ico-menu'), !open);
+    showGlyph(U.$('#ico-close'), open);
+    setLabel(button, I18N.t(open ? 'ui.close' : 'ui.menu'));
+  }
+
+  function showGlyph(node, on) {
+    if (on) { node.removeAttribute('hidden'); } else { node.setAttribute('hidden', 'hidden'); }
   }
 
   function toggleMenu() { setMenu(U.$('#panel').hidden); }
@@ -215,6 +226,8 @@
     for (i = 0; i < labelled.length; i++) {
       setLabel(labelled[i], I18N.t(labelled[i].getAttribute('data-i18n-label')));
     }
+    /* The menu button says Close while the panel is open. */
+    setLabel(U.$('#btn-menu'), I18N.t(U.$('#panel').hidden ? 'ui.menu' : 'ui.close'));
     var placeholders = document.querySelectorAll('[data-i18n-placeholder]');
     for (i = 0; i < placeholders.length; i++) {
       placeholders[i].setAttribute('placeholder', I18N.t(placeholders[i].getAttribute('data-i18n-placeholder')));

@@ -39,12 +39,19 @@
     <!-- One button opens everything; its label lives in title/aria-label so it
          translates like the rest of the interface. -->
     <div class="tools">
-      <button class="btn btn-icon" id="btn-menu" type="button" aria-expanded="false"
+      <button class="btn btn-icon btn-menu" id="btn-menu" type="button" aria-expanded="false"
               data-i18n-label="ui.menu" title="Menu" aria-label="Menu">
-        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+        <!-- The middle stroke is short on purpose: it reads as a button rather
+             than as three anonymous lines. The × replaces it while the menu is
+             open, so the same button also closes it. -->
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" id="ico-menu">
           <line x1="4" y1="7" x2="20" y2="7"></line>
-          <line x1="4" y1="12" x2="20" y2="12"></line>
+          <line x1="4" y1="12" x2="15" y2="12"></line>
           <line x1="4" y1="17" x2="20" y2="17"></line>
+        </svg>
+        <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false" id="ico-close" hidden>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+          <line x1="18" y1="6" x2="6" y2="18"></line>
         </svg>
       </button>
     </div>

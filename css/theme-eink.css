@@ -99,3 +99,10 @@ body[data-theme="eink"] .sheet { background: #ffffff; color: #000000; }
 body[data-theme="eink"] .lib-row { border-bottom-color: #cccccc; }
 body[data-theme="eink"] .lib-group { color: #555555; }
 body[data-theme="eink"] .lib-now { color: #555555; }
+
+/* The menu button: black disc, white glyph; pressing it flips to white. */
+body[data-theme="eink"] .btn-menu {
+  background: #000; color: #fff; border-color: #000; border-radius: 50%;
+}
+body[data-theme="eink"] .btn-menu:active { background: #fff; color: #000; }
+body[data-theme="eink"] .btn-menu svg { width: 22px; height: 22px; stroke-width: 2.4; }

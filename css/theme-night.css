@@ -93,3 +93,9 @@ body[data-theme="night"] .sheet { background: #0b0f14; color: #e8eef5; }
 body[data-theme="night"] .lib-row { border-bottom-color: #1e2733; }
 body[data-theme="night"] .lib-group { color: #8ea0b5; }
 body[data-theme="night"] .lib-now { color: #8ea0b5; }
+
+body[data-theme="night"] .btn-menu {
+  background: #2f6bd8; color: #ffffff; border-color: #4d8dfd; border-radius: 50%;
+}
+body[data-theme="night"] .btn-menu:active { background: #4d8dfd; }
+body[data-theme="night"] .btn-menu svg { width: 22px; height: 22px; stroke-width: 2.2; }

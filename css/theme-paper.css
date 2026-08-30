@@ -105,3 +105,9 @@ body[data-theme="paper"] .sheet { background: #f6f3ec; color: #1d1b16; }
 body[data-theme="paper"] .lib-row { border-bottom-color: #ddd5c6; }
 body[data-theme="paper"] .lib-group { color: #6d6555; }
 body[data-theme="paper"] .lib-now { color: #6d6555; }
+
+body[data-theme="paper"] .btn-menu {
+  background: #1d1b16; color: #f6f3ec; border-color: #1d1b16; border-radius: 50%;
+}
+body[data-theme="paper"] .btn-menu:active { background: #3f3a30; }
+body[data-theme="paper"] .btn-menu svg { width: 22px; height: 22px; stroke-width: 2.2; }

@@ -7,7 +7,8 @@ A weather PWA for the **PocketBook Verse Pro Color** e-reader and for ordinary
 phones. Next to every number there is an intensity scale, so you see not just
 "6.2 m/s" but where that value sits between dead calm and a storm.
 
-Four designs ship with the app and are cycled with the grid icon in the top bar.
+Four designs ship with the app and are cycled from the menu — the filled disc
+on the right of the top bar, which turns into a × while the panel is open.
 
 | 1 · E-Ink | 2 · E-Ink Color | 3 · Night | 4 · Light |
 |---|---|---|---|

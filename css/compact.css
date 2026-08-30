@@ -31,6 +31,9 @@
   body[data-theme] .updated { font-size: 10px; }
   body[data-theme] .cond { font-size: 11px; }
   body[data-theme] .btn-icon svg { width: 20px; height: 20px; }
+  /* Doubled class, so this outranks the per-theme sizing of the same button. */
+  body[data-theme] .btn-menu.btn-icon { width: 38px; height: 38px; }
+  body[data-theme] .btn-menu.btn-icon svg { width: 20px; height: 20px; }
 
   body[data-theme] .cards { display: flex; flex-wrap: wrap; margin-top: 5px; }
   body[data-theme] .card {
@@ -81,6 +84,8 @@
   @media (max-height: 660px) {
     body[data-theme] .clock { font-size: 30px; }
     body[data-theme] .card-icon svg { width: 26px; height: 26px; }
+    body[data-theme] .btn-menu.btn-icon { width: 34px; height: 34px; }
+    body[data-theme] .btn-menu.btn-icon svg { width: 18px; height: 18px; }
     body[data-theme] .card { margin: 0 3px 3px 0; padding: 2px 5px 4px 5px; }
     body[data-theme] .seg { height: 7px; }
     body[data-theme] .scale { padding-top: 7px; }

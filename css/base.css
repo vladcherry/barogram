@@ -44,6 +44,15 @@ button, input { font-family: inherit; font-size: inherit; }
 }
 .input { flex: 1 1 160px; padding: 8px 10px; border-width: 2px; border-style: solid; }
 
+/* The menu button is the one solid shape in the header: a filled disc with the
+   glyph knocked out of it, so the only control on the screen is impossible to
+   miss and is a comfortable target on a reader. The middle stroke of the bars
+   is short, and the whole glyph becomes a × while the panel is open. */
+.btn-menu {
+  width: 42px; height: 42px; padding: 0; border-radius: 50%;
+  display: flex; align-items: center; justify-content: center;
+}
+
 /* Icon buttons in the top bar. Strokes follow the theme colour, so one icon
    set works on white paper and on the dark tiles alike. */
 .btn-icon { padding: 7px; line-height: 0; }

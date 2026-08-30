@@ -117,3 +117,9 @@ body[data-theme="tiles"] .lib-row { border-bottom-color: #000000; }
 body[data-theme="tiles"] .lib-group { color: #000000; }
 body[data-theme="tiles"] .lib-now { color: #444444; }
 body[data-theme="tiles"] .sheet-title { text-transform: uppercase; letter-spacing: 0.04em; }
+
+body[data-theme="tiles"] .btn-menu {
+  background: #000; color: #fff; border-color: #000; border-radius: 50%; padding: 0;
+}
+body[data-theme="tiles"] .btn-menu:active { background: #fff; color: #000; }
+body[data-theme="tiles"] .btn-menu svg { width: 22px; height: 22px; stroke-width: 2.4; }
