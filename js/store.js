@@ -5,6 +5,7 @@ var Store = (function () {
     theme: null,        /* null means: not chosen yet, pick one for the device */
     lang: null,
     lat: null, lon: null, place: '',
+    placeSource: null,  /* 'geo' — found by the device, 'city' — chosen by hand */
     lastData: null, lastTs: 0,
     background: false, keepScreen: false
   };

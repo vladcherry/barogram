@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.30-4';
+  var APP_VERSION = '2026.08.30-5';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -840,8 +840,12 @@
     });
   }
 
-  function setPlace(lat, lon, name) {
-    Store.set({ lat: lat, lon: lon, place: name || (U.fmt(lat, 2) + ', ' + U.fmt(lon, 2)) });
+  function setPlace(lat, lon, name, source) {
+    Store.set({
+      lat: lat, lon: lon,
+      place: name || (U.fmt(lat, 2) + ', ' + U.fmt(lon, 2)),
+      placeSource: source || 'city'
+    });
     U.setText(U.$('#place'), settings.place);
     refreshPanelValues();
     refresh();
@@ -1005,7 +1009,12 @@
   /* ---------- installing ----------
      Chromium hands us a real install prompt through beforeinstallprompt; Safari
      never will, so there the banner carries the Share → Add to Home Screen
-     instructions instead. Either way it appears once and can be dismissed. */
+     instructions instead. As long as the app is not installed the offer comes
+     back on every launch — installed is where the hourly wake-up and the
+     offline copy actually work — and "Later" puts it away until the next one. */
+
+  /* Dismissed for this run only: nothing about it is written down. */
+  var installHidden = false;
 
   function isInstalled() {
     if (window.matchMedia && window.matchMedia('(display-mode: standalone)').matches) { return true; }
@@ -1021,7 +1030,7 @@
 
   function showInstall(force) {
     if (isInstalled()) { return; }
-    if (!force && settings.installDismissed) { return; }
+    if (!force && installHidden) { return; }
     var text = installPrompt ? I18N.t('install.ready')
                              : (isIOS() ? I18N.t('install.ios') : I18N.t('install.other'));
     U.setText(U.$('#install-text'), text);
@@ -1029,9 +1038,9 @@
     U.$('#install').hidden = false;
   }
 
-  function hideInstall(remember) {
+  function hideInstall(forThisRun) {
     U.$('#install').hidden = true;
-    if (remember) { Store.set({ installDismissed: true }); }
+    if (forThisRun) { installHidden = true; }
   }
 
   function runInstallPrompt() {
@@ -1044,8 +1053,7 @@
       deferred.userChoice.then(function (choice) {
         if (choice && choice.outcome === 'accepted') {
           U.setText(U.$('#install-text'), I18N.t('install.done'));
-          Store.set({ installDismissed: true });
-          setTimeout(function () { hideInstall(false); }, 2500);
+          setTimeout(function () { hideInstall(true); }, 2500);
         } else {
           hideInstall(true);
         }
@@ -1066,8 +1074,7 @@
 
     window.addEventListener('appinstalled', function () {
       installPrompt = null;
-      Store.set({ installDismissed: true });
-      hideInstall(false);
+      hideInstall(true);
     }, false);
 
     /* Give the browser a moment to fire its own prompt before falling back to
@@ -1084,11 +1091,48 @@
     }
     setHint(I18N.t('hint.locating'));
     navigator.geolocation.getCurrentPosition(function (pos) {
-      setPlace(U.num(pos.coords.latitude, 4), U.num(pos.coords.longitude, 4), '');
+      setPlace(U.num(pos.coords.latitude, 4), U.num(pos.coords.longitude, 4), '', 'geo');
       setHint(I18N.t('hint.geoOk'));
     }, function (e) {
       setHint(I18N.t('hint.geoFailed', { err: (e && e.message) ? e.message : 'error' }));
     }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 });
+  }
+
+  /* Every launch asks the device where it is, so a phone that travelled shows
+     the weather where it woke up. A place typed in by hand is left alone — that
+     is a deliberate choice, not a guess — and a refusal costs nothing: the
+     browser remembers it and answers without asking again. Anything closer than
+     a couple of kilometres counts as the same place and the cached reading
+     stands. */
+  var SAME_PLACE_KM = 2;
+
+  function autoLocate() {
+    if (demoMode || !navigator.geolocation) { return; }
+    if (settings.lat !== null && settings.placeSource === 'city') { return; }
+
+    var known = settings.lat !== null && settings.lon !== null;
+    if (!known) { setHint(I18N.t('hint.locating')); }
+
+    navigator.geolocation.getCurrentPosition(function (pos) {
+      var lat = U.num(pos.coords.latitude, 4);
+      var lon = U.num(pos.coords.longitude, 4);
+      if (known && distanceKm(settings.lat, settings.lon, lat, lon) < SAME_PLACE_KM) {
+        Store.set({ placeSource: 'geo' });
+        return;
+      }
+      setPlace(lat, lon, '', 'geo');
+      if (!known) { setHint(I18N.t('hint.geoOk')); closeMenu(); }
+    }, function () {
+      /* Refused, or no fix: whatever place is already stored still stands. */
+      if (!known) { setHint(I18N.t('hint.pickPlace')); }
+    }, { enableHighAccuracy: false, timeout: 15000, maximumAge: 600000 });
+  }
+
+  /* Flat-earth arithmetic, and quite enough to tell one town from the next. */
+  function distanceKm(lat1, lon1, lat2, lon2) {
+    var dLat = (lat2 - lat1) * 111;
+    var dLon = (lon2 - lon1) * 111 * Math.cos((lat1 + lat2) / 2 * Math.PI / 180);
+    return Math.sqrt(dLat * dLat + dLon * dLon);
   }
 
   function searchCity() {
@@ -1122,7 +1166,7 @@
     var button = U.el('button', 'btn btn-found', label);
     button.type = 'button';
     button.onclick = function () {
-      setPlace(U.num(result.latitude, 4), U.num(result.longitude, 4), result.name);
+      setPlace(U.num(result.latitude, 4), U.num(result.longitude, 4), result.name, 'city');
       U.clear(list);
       setHint(I18N.t('hint.placeSet', { name: result.name }));
       closeMenu();
@@ -1186,6 +1230,8 @@
       setHint(I18N.t('hint.pickPlace'));
       setStatus(I18N.t('status.noPlace'));
     }
+    /* The cached reading is already on screen; the fix arrives when it arrives. */
+    autoLocate();
 
     scheduleHourlyRefresh();
 

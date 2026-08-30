@@ -138,9 +138,16 @@ barogram of the past 24 hours.
 Marine and air-quality data are both optional: neither is allowed to block the
 forecast if the endpoint has nothing for that point.
 
-The place comes either from the Geolocation API ("My location") or from the city
-search. Coordinates and the last weather snapshot are kept in `localStorage`, so
-the app opens with data even with no network.
+The place comes either from the Geolocation API or from the city search, and
+every launch asks the device where it is: a phone that travelled shows the
+weather where it woke up without being told. The cached reading is on screen
+first — the fix is applied when it arrives, and only if it is more than two
+kilometres from the stored point. A place chosen by hand in the city search is
+never overwritten, and a refused permission costs nothing, since the browser
+answers from its own memory. *My location* in the menu asks again on demand.
+
+Coordinates, where they came from and the last weather snapshot are kept in
+`localStorage`, so the app opens with data even with no network.
 
 ## Hourly updates, minute-accurate clock
 
@@ -211,8 +218,10 @@ remembered. Dates, weekday names and the compass points are localised too.
 The app asks to be installed itself: on Chromium it catches the browser's own
 install prompt and offers an *Install* button, and where no such prompt exists —
 Safari, most of all — the same banner carries the Share → Add to Home Screen
-instructions instead. *Later* dismisses it for good; the menu's *Install app*
-brings it back. The banner floats over the cards rather than sitting in the
+instructions instead. As long as the app is not installed the offer comes back
+on every launch — installed is where the hourly wake-up and the offline copy
+actually work — and *Later* puts it away until the next one. The menu's *Install
+app* brings it back at any time. The banner floats over the cards rather than sitting in the
 flow, which would push the last row off a short screen.
 
 **iPhone / iPad.** Open https://vladcherry.github.io/barogram/ **in Safari** —
