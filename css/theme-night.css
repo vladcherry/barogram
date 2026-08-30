@@ -78,3 +78,13 @@ body[data-theme="night"] .lv-bad-text  { color: #ff8574; }
 body[data-theme="night"] .lv-crit-text { color: #ff6b5c; }
 
 body[data-theme="night"] .install { border-color: #26313d; background: #131a22; border-radius: 14px; font-size: 13px; }
+
+body[data-theme="night"] .sec { border-color: #26313d; border-radius: 14px; background: #141b23; overflow: hidden; }
+body[data-theme="night"] .row { border-bottom-color: #1e2733; }
+body[data-theme="night"] .sec-title { color: #7f93a8; }
+body[data-theme="night"] .row-val { color: #8ea0b5; }
+body[data-theme="night"] .row-chev { color: #5f7186; }
+body[data-theme="night"] .switch { border-color: #2f3c4a; background: #1b232d; }
+body[data-theme="night"] .switch i { border-color: #3a4756; background: #8ea0b5; }
+body[data-theme="night"] .switch.is-on { background: #2f6bd8; border-color: #4d8dfd; }
+body[data-theme="night"] .switch.is-on i { background: #ffffff; border-color: #4d8dfd; }

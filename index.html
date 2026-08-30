@@ -60,32 +60,81 @@
     </div>
   </div>
 
+  <!-- Settings as grouped rows: name on the left, current value or a switch on
+       the right, so every setting reads without being opened. -->
   <div class="panel" id="panel" hidden>
-    <!-- Design row is built in app.js: one button per design, active one marked. -->
-    <div class="panel-row" id="design-row"></div>
-    <div class="panel-row">
-      <button class="btn" id="btn-refresh" type="button" data-i18n="ui.refresh">Refresh</button>
-      <button class="btn" id="btn-edit" type="button" data-i18n="ui.edit">Edit cards</button>
-      <button class="btn" id="btn-geo" type="button" data-i18n="ui.myLocation">My location</button>
-      <button class="btn" id="btn-background" type="button">Background updates</button>
-      <button class="btn" id="btn-screen" type="button">Keep screen on</button>
-      <button class="btn" id="btn-language" type="button">Language</button>
+
+    <h3 class="sec-title" data-i18n="ui.secView">Appearance</h3>
+    <div class="sec">
+      <div class="row row-block">
+        <span class="row-name" data-i18n="ui.designs">Design</span>
+        <div class="choices" id="design-row"></div>
+      </div>
+      <button class="row" id="btn-language" type="button">
+        <span class="row-name" data-i18n="ui.language">Language</span>
+        <span class="row-val" id="val-language"></span>
+        <span class="row-chev" aria-hidden="true">›</span>
+      </button>
+      <button class="row" id="btn-edit" type="button">
+        <span class="row-name" data-i18n="ui.cardsCount">Cards on screen</span>
+        <span class="row-val" id="val-cards"></span>
+        <span class="row-chev" aria-hidden="true">›</span>
+      </button>
     </div>
-    <!-- In full-screen browsers there is no address bar, so the app has to
-         offer the page reload and the version update itself. -->
-    <div class="panel-row">
-      <button class="btn" id="btn-reload" type="button" data-i18n="ui.reload">Reload page</button>
-      <button class="btn" id="btn-update" type="button" data-i18n="ui.update">Update app</button>
-      <button class="btn" id="btn-install-help" type="button" data-i18n="ui.installHelp">Install app</button>
-      <span class="version" id="version"></span>
+
+    <h3 class="sec-title" data-i18n="ui.secPlace">Place</h3>
+    <div class="sec">
+      <div class="row">
+        <span class="row-name" id="val-place"></span>
+        <span class="row-val" id="val-coords"></span>
+      </div>
+      <button class="row" id="btn-geo" type="button">
+        <span class="row-name" data-i18n="ui.myLocation">My location</span>
+        <span class="row-chev" aria-hidden="true">›</span>
+      </button>
+      <div class="row row-block">
+        <div class="row-search">
+          <input class="input" id="city-input" type="text"
+                 data-i18n-placeholder="ui.cityPlaceholder" placeholder="City (for example, Odesa)">
+          <button class="btn" id="btn-city" type="button" data-i18n="ui.find">Find</button>
+        </div>
+        <ul class="found" id="found"></ul>
+      </div>
     </div>
-    <div class="panel-row">
-      <input class="input" id="city-input" type="text"
-             data-i18n-placeholder="ui.cityPlaceholder" placeholder="City (for example, Odesa)">
-      <button class="btn" id="btn-city" type="button" data-i18n="ui.find">Find</button>
+
+    <h3 class="sec-title" data-i18n="ui.secUpdate">Updates</h3>
+    <div class="sec">
+      <button class="row" id="btn-background" type="button" aria-pressed="false">
+        <span class="row-name" data-i18n="ui.background">Background updates</span>
+        <span class="switch" id="sw-background" aria-hidden="true"><i></i></span>
+      </button>
+      <button class="row" id="btn-screen" type="button" aria-pressed="false">
+        <span class="row-name" data-i18n="ui.keepScreen">Keep screen on</span>
+        <span class="switch" id="sw-screen" aria-hidden="true"><i></i></span>
+      </button>
+      <button class="row" id="btn-refresh" type="button">
+        <span class="row-name" data-i18n="ui.refresh">Refresh</span>
+        <span class="row-val" id="val-updated"></span>
+      </button>
     </div>
-    <div class="panel-row"><ul class="found" id="found"></ul></div>
-    <div class="panel-row"><p class="hint" id="hint"></p></div>
+
+    <h3 class="sec-title" data-i18n="ui.secApp">App</h3>
+    <div class="sec">
+      <button class="row" id="btn-install-help" type="button">
+        <span class="row-name" data-i18n="ui.installHelp">Install app</span>
+        <span class="row-chev" aria-hidden="true">›</span>
+      </button>
+      <button class="row" id="btn-reload" type="button">
+        <span class="row-name" data-i18n="ui.reload">Reload page</span>
+        <span class="row-chev" aria-hidden="true">›</span>
+      </button>
+      <button class="row" id="btn-update" type="button">
+        <span class="row-name" data-i18n="ui.update">Update app</span>
+        <span class="row-val version" id="version"></span>
+      </button>
+    </div>
+
+    <p class="hint" id="hint"></p>
   </div>
 
   <!-- Shown only while the card editor is open. -->

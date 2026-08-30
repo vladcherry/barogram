@@ -90,3 +90,13 @@ body[data-theme="paper"] .lv-bad-text  { color: #a83f2c; }
 body[data-theme="paper"] .lv-crit-text { color: #6f2320; }
 
 body[data-theme="paper"] .install { border-width: 1px; border-color: #cfc7b6; background: #fffdf8; border-radius: 6px; font-size: 13px; }
+
+body[data-theme="paper"] .sec { border-color: #cfc7b6; border-radius: 8px; background: #fffdf8; overflow: hidden; }
+body[data-theme="paper"] .row { border-bottom-color: #eee7db; }
+body[data-theme="paper"] .sec-title { color: #8b8271; }
+body[data-theme="paper"] .row-val { color: #6d6553; }
+body[data-theme="paper"] .row-chev { color: #8b8271; }
+body[data-theme="paper"] .switch { border-color: #b9b0a0; background: #ece6da; }
+body[data-theme="paper"] .switch i { border-color: #b9b0a0; background: #fffdf8; }
+body[data-theme="paper"] .switch.is-on { background: #3f7f4b; border-color: #3f7f4b; }
+body[data-theme="paper"] .switch.is-on i { background: #ffffff; border-color: #3f7f4b; }

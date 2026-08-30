@@ -46,11 +46,14 @@ ties so the page still scrolls, and swipes that start inside the open menu are
 left to its buttons.
 
 The top bar holds the clock and a single hamburger button, so the readings get
-the rest of the screen. It opens the menu, which carries everything: one button
-per design with the current one marked (picking directly beats cycling through
-four full-screen e-ink repaints), refresh, location and city search, the
-background and wake-lock toggles, and the language switch. Picking a design,
-refreshing or choosing a city closes the menu again.
+the rest of the screen. It opens the settings, grouped into four sections —
+Appearance, Place, Updates, App — where every setting is a full-width row with
+its name on the left and its current value or a switch on the right, so the
+panel can be read without opening anything: which language is on, how many cards
+are on screen, where the place is, how long ago the weather came in, which build
+is running. Design is picked directly from a row of four buttons rather than
+cycled, because cycling means four full-screen e-ink repaints to reach the last
+one. Picking a design, refreshing or choosing a city closes the panel again.
 
 A full-screen browser (the way a reader is usually set up) hides its own address
 bar and reload button, so the menu carries them instead: *Reload page* reloads,

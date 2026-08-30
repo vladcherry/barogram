@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.29-15';
+  var APP_VERSION = '2026.08.30-1';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -50,7 +50,6 @@
     var row = U.$('#design-row');
     if (!row) { return; }
     U.clear(row);
-    row.appendChild(U.el('span', 'menu-label', I18N.t('ui.designs')));
     for (var i = 0; i < THEMES.length; i++) {
       row.appendChild(designButton(THEMES[i]));
     }
@@ -126,6 +125,7 @@
   /* ---------- menu ---------- */
 
   function setMenu(open) {
+    if (open) { refreshPanelValues(); }
     U.$('#panel').hidden = !open;
     U.$('#btn-menu').setAttribute('aria-expanded', open ? 'true' : 'false');
   }
@@ -144,14 +144,14 @@
     applyTheme(settings.theme);
     updateBackgroundButton();
     updateScreenButton();
-    U.setText(U.$('#btn-language'), I18N.t('ui.language', { name: I18N.t('lang.' + active) }));
     buildDesignRow();
+    refreshPanelValues();
+    setHint('');
     if (!U.$('#install').hidden) { showInstall(true); }
     if (editing) {
       U.setText(U.$('#edit-hint'), I18N.t('hint.editMode'));
       renderLibrary();
     }
-    U.setText(U.$('#version'), I18N.t('ui.version', { v: APP_VERSION }));
     U.setText(U.$('#place'), settings.place || I18N.t(demoMode ? 'ui.demoPlace' : 'ui.noPlace'));
     U.setText(U.$('#date'), U.dateText(new Date()));
     U.setText(U.$('#updated'), U.agoText(settings.lastTs));
@@ -182,6 +182,19 @@
     for (i = 0; i < placeholders.length; i++) {
       placeholders[i].setAttribute('placeholder', I18N.t(placeholders[i].getAttribute('data-i18n-placeholder')));
     }
+  }
+
+  /* Every row shows its current value, so the panel reads without being poked. */
+  function refreshPanelValues() {
+    U.setText(U.$('#val-language'), I18N.t('lang.' + I18N.lang()));
+    U.setText(U.$('#val-cards'), String(cardList().length));
+    U.setText(U.$('#val-place'), settings.place || I18N.t('ui.noPlace'));
+    U.setText(U.$('#val-coords'),
+      settings.lat === null ? '' : (U.fmt(settings.lat, 2) + ', ' + U.fmt(settings.lon, 2)));
+    U.setText(U.$('#val-updated'), U.agoText(settings.lastTs));
+    U.setText(U.$('#version'), APP_VERSION);
+    updateBackgroundButton();
+    updateScreenButton();
   }
 
   /* ---------- clock ---------- */
@@ -662,6 +675,7 @@
       render(data);
       U.setText(U.$('#updated'), U.agoText(settings.lastTs));
       setStatus(I18N.t('status.ok'));
+      refreshPanelValues();
       pushConfigToWorker();
     }, function (err) {
       refreshing = false;
@@ -672,6 +686,7 @@
   function setPlace(lat, lon, name) {
     Store.set({ lat: lat, lon: lon, place: name || (U.fmt(lat, 2) + ', ' + U.fmt(lon, 2)) });
     U.setText(U.$('#place'), settings.place);
+    refreshPanelValues();
     refresh();
   }
 
@@ -706,14 +721,20 @@
     });
   }
 
+  /* The switch carries the state now, so the row keeps its plain name. */
+  function setSwitch(switchId, buttonId, on) {
+    var knob = U.$(switchId);
+    if (knob) { knob.className = on ? 'switch is-on' : 'switch'; }
+    var button = U.$(buttonId);
+    if (button) { button.setAttribute('aria-pressed', on ? 'true' : 'false'); }
+  }
+
   function updateBackgroundButton() {
-    U.setText(U.$('#btn-background'),
-      I18N.t('ui.background', { state: I18N.t(settings.background ? 'ui.on' : 'ui.off') }));
+    setSwitch('#sw-background', '#btn-background', !!settings.background);
   }
 
   function updateScreenButton() {
-    U.setText(U.$('#btn-screen'),
-      I18N.t('ui.keepScreen', { state: I18N.t(screenLock ? 'ui.on' : 'ui.off') }));
+    setSwitch('#sw-screen', '#btn-screen', !!screenLock);
   }
 
   function toggleBackground() {

@@ -83,3 +83,13 @@ body[data-theme="eink"] .spark-bar.lv-crit { background: #6f1010; }
 body[data-theme="eink"] .card-band { color: #000; }
 
 body[data-theme="eink"] .install { background: #ffffff; border-color: #000; font-size: 14px; }
+
+/* Settings rows: heavy rules, black on white, nothing subtle to lose on e-ink. */
+body[data-theme="eink"] .sec { border-color: #000; border-width: 3px; }
+body[data-theme="eink"] .row { border-bottom-color: #000; border-bottom-width: 2px; font-size: 16px; }
+body[data-theme="eink"] .sec-title { color: #000; }
+body[data-theme="eink"] .row-val, body[data-theme="eink"] .row-chev { font-size: 14px; }
+body[data-theme="eink"] .switch { border-color: #000; border-width: 2px; background: #fff; }
+body[data-theme="eink"] .switch i { border-color: #000; background: #fff; }
+body[data-theme="eink"] .switch.is-on { background: #000; }
+body[data-theme="eink"] .switch.is-on i { background: #fff; }

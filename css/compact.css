@@ -74,6 +74,8 @@
   body[data-theme="eink"] .card { border-width: 2px; }
 
   body[data-theme] .footbar { font-size: 10px; }
+  body[data-theme] .row { padding: 9px 10px; }
+  body[data-theme] .sec-title { margin: 10px 2px 4px 2px; }
 
   /* Short screens need one more notch of density to clear the fold. */
   @media (max-height: 660px) {
