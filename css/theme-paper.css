@@ -128,3 +128,8 @@ body[data-theme="paper"] .act-done {
 body[data-theme="paper"] .act-reset { margin-left: -1px; border-top-left-radius: 0; border-bottom-left-radius: 0; }
 body[data-theme="paper"] .act-done:active { background: #3f3a30; }
 body[data-theme="paper"] .act-reset:active { background: #ece6da; }
+
+/* Editor: the removal badge on the corner of a card. */
+body[data-theme="paper"] .card-del { background: #a83f2c; border-color: #fffdf8; color: #ffffff; }
+body[data-theme="paper"] .card-del:active { background: #ffffff; color: #a83f2c; }
+body[data-theme="paper"] .btn-move:active { opacity: 0.5; }

@@ -195,9 +195,10 @@ and Escape (or ×) closes the sheet.
 
 ## Rearranging the cards
 
-Hold any card and the screen becomes an editor: drag a card to move it, use the
-arrows if dragging on e-ink is being uncooperative, × removes a card and + opens
-the library. *Default set* restores the ten cards the app ships with, *Done*
+Hold any card and the screen becomes an editor: each card grows a grab handle
+across its foot with an arrow at either end — dragging on e-ink is a lottery, so
+the arrows stay — and a round × on its corner, half off the card, where it
+cannot be hit while reaching for something else. The wide bar opens the library. *Default set* restores the ten cards the app ships with, *Done*
 leaves the editor. The two of them are one strip the width of the grid — *Done*
 filled and the wider half, *Defaults* the outline beside it — and it sits above
 the grid and again below it, as does the full-width *Add a card* bar, so nothing

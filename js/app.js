@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.30-7';
+  var APP_VERSION = '2026.08.30-8';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -498,7 +498,10 @@
       icon: iconFor(key, value, w)
     });
     if (def.spark) { appendSpark(card, w[def.spark.series], spec, def.spark.caption); }
-    if (editing) { card.appendChild(editControls(key)); }
+    if (editing) {
+      card.appendChild(editControls(key));
+      card.appendChild(deleteBadge(key));
+    }
     return card;
   }
 
@@ -537,17 +540,31 @@
      buttons do the same job as dragging, because dragging on electronic ink is
      a lottery. */
 
+  /* The card in the editor: a grab handle across the foot with an arrow at each
+     end — dragging on electronic ink is a lottery, so the arrows stay — and the
+     removal on the corner, as a badge, where it cannot be hit by accident. */
   function editControls(key) {
     var box = U.el('div', 'card-edit');
-    box.appendChild(editButton('‹', 'ui.moveLeft', function () { moveCard(key, -1); }));
-    box.appendChild(editButton('×', 'ui.removeCard', function () { removeCard(key); }));
-    box.appendChild(editButton('›', 'ui.moveRight', function () { moveCard(key, 1); }));
+    box.appendChild(editButton(Icons.chevron(-1), 'ui.moveLeft', 'btn-move',
+      function () { moveCard(key, -1); }));
+    var grip = U.el('span', 'card-grip');
+    grip.appendChild(Icons.grip());
+    box.appendChild(grip);
+    box.appendChild(editButton(Icons.chevron(1), 'ui.moveRight', 'btn-move',
+      function () { moveCard(key, 1); }));
     return box;
   }
 
-  function editButton(glyph, labelKey, onClick) {
-    var button = U.el('button', 'btn btn-edit', glyph);
+  function deleteBadge(key) {
+    return editButton(Icons.cross(), 'ui.removeCard', 'card-del',
+      function () { removeCard(key); });
+  }
+
+  function editButton(glyph, labelKey, cls, onClick) {
+    var button = U.el('button', cls);
     button.type = 'button';
+    glyph.setAttribute('class', 'edit-ico');
+    button.appendChild(glyph);
     setLabel(button, I18N.t(labelKey));
     button.onclick = function (e) {
       if (e && e.stopPropagation) { e.stopPropagation(); }

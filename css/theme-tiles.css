@@ -150,3 +150,8 @@ body[data-theme="tiles"] .act { border-color: #000; color: #000; }
 body[data-theme="tiles"] .act-done { background: #000; color: #fff; }
 body[data-theme="tiles"] .act-done:active { background: #fff; color: #000; }
 body[data-theme="tiles"] .act-reset:active { background: #000; color: #fff; }
+
+/* Editor: the removal badge on the corner of a card. */
+body[data-theme="tiles"] .card-del { background: #c8341f; border-color: #000000; color: #ffffff; }
+body[data-theme="tiles"] .card-del:active { background: #ffffff; color: #c8341f; }
+body[data-theme="tiles"] .btn-move:active { opacity: 0.5; }
