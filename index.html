@@ -147,16 +147,42 @@
   <!-- Shown only while the card editor is open, and repeated under the grid so
        the controls are in reach whichever end of a long screen you are at. -->
   <div class="editbar" hidden>
-    <button class="btn js-edit-done" type="button" data-i18n="ui.editDone">Done</button>
-    <button class="btn js-cards-reset" type="button" data-i18n="ui.resetCards">Default set</button>
+    <div class="editbar-actions">
+      <button class="act act-done js-edit-done" type="button">
+        <svg class="act-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <polyline points="5,13 10,18 19,6"></polyline>
+        </svg>
+        <span data-i18n="ui.editDone">Done</span>
+      </button>
+      <button class="act act-reset js-cards-reset" type="button">
+        <svg class="act-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 12a8 8 0 1 1 2.5 5.8"></path>
+          <polyline points="4,5 4,11 10,11"></polyline>
+        </svg>
+        <span data-i18n="ui.resetCards">Default set</span>
+      </button>
+    </div>
     <span class="hint edit-hint"></span>
   </div>
 
   <main class="cards" id="cards"></main>
 
   <div class="editbar editbar-bottom" hidden>
-    <button class="btn js-edit-done" type="button" data-i18n="ui.editDone">Done</button>
-    <button class="btn js-cards-reset" type="button" data-i18n="ui.resetCards">Default set</button>
+    <div class="editbar-actions">
+      <button class="act act-done js-edit-done" type="button">
+        <svg class="act-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <polyline points="5,13 10,18 19,6"></polyline>
+        </svg>
+        <span data-i18n="ui.editDone">Done</span>
+      </button>
+      <button class="act act-reset js-cards-reset" type="button">
+        <svg class="act-ico" viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+          <path d="M4 12a8 8 0 1 1 2.5 5.8"></path>
+          <polyline points="4,5 4,11 10,11"></polyline>
+        </svg>
+        <span data-i18n="ui.resetCards">Default set</span>
+      </button>
+    </div>
     <span class="hint edit-hint"></span>
   </div>
 

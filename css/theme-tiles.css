@@ -146,3 +146,7 @@ body[data-theme="tiles"] .sheet .seg-on.lv-bad  { background: #c8341f; }
 body[data-theme="tiles"] .sheet .seg-on.lv-crit { background: #6f1010; }
 body[data-theme="tiles"] .sheet .scale-marker { border-top-color: #000; }
 
+body[data-theme="tiles"] .act { border-color: #000; color: #000; }
+body[data-theme="tiles"] .act-done { background: #000; color: #fff; }
+body[data-theme="tiles"] .act-done:active { background: #fff; color: #000; }
+body[data-theme="tiles"] .act-reset:active { background: #000; color: #fff; }

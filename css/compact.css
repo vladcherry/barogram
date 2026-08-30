@@ -80,6 +80,13 @@
   body[data-theme="paper"] .card { border-left-width: 3px; padding-left: 7px; }
   body[data-theme="eink"] .card { border-width: 2px; }
 
+  body[data-theme] .act { padding: 10px 6px; font-size: 13px; }
+  body[data-theme] .act-ico { width: 15px; height: 15px; margin-right: 6px; }
+  /* On the narrowest phones the words need the room the second icon takes: the
+     word is what has to survive, the arrow is decoration beside it. */
+  @media (max-width: 360px) {
+    body[data-theme] .act-reset .act-ico { display: none; }
+  }
   body[data-theme] .footbar { font-size: 10px; }
   body[data-theme] .row { padding: 9px 10px; }
   body[data-theme] .sec-title { margin: 10px 2px 4px 2px; }

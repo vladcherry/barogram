@@ -119,3 +119,12 @@ body[data-theme="paper"] .det-row, body[data-theme="paper"] .det-field { border-
 body[data-theme="paper"] .det-field, body[data-theme="paper"] .det-note,
 body[data-theme="paper"] .det-row-val { color: #6d6555; }
 body[data-theme="paper"] .det-src { border-top-color: #cfc7b6; }
+
+body[data-theme="paper"] .act { border-width: 1px; border-color: #b9b0a0; color: #2c2820; border-radius: 8px; }
+body[data-theme="paper"] .act-done {
+  background: #1d1b16; border-color: #1d1b16; color: #f6f3ec;
+  border-top-right-radius: 0; border-bottom-right-radius: 0;
+}
+body[data-theme="paper"] .act-reset { margin-left: -1px; border-top-left-radius: 0; border-bottom-left-radius: 0; }
+body[data-theme="paper"] .act-done:active { background: #3f3a30; }
+body[data-theme="paper"] .act-reset:active { background: #ece6da; }

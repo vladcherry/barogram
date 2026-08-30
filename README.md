@@ -198,9 +198,10 @@ and Escape (or ×) closes the sheet.
 Hold any card and the screen becomes an editor: drag a card to move it, use the
 arrows if dragging on e-ink is being uncooperative, × removes a card and + opens
 the library. *Default set* restores the ten cards the app ships with, *Done*
-leaves the editor. Both buttons sit above the grid and again below it, and so
-does the full-width *Add a card* bar, so nothing has to be scrolled to at either
-end of a long screen. The set and its order live in
+leaves the editor. The two of them are one strip the width of the grid — *Done*
+filled and the wider half, *Defaults* the outline beside it — and it sits above
+the grid and again below it, as does the full-width *Add a card* bar, so nothing
+has to be scrolled to at either end of a long screen. The set and its order live in
 `localStorage`, so the screen comes back the way it was left. The editor is also
 reachable from the menu, and design swipes are suspended while it is open.
 

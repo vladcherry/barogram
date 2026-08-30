@@ -115,3 +115,9 @@ body[data-theme="eink"] .det-row, body[data-theme="eink"] .det-field { border-bo
 body[data-theme="eink"] .det-field, body[data-theme="eink"] .det-note,
 body[data-theme="eink"] .det-row-val { color: #555555; }
 body[data-theme="eink"] .det-src { border-top-color: #000000; }
+
+/* The editor strip: square, like everything else in this design. */
+body[data-theme="eink"] .act { border-color: #000; color: #000; }
+body[data-theme="eink"] .act-done { background: #000; color: #fff; }
+body[data-theme="eink"] .act-done:active { background: #fff; color: #000; }
+body[data-theme="eink"] .act-reset:active { background: #000; color: #fff; }

@@ -108,3 +108,12 @@ body[data-theme="night"] .det-row, body[data-theme="night"] .det-field { border-
 body[data-theme="night"] .det-field, body[data-theme="night"] .det-note,
 body[data-theme="night"] .det-row-val { color: #8ea0b5; }
 body[data-theme="night"] .det-src { border-top-color: #26313d; }
+
+body[data-theme="night"] .act { border-color: #26313d; color: #cfe0f0; border-radius: 14px; }
+body[data-theme="night"] .act-done {
+  background: #2f6bd8; border-color: #4d8dfd; color: #ffffff;
+  border-top-right-radius: 0; border-bottom-right-radius: 0;
+}
+body[data-theme="night"] .act-reset { border-top-left-radius: 0; border-bottom-left-radius: 0; }
+body[data-theme="night"] .act-done:active { background: #4d8dfd; }
+body[data-theme="night"] .act-reset:active { background: #1b232d; }

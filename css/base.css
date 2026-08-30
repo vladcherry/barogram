@@ -189,10 +189,30 @@ button, input { font-family: inherit; font-size: inherit; }
 
 /* ---- card editor ---- */
 /* The bar is on screen twice, above and below the grid, so the controls are in
-   reach at either end; the explanation is printed once, at the top. */
+   reach at either end; the explanation is printed once, at the top.
+   The two actions are one strip the width of the grid: Done carries the weight
+   and the fill, Default set is the narrower outline beside it. */
 .editbar { display: flex; flex-wrap: wrap; align-items: center; margin-top: 8px; }
-.editbar .hint { flex: 1 1 200px; margin-left: 8px; }
+.editbar .hint { flex: 1 1 100%; margin: 4px 2px 0 2px; }
 .editbar-bottom .edit-hint { display: none; }
+.editbar-actions { display: flex; width: 100%; }
+.act {
+  display: flex; align-items: center; justify-content: center;
+  flex: 1 1 0; min-width: 0; margin: 0; padding: 11px 8px;
+  border-width: 2px; border-style: solid; background: transparent;
+  font: inherit; font-weight: 700; font-size: 14px; color: inherit;
+  -webkit-appearance: none; appearance: none; cursor: pointer;
+}
+/* Done is the one you reach for, so it is the wider half. The basis is zero on
+   purpose: the halves are sized by the ratio, not by how long their words are. */
+.act-done { flex: 1.35 1 0; }
+/* Pulled onto its neighbour, so the two borders read as one line. */
+.act-reset { margin-left: -2px; }
+.act-ico {
+  flex: 0 0 auto; width: 16px; height: 16px; margin-right: 7px;
+  fill: none; stroke: currentColor; stroke-width: 2.2;
+  stroke-linecap: round; stroke-linejoin: round;
+}
 /* The library sheet: a full-screen layer with its own scroll, so the list never
    starts below the fold and the card grid underneath does not move. */
 .sheet {
