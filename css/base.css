@@ -233,9 +233,16 @@ button, input { font-family: inherit; font-size: inherit; }
 .card-edit { display: flex; justify-content: space-between; margin-top: 6px; }
 .btn-edit { flex: 1 1 auto; margin: 0 3px 0 0; padding: 4px 0; text-align: center; font-weight: 700; }
 .btn-edit:last-child { margin-right: 0; }
-.card-add { display: flex; flex-direction: column; align-items: center; justify-content: center; }
-.btn-add { font-size: 26px; line-height: 1; padding: 4px 14px; margin: 0; }
-.card-add-label { margin-top: 4px; font-size: 12px; text-align: center; }
+/* The add bar spans the whole row and the button fills it, so the card's own
+   frame is the only frame and the entire strip is the target. */
+.card-add { display: flex; padding: 0; }
+.btn-add {
+  display: flex; align-items: center; justify-content: center;
+  width: 100%; margin: 0; border: 0; padding: 13px 0;
+  font-weight: 700; text-align: center;
+}
+.btn-add-plus { font-size: 24px; line-height: 1; margin-right: 8px; }
+.btn-add-label { font-size: 16px; }
 /* While editing, cards are handles: no text selection, no long-press callout. */
 body[data-editing="1"] .card {
   -webkit-user-select: none; user-select: none; -webkit-touch-callout: none;

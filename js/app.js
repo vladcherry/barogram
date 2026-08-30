@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.30-3';
+  var APP_VERSION = '2026.08.30-4';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -512,6 +512,10 @@
 
     U.setText(U.$('#cond'), U.wmoText(w.code));
 
+    /* In the editor the add bar frames the grid, top and bottom, so it is in
+       reach without scrolling past every card first. */
+    if (editing) { host.appendChild(addCardTile()); }
+
     var list = cardList(), i, card;
     for (i = 0; i < list.length; i++) {
       card = buildCard(list[i], w);
@@ -549,14 +553,17 @@
     return button;
   }
 
+  /* One wide bar rather than a tile the size of a card: it is the way out of the
+     editor into the library, and on a reader it has to be hittable. */
   function addCardTile() {
     var tile = U.el('article', 'card card-add');
-    var button = U.el('button', 'btn btn-add', '+');
+    var button = U.el('button', 'btn btn-add');
     button.type = 'button';
+    button.appendChild(U.el('span', 'btn-add-plus', '+'));
+    button.appendChild(U.el('span', 'btn-add-label', I18N.t('ui.library')));
     setLabel(button, I18N.t('ui.library'));
     button.onclick = openLibrary;
     tile.appendChild(button);
-    tile.appendChild(U.el('div', 'card-add-label', I18N.t('ui.library')));
     return tile;
   }
 

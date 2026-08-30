@@ -99,3 +99,6 @@ body[data-theme="night"] .btn-menu {
 }
 body[data-theme="night"] .btn-menu:active { background: #4d8dfd; }
 body[data-theme="night"] .btn-menu svg { width: 22px; height: 22px; stroke-width: 2.2; }
+
+body[data-theme="night"] .card-add { flex: 1 1 100%; max-width: 100%; padding: 0; }
+body[data-theme="night"] .btn-add { border-radius: 18px; color: #cfe0f0; }

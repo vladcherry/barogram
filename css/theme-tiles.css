@@ -123,3 +123,5 @@ body[data-theme="tiles"] .btn-menu {
 }
 body[data-theme="tiles"] .btn-menu:active { background: #fff; color: #000; }
 body[data-theme="tiles"] .btn-menu svg { width: 22px; height: 22px; stroke-width: 2.4; }
+
+body[data-theme="tiles"] .card-add { flex: 1 1 100%; max-width: 100%; padding: 0; }

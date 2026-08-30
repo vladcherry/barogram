@@ -106,3 +106,6 @@ body[data-theme="eink"] .btn-menu {
 }
 body[data-theme="eink"] .btn-menu:active { background: #fff; color: #000; }
 body[data-theme="eink"] .btn-menu svg { width: 22px; height: 22px; stroke-width: 2.4; }
+
+/* The add bar takes the whole row, above the grid and below it. */
+body[data-theme="eink"] .card-add { flex: 1 1 100%; max-width: 100%; padding: 0; }

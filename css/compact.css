@@ -40,6 +40,10 @@
     flex: 1 1 47%; min-width: 0; max-width: 50%;
     margin: 0 4px 4px 0; padding: 3px 6px 5px 6px;
   }
+  /* The add bar keeps the full width and stays a comfortable target. */
+  body[data-theme] .card-add { flex: 1 1 100%; max-width: 100%; margin-right: 0; padding: 0; }
+  body[data-theme] .btn-add { padding: 11px 0; }
+  body[data-theme] .btn-add-label { font-size: 15px; }
 
   /* The charts and the scale end labels are the first things to go. */
   body[data-theme] .spark,

@@ -111,3 +111,5 @@ body[data-theme="paper"] .btn-menu {
 }
 body[data-theme="paper"] .btn-menu:active { background: #3f3a30; }
 body[data-theme="paper"] .btn-menu svg { width: 22px; height: 22px; stroke-width: 2.2; }
+
+body[data-theme="paper"] .card-add { flex: 1 1 100%; max-width: 100%; padding: 0; }
