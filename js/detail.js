@@ -57,6 +57,15 @@ var Detail = (function () {
     dogWalk:     ['temp', 'dewPoint', 'clouds', 'wind', 'rain', 'rainProb', 'airQuality', 'uv', 'visibility']
   };
 
+  /* The wind profile, as the drone sheet shows it: one row per height above the
+     ground. Only the ten-metre wind exists in "current"; the rest is hourly. */
+  var PROFILE = [
+    { height: 10,  speed: 'wind',    dir: 'windDir',    field: 'wind_speed_10m' },
+    { height: 80,  speed: 'wind80',  dir: 'windDir80',  field: 'wind_speed_80m' },
+    { height: 120, speed: 'wind120', dir: 'windDir120', field: 'wind_speed_120m', ceiling: true },
+    { height: 180, speed: 'wind180', dir: 'windDir180', field: 'wind_speed_180m' }
+  ];
+
   var current = null;
 
   function isIndex(key) { return !!INPUTS[key]; }
@@ -154,6 +163,41 @@ var Detail = (function () {
     return host;
   }
 
+  function metres(height) { return height + ' ' + I18N.t('unit.wave'); }
+
+  /* Wind by height: what the aircraft actually flies in, not what the anemometer
+     on its two-metre post reports. The ceiling row is the one the index uses. */
+  function windProfile(w) {
+    var host = document.createDocumentFragment();
+    var spec = Metrics.SPEC.wind;
+    /* The height the index actually weighed — 120 m where the forecast has it,
+       whatever it fell back to otherwise. */
+    var used = Metrics.flightWind(w).h;
+    var aloft = 0, i, item, v, dir, text, node, band;
+
+    for (i = 0; i < PROFILE.length; i++) {
+      item = PROFILE[i];
+      v = (w && w[item.speed] !== null && w[item.speed] !== undefined) ? Number(w[item.speed]) : null;
+      if (v === null || isNaN(v)) { continue; }
+      if (item.height > 10) { aloft++; }
+      dir = (w[item.dir] === null || w[item.dir] === undefined) ? null : w[item.dir];
+      node = row(metres(item.height), '',
+        'det-wind-row' + (item.height === used ? ' is-now' : ''));
+      /* The speed carries the band colour on its own element: a colour set
+         directly always beats one inherited from the row. */
+      band = Metrics.band(spec.bands, v);
+      text = U.el('span', band.cls + '-text', U.fmt(v, 1) + ' ' + I18N.t('unit.wind'));
+      node.childNodes[1].appendChild(text);
+      if (dir !== null) {
+        node.childNodes[1].appendChild(document.createTextNode(' · ' + U.windDir(dir)));
+      }
+      host.appendChild(node);
+    }
+    /* One row is not a profile: with nothing above ten metres the block says
+       nothing the wind card does not already say. */
+    return aloft ? host : null;
+  }
+
   /* And where each of those readings came from. */
   function sourceTable(keys) {
     var host = document.createDocumentFragment(), i, src;
@@ -173,6 +217,7 @@ var Detail = (function () {
     if (isIndex(key)) {
       box.appendChild(para(I18N.t('src.derived')));
       box.appendChild(sourceTable(INPUTS[key]));
+      if (key === 'drone') { box.appendChild(profileSources()); }
     } else {
       var src = SOURCES[key];
       if (src) {
@@ -186,6 +231,17 @@ var Detail = (function () {
     if (opts.updated) { box.appendChild(row(I18N.t('src.read'), opts.updated)); }
     box.appendChild(para(I18N.t('src.licence')));
     return box;
+  }
+
+  /* The profile has no card of its own, so its fields are named here. */
+  function profileSources() {
+    var host = document.createDocumentFragment(), i;
+    for (i = 1; i < PROFILE.length; i++) {
+      host.appendChild(row(I18N.t('ui.windAt', { h: metres(PROFILE[i].height) }),
+        I18N.t('src.api.forecast')));
+      host.appendChild(U.el('div', 'det-field', PROFILE[i].field));
+    }
+    return host;
   }
 
   function mathBlock(key) {
@@ -243,6 +299,16 @@ var Detail = (function () {
 
     if (isIndex(key)) {
       body.appendChild(whyBlock(opts.why));
+      /* For a drone the wind profile is the reading that matters most, so it
+         comes before the flat list of everything else. */
+      if (key === 'drone') {
+        var profile = windProfile(opts.w);
+        if (profile) {
+          body.appendChild(head(I18N.t('ui.windProfile')));
+          body.appendChild(profile);
+          body.appendChild(para(I18N.t('note.ceiling')));
+        }
+      }
       body.appendChild(head(I18N.t('ui.detailInputs')));
       body.appendChild(inputTable(key, opts.w));
     }

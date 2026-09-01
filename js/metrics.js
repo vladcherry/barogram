@@ -535,14 +535,32 @@ var Metrics = (function () {
     return { value: U.clamp(10 - p, 0, 10), why: why };
   }
 
+  /* A drone does not fly at ten metres. The legal ceiling is 120 m across most
+     of Europe and 400 ft in the United States, and the wind up there is
+     routinely half again the surface reading, because the ground stops slowing
+     it down. So the index weighs the wind at the ceiling where the forecast
+     carries it, and says which height it used. */
+  function flightWind(w) {
+    if (w.wind120 !== null && w.wind120 !== undefined) { return { v: w.wind120, h: 120 }; }
+    if (w.wind80 !== null && w.wind80 !== undefined) { return { v: w.wind80, h: 80 }; }
+    return { v: w.wind, h: 10 };
+  }
+
   /* Drone flight: wind and its gusts decide, rain grounds it outright, and the
      rest is what stops you seeing the aircraft or holding a charge. */
   function drone(w) {
-    if (w.wind === null) { return null; }
+    var air = flightWind(w);
+    if (air.v === null) { return null; }
     var p = 0, why = [];
-    var pw = penalty([[4, 0], [6, 1], [8, 2.5], [10, 4.5], [99, 7]], w.wind);
-    p += pw; if (pw >= 1) { why.push(reason('why.wind', { v: Math.round(w.wind) })); }
-    if (w.gust !== null && w.gust - w.wind > 4) {
+    var pw = penalty([[4, 0], [6, 1], [8, 2.5], [10, 4.5], [99, 7]], air.v);
+    p += pw;
+    if (pw >= 1) {
+      why.push(air.h === 10 ? reason('why.wind', { v: Math.round(air.v) })
+                            : reason('why.windAloft', { v: Math.round(air.v), h: air.h }));
+    }
+    /* Gusts are forecast at ten metres only, so the gustiness of the surface
+       wind is the proxy for how rough it is higher up. */
+    if (w.gust !== null && w.wind !== null && w.gust - w.wind > 4) {
       p += (w.gust - w.wind > 7 ? 2.5 : 1.2);
       why.push(reason('why.gusts'));
     }
@@ -673,7 +691,7 @@ var Metrics = (function () {
   }
 
   return {
-    SPEC: SPEC, band: band, drone: drone, boatFishing: boatFishing, camping: camping,
+    SPEC: SPEC, band: band, drone: drone, flightWind: flightWind, boatFishing: boatFishing, camping: camping,
     dogWalk: dogWalk,
     snorkel: snorkel, bike: bike, run: run, swim: swim, tennis: tennis,
     hike: hike, fishing: fishing, golf: golf, surf: surf, windsport: windsport

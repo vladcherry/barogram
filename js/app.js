@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.30-10';
+  var APP_VERSION = '2026.08.30-11';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);

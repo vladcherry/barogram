@@ -279,6 +279,10 @@ body[data-theme] .det-hero .scale-ends { display: flex; font-size: 11px; }
 /* Shrinkable, so a long value wraps instead of running over the name. */
 .det-row-val { flex: 0 1 auto; margin-left: 10px; text-align: right; }
 .det-row.is-now { font-weight: 700; }
+/* The wind profile reads at full strength rather than in the muted value
+   colour: it is the reading of the row, not a footnote to it. Designs that
+   colour their band labels colour these too, from the class on the number. */
+body[data-theme] .det-row.det-wind-row .det-row-val { color: inherit; }
 /* API field names: verbatim, so they can be looked up in the Open-Meteo docs. */
 .det-field {
   padding: 2px 4px 7px 4px; font-size: 12px;

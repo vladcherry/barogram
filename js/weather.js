@@ -21,8 +21,11 @@ var Weather = (function () {
       latitude: lat, longitude: lon,
       current: 'temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,is_day,precipitation,rain,' +
                'weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index',
+      /* The wind at height is hourly-only — Open-Meteo offers no such field in
+         "current" — and it is what a drone actually flies in. */
       hourly: 'temperature_2m,precipitation,precipitation_probability,uv_index,pressure_msl,cloud_cover,' +
-              'wind_speed_10m,visibility',
+              'wind_speed_10m,visibility,wind_speed_80m,wind_speed_120m,wind_speed_180m,' +
+              'wind_direction_80m,wind_direction_120m,wind_direction_180m',
       daily: 'temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_sum,sunrise,sunset',
       wind_speed_unit: 'ms', timezone: 'auto', past_days: 1, forecast_days: 2
     });
@@ -135,11 +138,21 @@ var Weather = (function () {
       waveHeight: null, wavePeriod: null, seaTemp: null, hasSea: false,
       dewPoint: pick(cur.dew_point_2m),
       visibility: null,
+      wind80: null, wind120: null, wind180: null,
+      windDir80: null, windDir120: null, windDir180: null,
       airQuality: null, pm25: null, pm10: null, pollen: null
     };
 
     var vis = pick(U.hourlyNow(hourly.time, hourly.visibility, nowIso));
     out.visibility = (vis === null) ? null : U.num(vis / 1000, 1);
+
+    /* The wind profile: the same hour, one row per height above the ground. */
+    out.wind80 = pick(U.hourlyNow(hourly.time, hourly.wind_speed_80m, nowIso));
+    out.wind120 = pick(U.hourlyNow(hourly.time, hourly.wind_speed_120m, nowIso));
+    out.wind180 = pick(U.hourlyNow(hourly.time, hourly.wind_speed_180m, nowIso));
+    out.windDir80 = pick(U.hourlyNow(hourly.time, hourly.wind_direction_80m, nowIso));
+    out.windDir120 = pick(U.hourlyNow(hourly.time, hourly.wind_direction_120m, nowIso));
+    out.windDir180 = pick(U.hourlyNow(hourly.time, hourly.wind_direction_180m, nowIso));
 
     if (out.uv === null) { out.uv = pick(U.hourlyNow(hourly.time, hourly.uv_index, nowIso)); }
     out.rainProb = pick(U.hourlyNow(hourly.time, hourly.precipitation_probability, nowIso));
@@ -223,6 +236,8 @@ var Weather = (function () {
       pressureSeries: pressure, tempSeries: temps, rainSeries: rains, pressureTrend3h: -1.8,
       waveHeight: 0.42, wavePeriod: 4.1, seaTemp: 24.3, hasSea: true,
       dewPoint: 18.6, visibility: 24.0,
+      wind80: 9.4, wind120: 10.8, wind180: 12.1,
+      windDir80: 228, windDir120: 235, windDir180: 240,
       airQuality: 32, pm25: 8.4, pm10: 14.2, pollen: 21
     };
   }

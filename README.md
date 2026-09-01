@@ -138,6 +138,17 @@ barogram of the past 24 hours.
 Marine and air-quality data are both optional: neither is allowed to block the
 forecast if the endpoint has nothing for that point.
 
+The forecast request also carries the wind at 80, 120 and 180 metres above the
+ground, with its direction at each height. Open-Meteo offers those only in the
+hourly section — `current` stops at ten metres — so they are read for the
+current hour like the rest of the hourly values. The drone card shows the whole
+profile and weighs its index at 120 m, the height a drone is allowed to fly to
+in most of Europe (400 ft in the United States), because the ground slows the
+wind down and the reading up there is routinely half again the surface figure.
+Gusts are forecast at ten metres only, so surface gustiness stands in for how
+rough it is higher up. The minimal fallback request does not ask for any of it,
+so a model without those levels cannot cost the app its forecast.
+
 The place comes either from the Geolocation API or from the city search, and
 every launch asks the device where it is: a phone that travelled shows the
 weather where it woke up without being told. The cached reading is on screen
