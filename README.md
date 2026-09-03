@@ -182,6 +182,33 @@ stock PocketBook browser almost certainly does not support it; there the working
 setup is the app kept open with the wake lock on, refreshing on the page's own
 hourly timer.
 
+## The outlook bar and the hour matrix
+
+Between the header and the grid sits one line that reads the activity cards on
+the screen and says what the next day looks like for them: what is worth doing
+now, and what is worth waiting for and until when. Add or remove an activity
+card and the line is recomputed on the spot — it is rebuilt from the same
+`render()` that applies the card set. With no activity card on the screen it
+falls back to the weather in a sentence; in the editor it steps aside.
+
+Tapping it opens the hour-by-hour matrix: the next 24 hours across, one row per
+activity, every hour coloured green, amber or red. Under the grid each activity
+gets its window — *best from 19:00 to 09:00* — with what is in the way now and
+what is left by then, in the same words the card uses.
+
+**There is no second rules engine.** The forecast request carries every reading
+a comfort index weighs, hour by hour, and `js/weather.js` turns those into
+frames shaped exactly like the current-conditions record — so `js/metrics.js`
+runs unchanged against an hour of the forecast without knowing it is not now.
+The colours are the app's own index bands: green from 6, amber from 4, red
+below, which are the thresholds behind *good*, *so-so* and *poor* on the cards
+themselves. A card reading "good" therefore cannot show red in the matrix; a
+separate set of thresholds would have made that possible, and the two would have
+contradicted each other in front of the user.
+
+Twenty-four cells share the row, so a whole day fits a phone without scrolling
+sideways; the scroller is there for the case where it does not.
+
 ## Tapping a card
 
 A tap opens the card at length, as a sheet over the screen:
@@ -333,6 +360,8 @@ js/metrics.js           scale bands and comfort-index maths
 js/icons.js             card icons: weather, comfort faces, sports with a verdict
 js/scale.js             scale, card and mini-chart rendering
 js/detail.js            the card sheet: meaning, bands, inputs, sources
+js/outlook.js           hourly grading of the comfort indices
+js/matrix.js            the hour-by-hour screen behind the outlook bar
 js/weather.js           Open-Meteo requests and normalisation
 js/app.js               screen, clock, schedule, background work
 sw.js                   offline cache, hourly periodicsync, notifications

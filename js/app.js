@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.08.30-11';
+  var APP_VERSION = '2026.09.03-1';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -153,7 +153,7 @@
   /* No Element.closest on the reader's browser, so walk up by hand. A swipe
      that starts inside the menu or inside a sheet belongs to that sheet. */
   function insideMenu(target) {
-    var stops = [U.$('#panel'), U.$('#library'), U.$('#detail')];
+    var stops = [U.$('#panel'), U.$('#library'), U.$('#detail'), U.$('#matrix')];
     for (var n = target; n; n = n.parentNode) {
       for (var i = 0; i < stops.length; i++) { if (n === stops[i]) { return true; } }
     }
@@ -229,6 +229,7 @@
     }
     /* A sheet built in the old language cannot be patched string by string. */
     Detail.close();
+    Matrix.close();
     /* The menu button says Close while the panel is open. */
     setLabel(U.$('#btn-menu'), I18N.t(U.$('#panel').hidden ? 'ui.menu' : 'ui.close'));
     var placeholders = document.querySelectorAll('[data-i18n-placeholder]');
@@ -530,6 +531,7 @@
       }
     }
     if (editing) { host.appendChild(addCardTile()); }
+    renderOutlook();
   }
 
 
@@ -588,6 +590,7 @@
   function setEditing(on) {
     editing = !!on;
     Detail.close();
+    Matrix.close();
     document.body.setAttribute('data-editing', editing ? '1' : '0');
     showEditBars(editing);
     closeLibrary();
@@ -872,6 +875,81 @@
     host.addEventListener('mousedown', function (e) { down(e.clientX, e.clientY); }, false);
     document.addEventListener('mousemove', function (e) { move(e.clientX, e.clientY); }, false);
     document.addEventListener('mouseup', up, false);
+  }
+
+  /* ---------- the outlook bar and its matrix ----------
+     The bar reads the cards that are on the screen, so adding or removing an
+     activity changes it on the spot: it is rebuilt from render(), which is
+     where the card set is applied in the first place. */
+
+  function renderOutlook() {
+    var bar = U.$('#outlook');
+    if (!bar) { return; }
+    var w = settings.lastData;
+    if (editing || !w) { bar.hidden = true; return; }
+
+    var plan = Outlook.plan(cardList(), w);
+    var parts = plan.rows.length ? activityLine(Outlook.summary(plan)) : [weatherLine(w)];
+    if (!parts.length || !parts[0]) { bar.hidden = true; return; }
+
+    /* Each sentence is its own element: a short screen keeps the first, which
+       is the one worth acting on, and drops the rest rather than growing. */
+    var host = U.$('#outlook-text');
+    U.clear(host);
+    for (var i = 0; i < parts.length; i++) {
+      host.appendChild(U.el('span', 'outlook-part', parts[i]));
+    }
+    U.setText(U.$('#outlook-more'), plan.rows.length ? I18N.t('ui.outlookMore') : '');
+    bar.hidden = false;
+  }
+
+  /* Two sentences at most: what is worth doing now, and what is worth waiting
+     for. Everything else belongs in the matrix. */
+  function activityLine(sum) {
+    var parts = [];
+    if (sum.now) {
+      parts.push(I18N.t('bar.nowGood', {
+        name: indexName(sum.now.key),
+        v: U.fmt(sum.now.now.value, 1)
+      }));
+    }
+    if (sum.later.length) {
+      parts.push(I18N.t('bar.later', {
+        names: namesOf(sum.later),
+        time: Outlook.hourLabel(sum.frames[sum.later[0].best.from])
+      }));
+    } else if (!sum.now && sum.stuck.length) {
+      parts.push(I18N.t('bar.noWindow', { names: namesOf(sum.stuck) }));
+    }
+    return parts;
+  }
+
+  function namesOf(rows) {
+    var names = [], i;
+    for (i = 0; i < rows.length && i < 3; i++) { names.push(indexName(rows[i].key)); }
+    return names.join(', ');
+  }
+
+  function indexName(key) { return I18N.t(Metrics.SPEC[key].title); }
+
+  /* With no activity card on the screen the bar still earns its place: it says
+     what the weather is doing, which is what the cards would have said. */
+  function weatherLine(w) {
+    if (w.temp === null) { return ''; }
+    return I18N.t('bar.general', {
+      cond: U.wmoText(w.code),
+      temp: U.fmt(w.temp, 1),
+      unit: I18N.t('unit.temp'),
+      prob: U.fmt(w.rainProb === null ? 0 : w.rainProb, 0)
+    });
+  }
+
+  function openMatrix() {
+    var w = settings.lastData;
+    if (!w) { return; }
+    var plan = Outlook.plan(cardList(), w);
+    if (!plan.rows.length) { return; }
+    Matrix.open(plan);
   }
 
   /* ---------- one card at length ---------- */
@@ -1293,10 +1371,13 @@
     bindAll('.js-cards-reset', resetCards);
     U.$('#btn-library-close').onclick = closeLibrary;
     U.$('#btn-detail-close').onclick = function () { Detail.close(); };
+    U.$('#outlook').onclick = openMatrix;
+    U.$('#btn-matrix-close').onclick = function () { Matrix.close(); };
     /* A hardware key on the reader and Escape on a desktop both close a sheet. */
     document.addEventListener('keydown', function (e) {
       if (e.keyCode !== 27) { return; }
       if (Detail.isOpen()) { Detail.close(); }
+      else if (Matrix.isOpen()) { Matrix.close(); }
       else if (!U.$('#library').hidden) { closeLibrary(); }
     }, false);
     bindLibrarySearch();

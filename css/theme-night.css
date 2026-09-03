@@ -121,3 +121,13 @@ body[data-theme="night"] .act-reset:active { background: #1b232d; }
 /* Editor: the removal badge on the corner of a card. */
 body[data-theme="night"] .card-del { background: #b2352a; border-color: #0b0f14; color: #ffffff; }
 body[data-theme="night"] .card-del:active { background: #ffffff; color: #b2352a; }
+
+/* The outlook bar and the hour matrix. */
+body[data-theme="night"] .outlook { border-color: #26313d; background: #141b23; border-radius: 14px; }
+body[data-theme="night"] .outlook-more { color: #8ea0b5; }
+body[data-theme="night"] .mx-name, body[data-theme="night"] .mx-tick { color: #8ea0b5; }
+body[data-theme="night"] .mx-cell { border-color: #26313d; border-radius: 3px; }
+body[data-theme="night"] .mx-cell.is-good { background: #35c46a; }
+body[data-theme="night"] .mx-cell.is-fair { background: #e3c74a; }
+body[data-theme="night"] .mx-cell.is-bad  { background: #ef5b45; }
+body[data-theme="night"] .mx-cell.is-none { background: #1b232d; }

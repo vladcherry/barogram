@@ -125,3 +125,13 @@ body[data-theme="eink"] .act-reset:active { background: #000; color: #fff; }
 /* Editor: the removal badge on the corner of a card. */
 body[data-theme="eink"] .card-del { background: #c8341f; border-color: #000000; color: #ffffff; }
 body[data-theme="eink"] .card-del:active { background: #ffffff; color: #c8341f; }
+
+/* The outlook bar and the hour matrix. */
+body[data-theme="eink"] .outlook { border-color: #000000; background: #ffffff; border-radius: 0; }
+body[data-theme="eink"] .outlook-more { color: #555555; }
+body[data-theme="eink"] .mx-name, body[data-theme="eink"] .mx-tick { color: #555555; }
+body[data-theme="eink"] .mx-cell { border-color: #000000; border-radius: 0; }
+body[data-theme="eink"] .mx-cell.is-good { background: #2e8b3d; }
+body[data-theme="eink"] .mx-cell.is-fair { background: #d8b21a; }
+body[data-theme="eink"] .mx-cell.is-bad  { background: #c8341f; }
+body[data-theme="eink"] .mx-cell.is-none { background: #eeeeee; }

@@ -121,6 +121,49 @@ button, input { font-family: inherit; font-size: inherit; }
 .hint { margin: 4px 0 0 0; }
 .version { margin-left: 8px; opacity: 0.7; font-size: 12px; }
 
+/* ---- the outlook bar ----
+   One line between the header and the grid, and a way into the matrix. It is a
+   button, so it looks like one: a full-width strip, not a paragraph. */
+.outlook {
+  display: flex; align-items: center; width: 100%;
+  margin: 8px 0 0 0; padding: 8px 10px; text-align: left;
+  border-width: 1px; border-style: solid; background: transparent;
+  font: inherit; color: inherit; cursor: pointer;
+  -webkit-appearance: none; appearance: none;
+}
+.outlook-text { flex: 1 1 auto; min-width: 0; font-size: 13px; }
+.outlook-part { display: inline; }
+.outlook-part + .outlook-part { margin-left: 4px; }
+.outlook-more { flex: 0 0 auto; margin-left: 10px; font-size: 12px; font-weight: 700; }
+.outlook-more:empty { display: none; }
+
+/* ---- the hour matrix ----
+   Twenty-four cells that share the row, so a whole day fits a phone without a
+   horizontal scroll; the scroller is there for the case where it does not. */
+.mx-row { display: flex; align-items: center; margin-bottom: 3px; }
+.mx-name {
+  flex: 0 0 86px; min-width: 0; padding-right: 6px; font-size: 12px;
+  overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+}
+.mx-cells { flex: 1 1 auto; display: flex; min-width: 0; overflow-x: auto; }
+.mx-cell {
+  flex: 1 1 0; min-width: 8px; height: 18px; margin-right: 1px;
+  border-width: 1px; border-style: solid;
+}
+.mx-cell:last-child { margin-right: 0; }
+.mx-tick {
+  flex: 1 1 0; min-width: 8px; font-size: 9px; letter-spacing: -0.03em;
+  overflow: visible; white-space: nowrap;
+}
+.mx-ruler { margin-bottom: 2px; }
+.mx-grid { margin-bottom: 6px; }
+.mx-legend { display: flex; flex-wrap: wrap; margin: 2px 0 10px 0; font-size: 11px; }
+.mx-key { display: flex; align-items: center; margin-right: 12px; }
+.mx-key .mx-cell { flex: 0 0 auto; width: 14px; height: 14px; margin-right: 4px; }
+.mx-key-text { }
+.mx-story { margin-bottom: 6px; }
+.mx-verdict { font-weight: 700; font-size: 13px; margin: 2px 0 0 0; }
+
 /* ---- cards ---- */
 .cards { display: flex; flex-wrap: wrap; margin-top: 12px; }
 .card { flex: 1 1 260px; margin: 0 8px 12px 0; padding: 10px 12px; min-width: 0; }

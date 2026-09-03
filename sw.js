@@ -2,7 +2,7 @@
    Periodic Background Sync wakes the app once an hour; the notification it
    posts is what lights up the device screen with fresh numbers. */
 
-var STATIC_CACHE = 'barogram-static-v12';
+var STATIC_CACHE = 'barogram-static-v13';
 var DATA_CACHE = 'barogram-data-v1';
 var CONFIG_KEY = 'https://barogram.local/config';
 var LAST_KEY = 'https://barogram.local/last-forecast';
@@ -13,7 +13,7 @@ var SHELL = [
   'css/base.css', 'css/theme-eink.css', 'css/theme-night.css', 'css/theme-paper.css',
   'css/theme-tiles.css', 'css/compact.css',
   'js/i18n.js', 'js/util.js', 'js/store.js', 'js/metrics.js', 'js/icons.js', 'js/scale.js',
-  'js/detail.js',
+  'js/detail.js', 'js/outlook.js', 'js/matrix.js',
   'js/weather.js', 'js/app.js',
   'icons/icon.svg', 'icons/icon-180.png', 'icons/icon-192.png', 'icons/icon-512.png'
 ];

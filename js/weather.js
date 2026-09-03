@@ -21,10 +21,13 @@ var Weather = (function () {
       latitude: lat, longitude: lon,
       current: 'temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,is_day,precipitation,rain,' +
                'weather_code,cloud_cover,pressure_msl,wind_speed_10m,wind_direction_10m,wind_gusts_10m,uv_index',
-      /* The wind at height is hourly-only — Open-Meteo offers no such field in
-         "current" — and it is what a drone actually flies in. */
-      hourly: 'temperature_2m,precipitation,precipitation_probability,uv_index,pressure_msl,cloud_cover,' +
-              'wind_speed_10m,visibility,wind_speed_80m,wind_speed_120m,wind_speed_180m,' +
+      /* The hourly block carries every reading a comfort index weighs, so the
+         same maths can be run hour by hour for the outlook. The wind at height
+         is hourly-only anyway — Open-Meteo has no such field in "current". */
+      hourly: 'temperature_2m,apparent_temperature,relative_humidity_2m,dew_point_2m,precipitation,' +
+              'precipitation_probability,weather_code,cloud_cover,pressure_msl,visibility,uv_index,is_day,' +
+              'wind_speed_10m,wind_gusts_10m,wind_direction_10m,' +
+              'wind_speed_80m,wind_speed_120m,wind_speed_180m,' +
               'wind_direction_80m,wind_direction_120m,wind_direction_180m',
       daily: 'temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_sum,sunrise,sunset',
       wind_speed_unit: 'ms', timezone: 'auto', past_days: 1, forecast_days: 2
@@ -36,7 +39,7 @@ var Weather = (function () {
       latitude: lat, longitude: lon,
       current: 'wave_height,wave_period,wave_direction,sea_surface_temperature,wind_wave_height',
       hourly: 'wave_height,sea_surface_temperature',
-      timezone: 'auto', forecast_days: 1
+      timezone: 'auto', forecast_days: 2
     });
   }
 
@@ -53,12 +56,15 @@ var Weather = (function () {
   }
 
   /* Air quality and pollen come from a separate Open-Meteo endpoint. */
+  var POLLEN = ['alder_pollen', 'birch_pollen', 'grass_pollen',
+                'mugwort_pollen', 'olive_pollen', 'ragweed_pollen'];
+
   function airUrl(lat, lon) {
     return query(AIR, {
       latitude: lat, longitude: lon,
-      current: 'european_aqi,pm2_5,pm10,alder_pollen,birch_pollen,grass_pollen,' +
-               'mugwort_pollen,olive_pollen,ragweed_pollen',
-      timezone: 'auto'
+      current: 'european_aqi,pm2_5,pm10,' + POLLEN.join(','),
+      hourly: 'european_aqi,pm2_5,' + POLLEN.join(','),
+      timezone: 'auto', forecast_days: 2
     });
   }
 
@@ -99,14 +105,106 @@ var Weather = (function () {
 
   /* Pollen is reported per species; the cards want one number to react to. */
   function totalPollen(current) {
-    var keys = ['alder_pollen', 'birch_pollen', 'grass_pollen',
-                'mugwort_pollen', 'olive_pollen', 'ragweed_pollen'];
     var total = null, i, v;
-    for (i = 0; i < keys.length; i++) {
-      v = pick(current[keys[i]]);
+    for (i = 0; i < POLLEN.length; i++) {
+      v = pick(current[POLLEN[i]]);
       if (v !== null) { total = (total === null ? 0 : total) + v; }
     }
     return total;
+  }
+
+  function totalPollenAt(hourly, idx) {
+    var total = null, i, v;
+    if (!hourly || idx === undefined || idx < 0) { return null; }
+    for (i = 0; i < POLLEN.length; i++) {
+      v = at(hourly[POLLEN[i]], idx);
+      if (v !== null) { total = (total === null ? 0 : total) + v; }
+    }
+    return total;
+  }
+
+  function at(arr, idx) {
+    if (!arr || idx === undefined || idx < 0 || arr[idx] === undefined) { return null; }
+    return pick(arr[idx]);
+  }
+
+  /* Endpoints answer on their own time arrays, so the hours are matched by the
+     timestamp rather than by position. */
+  function indexByTime(times) {
+    var map = {}, i;
+    if (!times) { return map; }
+    for (i = 0; i < times.length; i++) { map[times[i]] = i; }
+    return map;
+  }
+
+  /* ---- the hourly frames ----
+     One snapshot per hour, shaped exactly like the current-conditions record,
+     so every comfort index in metrics.js can be run against an hour of the
+     forecast without knowing that it is not now. That is the whole trick: the
+     outlook and the cards cannot disagree, because they are the same maths. */
+  var HOURS_AHEAD = 24;
+
+  function buildFrames(forecast, marine, air, out) {
+    var hourly = (forecast && forecast.hourly) || {};
+    var daily = (forecast && forecast.daily) || {};
+    var marineHours = (marine && marine.hourly) || {};
+    var airHours = (air && air.hourly) || {};
+    if (!hourly.time || !hourly.time.length) { return []; }
+
+    var nowIso = U.isoLocalHour(new Date());
+    var start = hourIndex(hourly.time, nowIso);
+    if (start < 0) { start = 0; }
+    var marineAt = indexByTime(marineHours.time);
+    var airAt = indexByTime(airHours.time);
+    var day = todayIndex(daily.time);
+    var tempMin = (daily.temperature_2m_min) ? pick(daily.temperature_2m_min[day]) : null;
+
+    var frames = [], i, t, mi, ai, frame, before;
+    for (i = start; i < hourly.time.length && frames.length < HOURS_AHEAD; i++) {
+      t = hourly.time[i];
+      mi = marineAt[t];
+      ai = airAt[t];
+      frame = {
+        t: t,
+        hour: Number(String(t).substring(11, 13)),
+        temp: at(hourly.temperature_2m, i),
+        feels: at(hourly.apparent_temperature, i),
+        humidity: at(hourly.relative_humidity_2m, i),
+        dewPoint: at(hourly.dew_point_2m, i),
+        clouds: at(hourly.cloud_cover, i),
+        rain: at(hourly.precipitation, i),
+        rainProb: at(hourly.precipitation_probability, i),
+        pressure: at(hourly.pressure_msl, i),
+        wind: at(hourly.wind_speed_10m, i),
+        gust: at(hourly.wind_gusts_10m, i),
+        windDir: at(hourly.wind_direction_10m, i),
+        wind80: at(hourly.wind_speed_80m, i),
+        wind120: at(hourly.wind_speed_120m, i),
+        wind180: at(hourly.wind_speed_180m, i),
+        windDir80: at(hourly.wind_direction_80m, i),
+        windDir120: at(hourly.wind_direction_120m, i),
+        windDir180: at(hourly.wind_direction_180m, i),
+        uv: at(hourly.uv_index, i),
+        code: at(hourly.weather_code, i),
+        isDay: at(hourly.is_day, i),
+        visibility: null,
+        waveHeight: at(marineHours.wave_height, mi),
+        seaTemp: at(marineHours.sea_surface_temperature, mi),
+        airQuality: at(airHours.european_aqi, ai),
+        pm25: at(airHours.pm2_5, ai),
+        pollen: totalPollenAt(airHours, ai),
+        tempMin: tempMin,
+        pressureTrend3h: null
+      };
+      var vis = at(hourly.visibility, i);
+      frame.visibility = (vis === null) ? null : U.num(vis / 1000, 1);
+      before = at(hourly.pressure_msl, i - 3);
+      if (before !== null && frame.pressure !== null) {
+        frame.pressureTrend3h = U.num(frame.pressure - before, 1);
+      }
+      frames.push(frame);
+    }
+    return frames;
   }
 
   /* Flatten every response into the single model the cards render from. */
@@ -140,7 +238,9 @@ var Weather = (function () {
       visibility: null,
       wind80: null, wind120: null, wind180: null,
       windDir80: null, windDir120: null, windDir180: null,
-      airQuality: null, pm25: null, pm10: null, pollen: null
+      airQuality: null, pm25: null, pm10: null, pollen: null,
+      /* One snapshot per hour for the next day, for the outlook. */
+      frames: []
     };
 
     var vis = pick(U.hourlyNow(hourly.time, hourly.visibility, nowIso));
@@ -191,6 +291,8 @@ var Weather = (function () {
       out.pm10 = pick(air.current.pm10);
       out.pollen = totalPollen(air.current);
     }
+
+    out.frames = buildFrames(forecast, marine, air, out);
     return out;
   }
 
@@ -222,7 +324,52 @@ var Weather = (function () {
   }
 
   /* Demo data, so the layout can be reviewed without network: index.html?demo=1 */
+  /* Demo frames: a day that starts hot and windy and cools off in the evening,
+     so every band of the outlook has something to show. */
+  function demoFrames(startHour) {
+    var frames = [], i, h, warmth, gust;
+    for (i = 0; i < 24; i++) {
+      h = (startHour + i) % 24;
+      warmth = 24 + 7 * Math.cos((h - 15) / 24 * 2 * Math.PI);
+      gust = 4 + 4 * Math.max(0, Math.cos((h - 14) / 24 * 2 * Math.PI));
+      frames.push({
+        t: 'demo-' + h, hour: h,
+        temp: U.num(warmth, 1), feels: U.num(warmth + 1.6, 1),
+        humidity: Math.round(70 - (warmth - 20) * 2),
+        dewPoint: U.num(warmth - 8, 1),
+        clouds: (h > 12 && h < 18) ? 60 : 25,
+        rain: (h === 16 || h === 17) ? 0.9 : 0,
+        rainProb: (h > 14 && h < 19) ? 60 : 15,
+        pressure: U.num(1010 - i * 0.1, 1),
+        wind: U.num(gust, 1), gust: U.num(gust + 4, 1), windDir: 220,
+        wind80: U.num(gust * 1.5, 1), wind120: U.num(gust * 1.7, 1), wind180: U.num(gust * 1.9, 1),
+        windDir80: 225, windDir120: 230, windDir180: 235,
+        uv: (h >= 8 && h <= 18) ? U.num(8 * Math.cos((h - 13) / 12 * Math.PI), 1) : 0,
+        code: (h === 16 || h === 17) ? 61 : 2, isDay: (h >= 6 && h <= 20) ? 1 : 0,
+        visibility: 24, waveHeight: 0.42, seaTemp: 24.3,
+        airQuality: 32, pm25: 8.4, pollen: 21,
+        tempMin: 19.8, pressureTrend3h: -1.8
+      });
+    }
+    return frames;
+  }
+
+  /* The demo record and its first frame describe the same hour, so the cards and
+     the outlook agree in the demo exactly as they do on real data. */
   function demo() {
+    var record = demoRecord();
+    var first = record.frames[0], k;
+    if (first) {
+      for (k in first) {
+        if (first.hasOwnProperty(k) && record[k] !== undefined && k !== 'frames') {
+          first[k] = record[k];
+        }
+      }
+    }
+    return record;
+  }
+
+  function demoRecord() {
     var i, pressure = [], temps = [], rains = [];
     for (i = 0; i < 24; i++) {
       pressure.push(1012 + Math.sin(i / 3.4) * 5 - i * 0.12);
@@ -238,7 +385,8 @@ var Weather = (function () {
       dewPoint: 18.6, visibility: 24.0,
       wind80: 9.4, wind120: 10.8, wind180: 12.1,
       windDir80: 228, windDir120: 235, windDir180: 240,
-      airQuality: 32, pm25: 8.4, pm10: 14.2, pollen: 21
+      airQuality: 32, pm25: 8.4, pm10: 14.2, pollen: 21,
+      frames: demoFrames(new Date().getHours())
     };
   }
 

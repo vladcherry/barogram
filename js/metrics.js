@@ -690,8 +690,12 @@ var Metrics = (function () {
     return { value: U.clamp(10 - p, 0, 10), why: why };
   }
 
+  /* Every comfort index, in the order the library offers them. */
+  var INDEX_KEYS = ['snorkel', 'swim', 'surf', 'windsport', 'bike', 'run', 'hike',
+                    'tennis', 'golf', 'fishing', 'boatFishing', 'camping', 'drone', 'dogWalk'];
+
   return {
-    SPEC: SPEC, band: band, drone: drone, flightWind: flightWind, boatFishing: boatFishing, camping: camping,
+    SPEC: SPEC, band: band, INDEX_KEYS: INDEX_KEYS, drone: drone, flightWind: flightWind, boatFishing: boatFishing, camping: camping,
     dogWalk: dogWalk,
     snorkel: snorkel, bike: bike, run: run, swim: swim, tennis: tennis,
     hike: hike, fishing: fishing, golf: golf, surf: surf, windsport: windsport

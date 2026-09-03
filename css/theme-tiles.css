@@ -154,3 +154,13 @@ body[data-theme="tiles"] .act-reset:active { background: #000; color: #fff; }
 /* Editor: the removal badge on the corner of a card. */
 body[data-theme="tiles"] .card-del { background: #c8341f; border-color: #000000; color: #ffffff; }
 body[data-theme="tiles"] .card-del:active { background: #ffffff; color: #c8341f; }
+
+/* The outlook bar and the hour matrix. */
+body[data-theme="tiles"] .outlook { border-color: #000000; background: #ffffff; border-radius: 0; }
+body[data-theme="tiles"] .outlook-more { color: #444444; }
+body[data-theme="tiles"] .mx-name, body[data-theme="tiles"] .mx-tick { color: #444444; }
+body[data-theme="tiles"] .mx-cell { border-color: #000000; border-radius: 0; }
+body[data-theme="tiles"] .mx-cell.is-good { background: #24732f; }
+body[data-theme="tiles"] .mx-cell.is-fair { background: #e2c23a; }
+body[data-theme="tiles"] .mx-cell.is-bad  { background: #c8341f; }
+body[data-theme="tiles"] .mx-cell.is-none { background: #eeeeee; }

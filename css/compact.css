@@ -87,6 +87,11 @@
   @media (max-width: 360px) {
     body[data-theme] .act-reset .act-ico { display: none; }
   }
+  body[data-theme] .outlook { margin-top: 5px; padding: 6px 8px; }
+  body[data-theme] .outlook-text { font-size: 11px; }
+  body[data-theme] .outlook-more { font-size: 11px; margin-left: 6px; }
+  body[data-theme] .mx-name { flex-basis: 74px; font-size: 11px; }
+  body[data-theme] .mx-cell { height: 16px; }
   body[data-theme] .footbar { font-size: 10px; }
   body[data-theme] .row { padding: 9px 10px; }
   body[data-theme] .sec-title { margin: 10px 2px 4px 2px; }
@@ -95,14 +100,23 @@
   @media (max-height: 660px) {
     body[data-theme] .clock { font-size: 30px; }
     body[data-theme] .card-icon svg { width: 26px; height: 26px; }
+    /* One sentence on a short screen: the bar may not grow into the grid. */
+    body[data-theme] .outlook { padding: 5px 8px; }
+    body[data-theme] .outlook-text { font-size: 10px; }
+    body[data-theme] .outlook-more { font-size: 10px; }
+    body[data-theme] .outlook-part + .outlook-part { display: none; }
     body[data-theme] .btn-menu.btn-icon { width: 34px; height: 34px; }
     body[data-theme] .btn-menu.btn-icon svg { width: 18px; height: 18px; }
-    body[data-theme] .card { margin: 0 3px 3px 0; padding: 2px 5px 4px 5px; }
+    /* The outlook bar took a line, so the cards give one back: a couple of
+       pixels a row is enough, and nothing has to be dropped. */
+    body[data-theme] .card { margin: 0 3px 3px 0; padding: 2px 5px 3px 5px; }
     body[data-theme] .seg { height: 7px; }
-    body[data-theme] .scale { padding-top: 7px; }
-    body[data-theme] .card-value { font-size: 24px; }
-    body[data-theme] .card-band { font-size: 10px; margin-top: 2px; }
-    body[data-theme] .card-note { font-size: 9px; }
+    body[data-theme] .scale { padding-top: 6px; }
+    body[data-theme] .card-value { font-size: 22px; }
+    body[data-theme] .card-band { font-size: 10px; margin-top: 1px; }
+    body[data-theme] .card-note { font-size: 9px; line-height: 1.15; }
+    body[data-theme] .card-title { font-size: 9px; }
+    body[data-theme] .cards { margin-top: 4px; }
     body[data-theme="night"] .topbar { padding: 6px 10px; }
   }
 }
