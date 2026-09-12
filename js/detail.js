@@ -370,6 +370,14 @@ var Detail = (function () {
 
     body.appendChild(hero(opts));
 
+    /* When to go comes first: it is the question the card was opened to answer,
+       and what the index means can wait until after the answer. */
+    var when = isIndex(key) ? whenBlock(key, opts.w) : null;
+    if (when) {
+      body.appendChild(head(I18N.t('ui.detailWhen')));
+      body.appendChild(when);
+    }
+
     if (I18N.has('about.' + key)) {
       body.appendChild(head(I18N.t('ui.detailAbout')));
       body.appendChild(para(I18N.t('about.' + key)));
@@ -377,11 +385,6 @@ var Detail = (function () {
 
     if (isIndex(key)) {
       body.appendChild(whyBlock(opts.why));
-      var when = whenBlock(key, opts.w);
-      if (when) {
-        body.appendChild(head(I18N.t('ui.detailWhen')));
-        body.appendChild(when);
-      }
       /* For a drone the wind profile is the reading that matters most, so it
          comes before the flat list of everything else. */
       if (key === 'drone') {

@@ -214,11 +214,13 @@ sideways; the scroller is there for the case where it does not.
 A tap opens the card at length, as a sheet over the screen:
 
 * the reading again, with the full scale and its end labels;
+* for a comfort index, **when it is worth going** first of all — the verdict,
+  the next 24 hours as a strip of coloured hours and every window the forecast
+  offers, not only the longest — since that is the question the card was opened
+  to answer;
 * **what it means** — a sentence or two on what the number actually says and
   where its thresholds come from;
-* for a comfort index, **what is costing it points right now**, **when it is
-  worth going** — the verdict, the next 24 hours as a strip of coloured hours
-  and every window the forecast offers, not only the longest — and **what went
+* for a comfort index, **what is costing it points right now** and **what went
   into it**: every reading it weighed, with the value each one has at this
   moment;
 * **the whole scale** as a table — every band with its range, the current one
