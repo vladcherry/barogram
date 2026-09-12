@@ -11,7 +11,7 @@
   var HOUR = 60 * 60 * 1000;
   /* Shown in the Place panel: on a full-screen browser it is the only way to
      tell whether a new build actually arrived. Bump it with every release. */
-  var APP_VERSION = '2026.09.03-1';
+  var APP_VERSION = '2026.09.12-1';
 
   var settings = Store.load();
   var demoMode = /[?&]demo=1/.test(location.search);
@@ -160,6 +160,52 @@
     return false;
   }
 
+  /* ---------- the back button ----------
+     Every layer that covers the screen — the menu, the library, a card, the
+     matrix, the editor — is a step the hardware Back key should undo rather
+     than leaving the app. Each open pushes one history entry; Back pops it and
+     closes the top layer, and a layer closed by its own × walks the same entry
+     back so the two stay in step. Without pushState (an old reader browser)
+     nothing is pushed and everything behaves as before. */
+
+  var layers = [];
+  var skipPop = false;
+
+  function historyWorks() {
+    return !!(window.history && window.history.pushState);
+  }
+
+  function layerOpened(name, close) {
+    if (!historyWorks() || layerAt(name) >= 0) { return; }
+    layers.push({ name: name, close: close });
+    try { window.history.pushState({ layer: name }, ''); } catch (e) { layers.pop(); }
+  }
+
+  /* A layer closed by its own control: drop its entry so Back does not have to
+     be pressed twice to leave a screen that is already gone. */
+  function layerClosed(name) {
+    var at = layerAt(name);
+    if (at < 0) { return; }
+    layers.splice(at, 1);
+    if (!historyWorks()) { return; }
+    skipPop = true;
+    try { window.history.back(); } catch (e) { skipPop = false; }
+  }
+
+  function layerAt(name) {
+    for (var i = 0; i < layers.length; i++) { if (layers[i].name === name) { return i; } }
+    return -1;
+  }
+
+  function bindBack() {
+    if (!historyWorks()) { return; }
+    window.addEventListener('popstate', function () {
+      if (skipPop) { skipPop = false; return; }
+      var top = layers.pop();
+      if (top) { top.close(); }
+    }, false);
+  }
+
   /* ---------- menu ---------- */
 
   function setMenu(open) {
@@ -173,6 +219,7 @@
     showGlyph(U.$('#ico-menu'), !open);
     showGlyph(U.$('#ico-close'), open);
     setLabel(button, I18N.t(open ? 'ui.close' : 'ui.menu'));
+    if (open) { layerOpened('panel', closeMenu); } else { layerClosed('panel'); }
   }
 
   function showGlyph(node, on) {
@@ -228,8 +275,8 @@
       setLabel(labelled[i], I18N.t(labelled[i].getAttribute('data-i18n-label')));
     }
     /* A sheet built in the old language cannot be patched string by string. */
-    Detail.close();
-    Matrix.close();
+    closeDetail();
+    closeMatrix();
     /* The menu button says Close while the panel is open. */
     setLabel(U.$('#btn-menu'), I18N.t(U.$('#panel').hidden ? 'ui.menu' : 'ui.close'));
     var placeholders = document.querySelectorAll('[data-i18n-placeholder]');
@@ -589,8 +636,8 @@
 
   function setEditing(on) {
     editing = !!on;
-    Detail.close();
-    Matrix.close();
+    closeDetail();
+    closeMatrix();
     document.body.setAttribute('data-editing', editing ? '1' : '0');
     showEditBars(editing);
     closeLibrary();
@@ -598,6 +645,9 @@
       setHint('');
       editHint(I18N.t('hint.editMode'));
       renderLibrary();
+      layerOpened('editing', function () { setEditing(false); });
+    } else {
+      layerClosed('editing');
     }
     render(settings.lastData);
   }
@@ -640,9 +690,13 @@
     renderLibrary();
     U.$('#library').hidden = false;
     U.$('#library').scrollTop = 0;
+    layerOpened('library', closeLibrary);
   }
 
-  function closeLibrary() { U.$('#library').hidden = true; }
+  function closeLibrary() {
+    U.$('#library').hidden = true;
+    layerClosed('library');
+  }
 
   /* The library only offers what is not on the screen already. */
   function renderLibrary() {
@@ -950,6 +1004,7 @@
     var plan = Outlook.plan(cardList(), w);
     if (!plan.rows.length) { return; }
     Matrix.open(plan);
+    layerOpened('matrix', closeMatrix);
   }
 
   /* ---------- one card at length ---------- */
@@ -977,6 +1032,17 @@
       place: settings.place || '',
       updated: U.agoText(settings.lastTs)
     });
+    layerOpened('detail', closeDetail);
+  }
+
+  function closeDetail() {
+    Detail.close();
+    layerClosed('detail');
+  }
+
+  function closeMatrix() {
+    Matrix.close();
+    layerClosed('matrix');
   }
 
   /* ---------- data ---------- */
@@ -1370,15 +1436,17 @@
     bindAll('.js-edit-done', function () { setEditing(false); });
     bindAll('.js-cards-reset', resetCards);
     U.$('#btn-library-close').onclick = closeLibrary;
-    U.$('#btn-detail-close').onclick = function () { Detail.close(); };
+    U.$('#btn-detail-close').onclick = closeDetail;
     U.$('#outlook').onclick = openMatrix;
-    U.$('#btn-matrix-close').onclick = function () { Matrix.close(); };
+    U.$('#btn-matrix-close').onclick = closeMatrix;
     /* A hardware key on the reader and Escape on a desktop both close a sheet. */
     document.addEventListener('keydown', function (e) {
       if (e.keyCode !== 27) { return; }
-      if (Detail.isOpen()) { Detail.close(); }
-      else if (Matrix.isOpen()) { Matrix.close(); }
+      if (Detail.isOpen()) { closeDetail(); }
+      else if (Matrix.isOpen()) { closeMatrix(); }
       else if (!U.$('#library').hidden) { closeLibrary(); }
+      else if (editing) { setEditing(false); }
+      else if (!U.$('#panel').hidden) { closeMenu(); }
     }, false);
     bindLibrarySearch();
   }
@@ -1433,6 +1501,7 @@
       if (Date.now() - settings.lastTs > 30 * 60 * 1000) { refresh(); }
     }, false);
 
+    bindBack();
     bindSwipe();
     bindCardGestures();
     bindInstall();

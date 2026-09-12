@@ -259,6 +259,26 @@ shows the card's icon, its name and what it reads right now, so a card can be
 judged before it is added. Adding leaves the sheet open and the row simply
 disappears from the list; × closes it.
 
+## On a tablet, and on the reader
+
+From 521 px up the cards lay out in columns — two on a reader or a small
+tablet, three from 720 px, four from 1000 px — and the designs that shout
+loudest come down a size, because a number set for a card the width of the
+screen is wrong in a column a third of it. The Light design, a column of dense
+rows by nature, becomes a grid of tiles there like the rest. A tablet in
+portrait fits its whole set with no scrolling at 768x1024 and at 800x1280, and
+on its side at 1024x768, where the 24 h charts give up their room the way they
+do on a phone.
+
+## The back button
+
+Every layer that covers the screen — the menu, the card library, a card, the
+hour matrix, the card editor — pushes one history entry when it opens, so the
+hardware Back key closes it instead of leaving the app. A layer closed by its
+own × walks the same entry back, so Back never has to be pressed twice for a
+screen that is already gone, and with nothing open Back leaves the page as it
+should. A browser without `pushState` pushes nothing and behaves as before.
+
 ## On a phone
 
 Below 520 px every design switches to a compact layout so the whole set of
@@ -352,7 +372,8 @@ css/theme-eink.css      design 1
 css/theme-night.css     design 3
 css/theme-paper.css     design 4 (Light)
 css/theme-tiles.css     design 2 (E-Ink Color)
-css/compact.css         phone layout: one screen, no scrolling (loaded last)
+css/compact.css         phone layout: one screen, no scrolling
+css/wide.css            tablet and desktop columns (loaded last)
 js/i18n.js              all user-facing strings: English source + ru/uk/es locales
 js/util.js              helpers, XHR, formatting, weather codes
 js/store.js             settings and cache in localStorage

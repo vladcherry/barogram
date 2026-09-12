@@ -1,0 +1,66 @@
+/* Tablets and desktops: the tile grid, not a column of wide rows.
+
+   Below 520 px the phone layout takes over; from there up — the e-ink reader at
+   536 px, a tablet, a desktop — there is room for real columns, and a card that
+   stretches the whole width reads worse than three that do not: the eye has to
+   travel the full width to reach one number.
+
+   Loaded after every theme and after compact.css, so at equal specificity these
+   rules win — and each design keeps its own colour and typography. */
+
+@media (min-width: 521px) {
+
+  body[data-theme] .cards { display: flex; flex-wrap: wrap; align-items: stretch; }
+  /* Only the sizing: each design keeps its own gaps, borders and radius. */
+  body[data-theme] .card { flex: 1 1 46%; max-width: 50%; min-width: 0; }
+
+  /* A number sized for a card the width of the screen is wrong in a column half
+     or a third of it: the designs that shout loudest come down a size. */
+  body[data-theme="eink"] .card { padding: 6px 8px 8px 8px; border-width: 2px; }
+  body[data-theme="eink"] .card-value { font-size: 38px; }
+  body[data-theme="eink"] .card-title { font-size: 14px; }
+  body[data-theme="eink"] .card-band { font-size: 14px; margin-top: 4px; }
+  body[data-theme="eink"] .card-note { font-size: 12px; }
+  body[data-theme="eink"] .card-icon svg { width: 36px; height: 36px; }
+  body[data-theme="night"] .card { padding: 10px 12px 12px 12px; }
+  body[data-theme="night"] .card-value { font-size: 32px; }
+  body[data-theme="night"] .card[data-metric="temp"] .card-value { font-size: 32px; }
+  body[data-theme="paper"] .card-value { font-size: 34px; }
+
+  /* The Light design is a column of rows by nature; on a tablet its rows become
+     cards, with the band colour still down the left edge. */
+  body[data-theme="paper"] .card {
+    display: flex; flex-direction: column;
+    border: 1px solid #e3dbcb; border-left-width: 4px; border-radius: 6px;
+    padding: 8px 10px 10px 10px; margin: 0 8px 8px 0;
+  }
+  body[data-theme="paper"] .card-head { display: flex; align-items: baseline; justify-content: space-between; }
+
+  /* The night design gives temperature the full width on a phone; with columns
+     to spare it is a card like the rest. */
+  body[data-theme="night"] .card[data-metric="temp"] { flex: 1 1 46%; max-width: 50%; }
+
+  /* Three columns once there is room, four on a desktop: ten cards then read as
+     three or four rows instead of five. */
+  @media (min-width: 720px) {
+    body[data-theme] .card { flex: 1 1 30%; max-width: 33.4%; }
+    body[data-theme="night"] .card[data-metric="temp"] { flex: 1 1 30%; max-width: 33.4%; }
+
+  }
+  @media (min-width: 1000px) {
+    body[data-theme] .card { flex: 1 1 23%; max-width: 25%; }
+    body[data-theme="night"] .card[data-metric="temp"] { flex: 1 1 23%; max-width: 25%; }
+  }
+
+  /* A tablet is held further away than a phone, so the type does not shrink —
+     but the 24 h charts are what make a card twice as tall as its reading, and
+     with four rows on the screen they are the first thing that can go. */
+  @media (max-height: 1100px) {
+    body[data-theme] .spark { height: 28px; }
+  }
+  /* A tablet on its side has the width of a desktop and the height of a phone:
+     there the charts go altogether, as they do on a phone. */
+  @media (max-height: 820px) {
+    body[data-theme] .spark, body[data-theme] .spark-cap { display: none; }
+  }
+}
