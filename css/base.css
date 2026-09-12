@@ -333,6 +333,10 @@ body[data-theme] .det-row.det-wind-row .det-row-val { color: inherit; }
   border-bottom-width: 1px; border-bottom-style: solid;
   word-break: break-word;
 }
+/* The day as a strip inside a card sheet: the matrix row without its name. */
+.det-strip { margin: 6px 0 8px 0; }
+.det-strip .mx-row { margin-bottom: 2px; }
+.det-strip .mx-cell { height: 20px; }
 .det-src { margin-top: 14px; padding-top: 6px; border-top-width: 2px; border-top-style: solid; }
 .det-math { margin-top: 10px; }
 /* Removal sits on the corner, half off the card: it is the one action here you

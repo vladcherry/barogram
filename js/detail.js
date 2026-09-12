@@ -198,6 +198,84 @@ var Detail = (function () {
     return aloft ? host : null;
   }
 
+  /* ---- when it is worth going ----
+     The same hourly grading the outlook bar and the matrix use, for this one
+     activity: a verdict, the day as a strip of hours, and every window the
+     forecast offers rather than only the longest one. */
+  function whenBlock(key, w) {
+    var frames = (w && w.frames) ? w.frames : [];
+    if (!frames.length || !Metrics[key]) { return null; }
+
+    var r = Outlook.row(key, frames);
+    var box = U.el('div');
+    box.appendChild(U.el('div', 'mx-verdict ' + verdictClass(r), verdictText(r, frames)));
+    box.appendChild(hourStrip(r, frames));
+
+    var good = Outlook.runs(r.cells, 'good');
+    var list = good.length ? good : Outlook.runs(r.cells, 'fair');
+    for (var i = 0; i < list.length && i < 4; i++) {
+      box.appendChild(windowRow(r, frames, list[i]));
+    }
+    box.appendChild(U.el('p', 'det-note', I18N.t('outlook.horizon')));
+    return box;
+  }
+
+  function verdictClass(r) {
+    if (r.now && r.now.grade === 'good') { return 'lv-good-text'; }
+    if (r.best && r.best.grade === 'good') { return 'lv-mid-text'; }
+    return r.best ? 'lv-warn-text' : 'lv-bad-text';
+  }
+
+  function verdictText(r, frames) {
+    if (r.now && r.now.grade === 'good') {
+      var i = 0;
+      while (i + 1 < r.cells.length && r.cells[i + 1].grade === 'good') { i++; }
+      return I18N.t('outlook.goodNow', { until: Outlook.hourLabel(frames[i]) });
+    }
+    if (r.best && r.best.grade === 'good') {
+      return I18N.t('outlook.goodLater', {
+        from: Outlook.hourLabel(frames[r.best.from]),
+        to: Outlook.hourLabel(frames[r.best.to])
+      });
+    }
+    if (r.best) {
+      return I18N.t('outlook.fairOnly', {
+        from: Outlook.hourLabel(frames[r.best.from]),
+        to: Outlook.hourLabel(frames[r.best.to])
+      });
+    }
+    return I18N.t('outlook.none');
+  }
+
+  /* The day as one strip, in the same colours as the matrix. */
+  function hourStrip(r, frames) {
+    var box = U.el('div', 'det-strip');
+    var ticks = U.el('div', 'mx-row mx-ruler');
+    var tickCells = U.el('span', 'mx-cells');
+    var cells = U.el('span', 'mx-cells');
+    var i, cell;
+
+    for (i = 0; i < r.cells.length; i++) {
+      tickCells.appendChild(U.el('span', 'mx-tick', (i % 3 === 0) ? U.pad2(frames[i].hour) : ''));
+      cell = U.el('span', 'mx-cell' + (r.cells[i].grade ? ' is-' + r.cells[i].grade : ' is-none'));
+      cell.setAttribute('title', U.pad2(frames[i].hour) + ':00 — ' +
+        (r.cells[i].value === null ? I18N.t('note.noData') : U.fmt(r.cells[i].value, 1)));
+      cells.appendChild(cell);
+    }
+    ticks.appendChild(tickCells);
+    box.appendChild(ticks);
+    box.appendChild(U.el('div', 'mx-row', ''));
+    box.lastChild.appendChild(cells);
+    return box;
+  }
+
+  function windowRow(r, frames, run) {
+    var top = Outlook.peak(r.cells, run);
+    return row(Outlook.hourLabel(frames[run.from]) + ' – ' + Outlook.hourLabel(frames[run.to]),
+      top === null ? '' : I18N.t('outlook.peak', { v: U.fmt(top, 1) }),
+      run.grade === 'good' ? 'is-now' : '');
+  }
+
   /* And where each of those readings came from. */
   function sourceTable(keys) {
     var host = document.createDocumentFragment(), i, src;
@@ -299,6 +377,11 @@ var Detail = (function () {
 
     if (isIndex(key)) {
       body.appendChild(whyBlock(opts.why));
+      var when = whenBlock(key, opts.w);
+      if (when) {
+        body.appendChild(head(I18N.t('ui.detailWhen')));
+        body.appendChild(when);
+      }
       /* For a drone the wind profile is the reading that matters most, so it
          comes before the flat list of everything else. */
       if (key === 'drone') {

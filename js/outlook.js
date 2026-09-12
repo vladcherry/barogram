@@ -114,8 +114,31 @@ var Outlook = (function () {
     return U.pad2(frame.hour) + ':00';
   }
 
+  /* Every stretch of a given grade, not just the longest: a day can offer a
+     morning and an evening, and naming only one of them hides the other. */
+  function runs(cells, grade) {
+    var out = [], from = -1, i;
+    for (i = 0; i <= cells.length; i++) {
+      if (i < cells.length && cells[i].grade === grade) {
+        if (from < 0) { from = i; }
+        continue;
+      }
+      if (from >= 0) { out.push({ from: from, to: i - 1, length: i - from, grade: grade }); from = -1; }
+    }
+    return out;
+  }
+
+  /* The best reading inside a stretch — what the window is worth at its peak. */
+  function peak(cells, run) {
+    var best = null, i;
+    for (i = run.from; i <= run.to; i++) {
+      if (cells[i].value !== null && (best === null || cells[i].value > best)) { best = cells[i].value; }
+    }
+    return best;
+  }
+
   return {
-    plan: plan, summary: summary, row: row, activities: activities,
+    plan: plan, summary: summary, row: row, activities: activities, runs: runs, peak: peak,
     gradeOf: gradeOf, hourLabel: hourLabel, GOOD: GOOD, FAIR: FAIR
   };
 })();
