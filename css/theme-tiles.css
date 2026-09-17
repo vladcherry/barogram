@@ -47,8 +47,8 @@ body[data-theme="tiles"] .card-unit { font-size: 12px; font-weight: 700; }
 body[data-theme="tiles"] .card-band { font-size: 12px; margin-top: 3px; text-transform: uppercase; }
 /* The 24 h charts and the scale end labels are what push the last tiles below
    the fold, so this design does without them; the note stays on one line. */
-body[data-theme="tiles"] .spark,
-body[data-theme="tiles"] .spark-cap,
+body[data-theme="tiles"] .card .spark,
+body[data-theme="tiles"] .card .spark-cap,
 body[data-theme="tiles"] .scale-ends { display: none; }
 body[data-theme="tiles"] .card-note {
   font-size: 10px; margin-top: 1px;
@@ -164,3 +164,16 @@ body[data-theme="tiles"] .mx-cell.is-good { background: #24732f; }
 body[data-theme="tiles"] .mx-cell.is-fair { background: #e2c23a; }
 body[data-theme="tiles"] .mx-cell.is-bad  { background: #c8341f; }
 body[data-theme="tiles"] .mx-cell.is-none { background: #eeeeee; }
+
+/* This design does without charts on a card, so it never had bar colours; in a
+   sheet the chart is shown and needs the same palette as the scale. */
+body[data-theme="tiles"] .sheet .spark-bar { background: #cccccc; }
+body[data-theme="tiles"] .sheet .spark-bar.lv-deep { background: #3b2f8f; }
+body[data-theme="tiles"] .sheet .spark-bar.lv-cold { background: #2b5fd9; }
+body[data-theme="tiles"] .sheet .spark-bar.lv-calm { background: #2f9bd4; }
+body[data-theme="tiles"] .sheet .spark-bar.lv-good { background: #2e8b3d; }
+body[data-theme="tiles"] .sheet .spark-bar.lv-mid  { background: #d8b21a; }
+body[data-theme="tiles"] .sheet .spark-bar.lv-warn { background: #d9741a; }
+body[data-theme="tiles"] .sheet .spark-bar.lv-bad  { background: #c8341f; }
+body[data-theme="tiles"] .sheet .spark-bar.lv-crit { background: #6f1010; }
+

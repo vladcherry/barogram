@@ -29,8 +29,14 @@ var Weather = (function () {
               'wind_speed_10m,wind_gusts_10m,wind_direction_10m,' +
               'wind_speed_80m,wind_speed_120m,wind_speed_180m,' +
               'wind_direction_80m,wind_direction_120m,wind_direction_180m',
-      daily: 'temperature_2m_max,temperature_2m_min,uv_index_max,precipitation_sum,sunrise,sunset',
-      wind_speed_unit: 'ms', timezone: 'auto', past_days: 1, forecast_days: 2
+      /* A week of daily summaries: the card sheets show as many days as the
+         forecast carries, and seven is where Open-Meteo stops being useful. */
+      daily: 'weather_code,temperature_2m_max,temperature_2m_min,' +
+             'apparent_temperature_max,apparent_temperature_min,' +
+             'precipitation_sum,precipitation_probability_max,precipitation_hours,' +
+             'wind_speed_10m_max,wind_gusts_10m_max,wind_direction_10m_dominant,' +
+             'uv_index_max,sunrise,sunset',
+      wind_speed_unit: 'ms', timezone: 'auto', past_days: 1, forecast_days: 7
     });
   }
 
@@ -39,7 +45,8 @@ var Weather = (function () {
       latitude: lat, longitude: lon,
       current: 'wave_height,wave_period,wave_direction,sea_surface_temperature,wind_wave_height',
       hourly: 'wave_height,sea_surface_temperature',
-      timezone: 'auto', forecast_days: 2
+      daily: 'wave_height_max',
+      timezone: 'auto', forecast_days: 7
     });
   }
 
@@ -74,6 +81,16 @@ var Weather = (function () {
       ok(data.results || []);
     }, fail);
   }
+
+  /* Where each card's reading sits in the normalised record, so the sheets can
+     pull an hourly series without knowing the shape of the API. */
+  var FIELD = {
+    temp: 'temp', feelsLike: 'feels', wind: 'wind', gusts: 'gust', windDir: 'windDir',
+    rain: 'rain', rainProb: 'rainProb', clouds: 'clouds', uv: 'uv', humidity: 'humidity',
+    dewPoint: 'dewPoint', pressure: 'pressure', visibility: 'visibility',
+    airQuality: 'airQuality', pm25: 'pm25', pollen: 'pollen',
+    waves: 'waveHeight', waterTemp: 'seaTemp'
+  };
 
   function pick(v) { return (v === null || v === undefined || isNaN(v)) ? null : Number(v); }
 
@@ -135,6 +152,95 @@ var Weather = (function () {
     if (!times) { return map; }
     for (i = 0; i < times.length; i++) { map[times[i]] = i; }
     return map;
+  }
+
+  /* ---- the daily summaries ----
+     One record per day the forecast carries, today first. Only what the API
+     aggregates itself: a day has no single humidity or pressure, and inventing
+     one would be worse than leaving the card without a daily section. */
+  /* The highest and lowest of a calendar day inside an hourly series. The API
+     has no daily aggregate for humidity, pressure, haze or the air, and rather
+     than leave those cards without a week, the day is read off their own hours
+     — which is the same forecast, only counted here. */
+  function dayRange(times, values, date) {
+    var hi = null, lo = null, i, v;
+    if (!times || !values) { return { max: null, min: null }; }
+    for (i = 0; i < times.length; i++) {
+      if (String(times[i]).substring(0, 10) !== date) { continue; }
+      v = pick(values[i]);
+      if (v === null) { continue; }
+      if (hi === null || v > hi) { hi = v; }
+      if (lo === null || v < lo) { lo = v; }
+    }
+    return { max: hi, min: lo };
+  }
+
+  function buildDays(forecast, marine, air) {
+    var daily = (forecast && forecast.daily) || {};
+    var hourly = (forecast && forecast.hourly) || {};
+    var seaHours = (marine && marine.hourly) || {};
+    var airHours = (air && air.hourly) || {};
+    var sea = (marine && marine.daily) || {};
+    if (!daily.time || !daily.time.length) { return []; }
+
+    var start = todayIndex(daily.time);
+    var seaAt = indexByTime(sea.time);
+    var out = [], i, t, si, hum, dew, pres, vis, water, aqi, pm, poll;
+
+    for (i = start; i < daily.time.length; i++) {
+      t = daily.time[i];
+      si = seaAt[t];
+      hum = dayRange(hourly.time, hourly.relative_humidity_2m, t);
+      dew = dayRange(hourly.time, hourly.dew_point_2m, t);
+      pres = dayRange(hourly.time, hourly.pressure_msl, t);
+      vis = dayRange(hourly.time, hourly.visibility, t);
+      water = dayRange(seaHours.time, seaHours.sea_surface_temperature, t);
+      aqi = dayRange(airHours.time, airHours.european_aqi, t);
+      pm = dayRange(airHours.time, airHours.pm2_5, t);
+      poll = pollenRange(airHours, t);
+      out.push({
+        humidityMax: hum.max, humidityMin: hum.min,
+        dewMax: dew.max, dewMin: dew.min,
+        pressureMax: pres.max, pressureMin: pres.min,
+        visMax: vis.max === null ? null : U.num(vis.max / 1000, 1),
+        visMin: vis.min === null ? null : U.num(vis.min / 1000, 1),
+        waterMax: water.max, waterMin: water.min,
+        aqiMax: aqi.max, pm25Max: pm.max, pollenMax: poll,
+        date: t,
+        code: at(daily.weather_code, i),
+        tempMax: at(daily.temperature_2m_max, i),
+        tempMin: at(daily.temperature_2m_min, i),
+        feelsMax: at(daily.apparent_temperature_max, i),
+        feelsMin: at(daily.apparent_temperature_min, i),
+        rainSum: at(daily.precipitation_sum, i),
+        rainProbMax: at(daily.precipitation_probability_max, i),
+        rainHours: at(daily.precipitation_hours, i),
+        windMax: at(daily.wind_speed_10m_max, i),
+        gustMax: at(daily.wind_gusts_10m_max, i),
+        windDirDom: at(daily.wind_direction_10m_dominant, i),
+        uvMax: at(daily.uv_index_max, i),
+        sunrise: daily.sunrise ? daily.sunrise[i] : null,
+        sunset: daily.sunset ? daily.sunset[i] : null,
+        waveMax: at(sea.wave_height_max, si)
+      });
+    }
+    return out;
+  }
+
+  /* The species are reported apart, so the day's peak is the peak of the sum. */
+  function pollenRange(airHours, date) {
+    var hi = null, i, k, total, v;
+    if (!airHours || !airHours.time) { return null; }
+    for (i = 0; i < airHours.time.length; i++) {
+      if (String(airHours.time[i]).substring(0, 10) !== date) { continue; }
+      total = null;
+      for (k = 0; k < POLLEN.length; k++) {
+        v = at(airHours[POLLEN[k]], i);
+        if (v !== null) { total = (total === null ? 0 : total) + v; }
+      }
+      if (total !== null && (hi === null || total > hi)) { hi = total; }
+    }
+    return hi;
   }
 
   /* ---- the hourly frames ----
@@ -239,8 +345,9 @@ var Weather = (function () {
       wind80: null, wind120: null, wind180: null,
       windDir80: null, windDir120: null, windDir180: null,
       airQuality: null, pm25: null, pm10: null, pollen: null,
-      /* One snapshot per hour for the next day, for the outlook. */
-      frames: []
+      /* One snapshot per hour for the next day, for the outlook; one record per
+         day for the week, for the card sheets. */
+      frames: [], days: []
     };
 
     var vis = pick(U.hourlyNow(hourly.time, hourly.visibility, nowIso));
@@ -293,6 +400,7 @@ var Weather = (function () {
     }
 
     out.frames = buildFrames(forecast, marine, air, out);
+    out.days = buildDays(forecast, marine, air);
     return out;
   }
 
@@ -356,6 +464,39 @@ var Weather = (function () {
 
   /* The demo record and its first frame describe the same hour, so the cards and
      the outlook agree in the demo exactly as they do on real data. */
+  /* A week of demo days, warm and turning wet in the middle. */
+  function demoDays(now) {
+    var out = [], i, d, warm, wet;
+    for (i = 0; i < 7; i++) {
+      d = new Date(now.getTime() + i * 86400000);
+      warm = 29 - i * 1.2;
+      wet = (i === 2 || i === 3);
+      out.push({
+        date: U.isoLocalHour(d).substring(0, 10),
+        code: wet ? 61 : (i === 5 ? 3 : 2),
+        tempMax: U.num(warm, 1), tempMin: U.num(warm - 9, 1),
+        feelsMax: U.num(warm + 1.5, 1), feelsMin: U.num(warm - 8, 1),
+        rainSum: wet ? U.num(3.4 + i, 1) : (i === 5 ? 0.4 : 0),
+        rainProbMax: wet ? 80 : (i === 5 ? 35 : 10),
+        rainHours: wet ? 5 : 0,
+        windMax: U.num(6 + (i % 3) * 2.4, 1), gustMax: U.num(11 + (i % 3) * 3, 1),
+        windDirDom: 200 + i * 8,
+        uvMax: U.num(8.1 - i * 0.4, 1),
+        sunrise: null, sunset: null,
+        waveMax: U.num(0.4 + (i % 3) * 0.25, 2),
+        humidityMax: 76 - i, humidityMin: 44 + i,
+        dewMax: U.num(warm - 7, 1), dewMin: U.num(warm - 12, 1),
+        pressureMax: 1014 - i, pressureMin: 1006 - i,
+        visMax: 24, visMin: wet ? 6 : 18,
+        waterMax: U.num(24.3 - i * 0.2, 1), waterMin: U.num(23.6 - i * 0.2, 1),
+        aqiMax: i < 2 ? 38 + i * 4 : null,
+        pm25Max: i < 2 ? U.num(9.4 + i, 1) : null,
+        pollenMax: i < 2 ? 24 + i * 3 : null
+      });
+    }
+    return out;
+  }
+
   function demo() {
     var record = demoRecord();
     var first = record.frames[0], k;
@@ -386,7 +527,8 @@ var Weather = (function () {
       wind80: 9.4, wind120: 10.8, wind180: 12.1,
       windDir80: 228, windDir120: 235, windDir180: 240,
       airQuality: 32, pm25: 8.4, pm10: 14.2, pollen: 21,
-      frames: demoFrames(new Date().getHours())
+      frames: demoFrames(new Date().getHours()),
+      days: demoDays(new Date())
     };
   }
 
@@ -405,6 +547,7 @@ var Weather = (function () {
 
   return {
     load: load, demo: demo, normalize: normalize, searchCity: searchCity, fill: fill,
+    FIELD: FIELD,
     forecastUrl: forecastUrl, marineUrl: marineUrl
   };
 })();

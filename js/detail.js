@@ -29,16 +29,6 @@ var Detail = (function () {
     waterTemp:  { api: 'marine',   field: 'sea_surface_temperature' }
   };
 
-  /* Where each reading sits in the normalised model, so the sheet can show the
-     inputs of an index with their current values. */
-  var FIELD = {
-    temp: 'temp', feelsLike: 'feels', wind: 'wind', gusts: 'gust', windDir: 'windDir',
-    rain: 'rain', rainProb: 'rainProb', clouds: 'clouds', uv: 'uv', humidity: 'humidity',
-    dewPoint: 'dewPoint', pressure: 'pressure', visibility: 'visibility',
-    airQuality: 'airQuality', pm25: 'pm25', pollen: 'pollen',
-    waves: 'waveHeight', waterTemp: 'seaTemp'
-  };
-
   /* What every comfort index reads, in the order it weighs them. */
   var INPUTS = {
     snorkel:     ['waves', 'waterTemp', 'wind', 'rain', 'clouds', 'uv'],
@@ -71,7 +61,7 @@ var Detail = (function () {
   function isIndex(key) { return !!INPUTS[key]; }
 
   function valueOf(w, key) {
-    var field = FIELD[key];
+    var field = Weather.FIELD[key];
     if (!field || !w) { return null; }
     var v = w[field];
     return (v === null || v === undefined || isNaN(v)) ? null : Number(v);
@@ -381,6 +371,21 @@ var Detail = (function () {
     if (I18N.has('about.' + key)) {
       body.appendChild(head(I18N.t('ui.detailAbout')));
       body.appendChild(para(I18N.t('about.' + key)));
+    }
+
+    /* A plain reading gets the forecast an index gets as a verdict: the hours
+       ahead, and the days the API summarises for itself. */
+    if (!isIndex(key)) {
+      var hours = Forecast.hourly(key, opts.w);
+      if (hours) {
+        body.appendChild(head(I18N.t('ui.hourly')));
+        body.appendChild(hours);
+      }
+      var days = Forecast.daily(key, opts.w);
+      if (days) {
+        body.appendChild(head(I18N.t('ui.daily')));
+        body.appendChild(days);
+      }
     }
 
     if (isIndex(key)) {

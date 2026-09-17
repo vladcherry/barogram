@@ -333,6 +333,13 @@ body[data-theme] .det-row.det-wind-row .det-row-val { color: inherit; }
   border-bottom-width: 1px; border-bottom-style: solid;
   word-break: break-word;
 }
+/* The forecast sections: the bars the cards use, with room to breathe and the
+   matrix's own hour ticks under them. */
+.fc-hourly { margin: 4px 0 8px 0; }
+.fc-hourly .spark { height: 56px; margin-top: 0; }
+.fc-hourly .mx-ruler { margin: 2px 0 4px 0; }
+.fc-daily { margin: 4px 0 8px 0; }
+
 /* The day as a strip inside a card sheet: the matrix row without its name. */
 .det-strip { margin: 6px 0 8px 0; }
 .det-strip .mx-row { margin-bottom: 2px; }

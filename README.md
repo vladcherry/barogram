@@ -220,6 +220,15 @@ A tap opens the card at length, as a sheet over the screen:
   to answer;
 * **what it means** — a sentence or two on what the number actually says and
   where its thresholds come from;
+* for a plain reading, **hour by hour** — the next 24 hours as bars coloured by
+  band, with the hours of the peak and the low named — and **day by day**: one
+  row per day the forecast carries. The daily figures are the ones Open-Meteo
+  aggregates itself where it has them (the day's high and low, the total rain
+  and the highest chance of it, the strongest wind, the dominant direction, the
+  peak UV, the day's weather code); where it has none — humidity, pressure,
+  dew point, visibility, sea temperature, the air — the day is counted off its
+  own hourly series and the caption says so. The air forecast reaches two days,
+  so those cards show two rows;
 * for a comfort index, **what is costing it points right now** and **what went
   into it**: every reading it weighed, with the value each one has at this
   moment;
@@ -384,6 +393,7 @@ js/store.js             settings and cache in localStorage
 js/metrics.js           scale bands and comfort-index maths
 js/icons.js             card icons: weather, comfort faces, sports with a verdict
 js/scale.js             scale, card and mini-chart rendering
+js/forecast.js          the hour-by-hour and day-by-day sections
 js/detail.js            the card sheet: meaning, bands, inputs, sources
 js/outlook.js           hourly grading of the comfort indices
 js/matrix.js            the hour-by-hour screen behind the outlook bar

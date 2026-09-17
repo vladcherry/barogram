@@ -61,6 +61,6 @@
   /* A tablet on its side has the width of a desktop and the height of a phone:
      there the charts go altogether, as they do on a phone. */
   @media (max-height: 820px) {
-    body[data-theme] .spark, body[data-theme] .spark-cap { display: none; }
+    body[data-theme] .card .spark, body[data-theme] .card .spark-cap { display: none; }
   }
 }
