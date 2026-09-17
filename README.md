@@ -221,7 +221,9 @@ A tap opens the card at length, as a sheet over the screen:
 * **what it means** — a sentence or two on what the number actually says and
   where its thresholds come from;
 * for a plain reading, **hour by hour** — the next 24 hours as bars coloured by
-  band, with the hours of the peak and the low named — and **day by day**: one
+  band, every third one carrying its figure above the tick that carries its
+  hour, with the unit said once in the heading and the hours of the peak and
+  the low named — and **day by day**: one
   row per day the forecast carries. The daily figures are the ones Open-Meteo
   aggregates itself where it has them (the day's high and low, the total rain
   and the highest chance of it, the strongest wind, the dominant direction, the

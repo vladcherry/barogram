@@ -336,6 +336,9 @@ body[data-theme] .det-row.det-wind-row .det-row-val { color: inherit; }
 /* The forecast sections: the bars the cards use, with room to breathe and the
    matrix's own hour ticks under them. */
 .fc-hourly { margin: 4px 0 8px 0; }
+/* The numbers sit on the baseline of their own row, right above the bars. */
+.fc-labels { margin-bottom: 1px; }
+.fc-labels .mx-tick { font-weight: 700; }
 .fc-hourly .spark { height: 56px; margin-top: 0; }
 .fc-hourly .mx-ruler { margin: 2px 0 4px 0; }
 .fc-daily { margin: 4px 0 8px 0; }

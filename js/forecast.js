@@ -126,11 +126,36 @@ var Forecast = (function () {
     if (!known) { return null; }
 
     var box = U.el('div', 'fc-hourly');
+    /* A bar says "more" or "less"; the numbers say how much. Every third hour
+       carries its value, above the same tick that carries its hour, so a column
+       reads top to bottom: the figure, the bar, the time. */
+    box.appendChild(labels(values, spec));
     var bars = Scale.sparkBars(values, spec, '');
     if (bars) { box.appendChild(bars); }
     box.appendChild(ruler(w.frames));
     box.appendChild(extremes(key, values, w.frames, spec));
     return box;
+  }
+
+  /* Twenty-four numbers would not fit a phone; eight do. */
+  function labels(values, spec) {
+    var line = U.el('div', 'mx-row fc-labels');
+    var cells = U.el('span', 'mx-cells');
+    for (var i = 0; i < values.length; i++) {
+      cells.appendChild(U.el('span', 'mx-tick',
+        (i % 3 === 0 && values[i] !== null) ? shortValue(values[i], spec) : ''));
+    }
+    line.appendChild(cells);
+    return line;
+  }
+
+  /* Three digits of precision is all the width there is: a pressure loses its
+     decimal, a wave keeps two, everything else keeps one. */
+  function shortValue(v, spec) {
+    var digits = spec.decimals;
+    if (Math.abs(v) >= 100) { digits = 0; }
+    else if (digits > 1 && Math.abs(v) >= 10) { digits = 1; }
+    return U.fmt(v, digits);
   }
 
   /* The same three-hour ticks as the outlook matrix, under the bars. */

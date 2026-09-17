@@ -378,7 +378,10 @@ var Detail = (function () {
     if (!isIndex(key)) {
       var hours = Forecast.hourly(key, opts.w);
       if (hours) {
-        body.appendChild(head(I18N.t('ui.hourly')));
+        /* The bars carry bare numbers, so the unit is said once, in the head. */
+        var unit = Metrics.SPEC[key].unit;
+        body.appendChild(head(I18N.t('ui.hourly') +
+          (unit ? ', ' + I18N.t(unit) : '')));
         body.appendChild(hours);
       }
       var days = Forecast.daily(key, opts.w);
